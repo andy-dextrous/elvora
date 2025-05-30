@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/next/keep-alive",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}

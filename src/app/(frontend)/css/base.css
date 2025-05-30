@@ -1,0 +1,19 @@
+/****************************************************/
+/* Base Styles are for element-level styles that
+/* are not part of a component
+/****************************************************/
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  /* Not Toaster from sonner */
+  section:not([aria-label="Notifications alt+T"]) {
+    @apply relative w-full px-(--section-padding-x) py-(--section-padding-y);
+  }
+}

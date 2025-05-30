@@ -1,0 +1,16 @@
+/* Tailwind Core */
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+/* Custom Theme */
+@import "./theme.css";
+
+/* Tailwind Layers */
+@import "./base.css";
+@import "./components.css";
+@import "./utilities.css";
+@import "./typography.css";
+
+/* ShadCN UI */
+@import "./ui.css";
