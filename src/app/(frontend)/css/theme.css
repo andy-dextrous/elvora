@@ -16,6 +16,13 @@
   --spacing-logo: clamp(45px, 10vw, 60px);
   --spacing-nav: clamp(50px, 10vh, 120px);
 
+  --section-padding-x: clamp(1rem, 4vw, 4rem);
+  --section-padding-y: clamp(1rem, 10vw, 4rem);
+  --column-padding-x: clamp(1rem, 5vw, 4rem);
+  --content-width: clamp(95vw, 95vw, 1368px);
+  --nav-height: clamp(50px, 10vh, 120px);
+  --logo-height: clamp(45px, 10vw, 60px);
+
   --spacing-content: clamp(1rem, 5vw, 1.3rem);
   --spacing-content-half: calc(var(--spacing-content) / 2);
   --spacing-content-double: calc(var(--spacing-content) * 2);
