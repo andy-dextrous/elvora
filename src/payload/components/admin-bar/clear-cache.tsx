@@ -26,11 +26,7 @@ function ClearCache() {
   }
 
   return (
-    <button
-      onClick={clearCache}
-      className="cursor-pointer rounded-sm border-none bg-transparent px-2 text-white hover:cursor-pointer hover:bg-[#37373c]"
-      type="submit"
-    >
+    <button onClick={clearCache} className="admin-bar__button" type="submit">
       Clear Cache
     </button>
   )

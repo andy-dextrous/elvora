@@ -1,4 +1,4 @@
-import { MediaBlock } from "@/payload/blocks/media/Component"
+import { MediaBlock } from "../../blocks/media/Component"
 import {
   DefaultNodeTypes,
   SerializedBlockNode,
@@ -11,12 +11,12 @@ import {
   RichText as ConvertRichText,
 } from "@payloadcms/richtext-lexical/react"
 
-import { CodeBlock, CodeBlockProps } from "@/payload/blocks/code/Component"
+import { CodeBlock, CodeBlockProps } from "../../blocks/code/Component"
 
-import type { MediaBlock as MediaBlockProps } from "@/payload/payload-types"
 import { cn } from "@/utilities/ui"
+import "./styles.scss"
 
-type NodeTypes = DefaultNodeTypes | SerializedBlockNode<MediaBlockProps | CodeBlockProps>
+type NodeTypes = DefaultNodeTypes | SerializedBlockNode<any | CodeBlockProps>
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   const { value, relationTo } = linkNode.fields.doc!
@@ -57,11 +57,11 @@ export default function RichText(props: Props) {
     <ConvertRichText
       converters={jsxConverters}
       className={cn(
-        "payload-richtext",
+        "payload-richtext !prose",
         {
-          container: enableGutter,
-          "max-w-none": !enableGutter,
-          "prose md:prose-md dark:prose-invert mx-auto": enableProse,
+          "payload-richtext--container": enableGutter,
+          "payload-richtext--full-width": !enableGutter,
+          "payload-richtext--prose": enableProse,
         },
         className
       )}

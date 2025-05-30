@@ -1,13 +1,13 @@
-import { Button } from "@/payload/components/ui/button"
+import { Button } from "../ui/button"
 import { HiOutlineExternalLink } from "react-icons/hi"
 import Link from "next/link"
 
-export default async function ViewPage() {
-  return (
-    <Link href="/">
-      <Button variant="icon">
-        <HiOutlineExternalLink className="text-2xl" />
-      </Button>
-    </Link>
-  )
+export default async function Actions() {
+	return (
+		<Link href="/">
+			<Button variant="icon" size="lg">
+				<HiOutlineExternalLink />
+			</Button>
+		</Link>
+	)
 }
