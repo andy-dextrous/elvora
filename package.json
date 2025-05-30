@@ -20,7 +20,7 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start"
   },
   "dependencies": {
-    "@gsap/react": "^2.1.2",
+    "@gsap/react": "latest",
     "@next/third-parties": "^15.3.0",
     "@payloadcms/admin-bar": "latest",
     "@payloadcms/db-mongodb": "latest",
