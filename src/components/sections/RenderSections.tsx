@@ -1,6 +1,6 @@
 import { HeroPrimaryComponent } from "@/components/sections/hero-primary/Component"
 import { TextImageComponent } from "@/components/sections/text-image/Component"
-import { CirclesAnimationComponent } from "@/components/sections/circles-animation/Component"
+import CirclesAnimationComponent from "@/components/sections/circles-animation/Component"
 import React, { Fragment } from "react"
 
 /*******************************************************/
