@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useRef } from "react"
-import { useGSAP, gsap, ScrollTrigger } from "@/providers/gsap"
+import { useGSAP, gsap, ScrollTrigger, GSDevTools } from "@/providers/gsap"
 import type { CirclesAnimationBlock } from "@/payload/payload-types"
 
 /*************************************************************************/
@@ -47,34 +47,37 @@ const CircleAnimation = ({
   useGSAP(
     () => {
       /*********************************************************
-       * Master Timeline
-       ********************************************************/
-
-      const tl = gsap.timeline({
-        // scrollTrigger: {
-        //   trigger: sectionRef.current,
-        //   start: "top top",
-        //   end: "+=200%",
-        //   pin: true,
-        //   scrub: 1,
-        // },
-      })
-
-      /*********************************************************
        * Constants
        ********************************************************/
 
-      const DRAWSVG_DURATION = 1.5
-      const ROTATION_DURATION = DRAWSVG_DURATION / 3
-      const RETURN_TIME = DRAWSVG_DURATION / 4
-      const TEXT_APPEAR_TIME = DRAWSVG_DURATION * 0.1
-      const SCRAMBLE_DURATION = DRAWSVG_DURATION / 2
+      const TOTAL_DURATION = 5
+      const ROTATIONS_DURING_DRAW = 3 // Number of rotations while circles are being drawn
+      const DRAWSVG_START_TIME = 0
+      const DRAWSVG_DURATION = TOTAL_DURATION * 0.5 // when circles finish drawing
+      const CIRCLES_SPLIT_START = TOTAL_DURATION * 0.15 // at this time, circles start to split
+      const TEXT_APPEAR_TIME = TOTAL_DURATION * 0.2
+      const TEXT_FADE_DURATION = TOTAL_DURATION * 0.2
+      const TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.6
+      const TEXT_END_STAGGER = 0.5 // Delay between each p element finishing
+      const BOTTOM_TEXT_APPEAR_TIME = TOTAL_DURATION * 0.7 // Bottom text appears later
+      const BOTTOM_TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.4 // Bottom text scramble duration
+      const INSIDE_FADE_DURATION = TOTAL_DURATION * 0.2
+      const INSIDE_APPEAR_TIME = TOTAL_DURATION - INSIDE_FADE_DURATION
+      const TRAIL_FADE_DURATION = TOTAL_DURATION * 0.05
+
+      // Ease constants
+      const DRAWSVG_EASE = "power2.inOut"
+      const ROTATION_EASE = "none"
+      const CIRCLE_MOVEMENT_EASE = "power1.inOut"
+      const TEXT_FADE_EASE = "power1.out"
+      const INSIDE_FADE_EASE = "power1.in"
+      const TRAIL_FADE_EASE = "power1.inOut"
 
       /*********************************************************
        * Start by hiding all elements
        ********************************************************/
 
-      tl.set(
+      gsap.set(
         [
           "#circle-right-trails circle",
           "#circle-left-trails circle",
@@ -113,11 +116,11 @@ const CircleAnimation = ({
        *  Then position primary circles on top of each other
        ********************************************************/
 
-      tl.set("#circle-right #circle-right-group", {
+      gsap.set("#circle-right #circle-right-group", {
         x: -moveDistance, // Move left by half distance
       })
 
-      tl.set("#circle-left #circle-left-group", {
+      gsap.set("#circle-left #circle-left-group", {
         x: moveDistance, // Move right by half distance
       })
 
@@ -125,7 +128,7 @@ const CircleAnimation = ({
        *  Elements are in place, now show the container
        ********************************************************/
 
-      tl.set(animationRef.current, {
+      gsap.set(animationRef.current, {
         autoAlpha: 1,
       })
 
@@ -133,7 +136,7 @@ const CircleAnimation = ({
        *  Now set up drawSVG for the trails
        ********************************************************/
 
-      tl.set(["#circle-right .lead-circle", "#circle-left .lead-circle"], {
+      gsap.set(["#circle-right .lead-circle", "#circle-left .lead-circle"], {
         drawSVG: "0%",
       })
 
@@ -142,16 +145,33 @@ const CircleAnimation = ({
        *  This is needed for the rotation to work
        ********************************************************/
 
-      tl.set(["#circle-left-group", "#circle-right-group"], {
+      gsap.set(["#circle-left-group", "#circle-right-group"], {
         transformOrigin: "center",
       })
 
-      tl.set("#circle-left-group", {
+      gsap.set("#circle-left-group", {
         rotation: 180,
       })
 
       /*********************************************************
-       *  Now reveal the circles
+       * Master Timeline with Scroll Control
+       ********************************************************/
+
+      const tl = gsap.timeline({
+        id: "circles-animation",
+        duration: TOTAL_DURATION,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "+=100%",
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+        },
+      })
+
+      /*********************************************************
+       *  Now ready to animate
        ********************************************************/
 
       tl.to(
@@ -159,20 +179,19 @@ const CircleAnimation = ({
         {
           drawSVG: "0 100%",
           duration: DRAWSVG_DURATION,
-          ease: "power2.inOut",
+          ease: DRAWSVG_EASE,
         },
-        0
+        DRAWSVG_START_TIME
       )
 
       tl.to(
         "#circle-left-group, #circle-right-group",
         {
-          rotation: "+=360",
-          duration: ROTATION_DURATION,
-          ease: "none",
-          repeat: -1,
+          rotation: `+=${360 * ROTATIONS_DURING_DRAW}`,
+          duration: DRAWSVG_DURATION,
+          ease: ROTATION_EASE,
         },
-        0
+        DRAWSVG_START_TIME
       )
 
       /*********************************************************
@@ -203,7 +222,7 @@ const CircleAnimation = ({
         {
           x: 0,
           duration: DRAWSVG_DURATION,
-          ease: "power1.inOut",
+          ease: CIRCLE_MOVEMENT_EASE,
           onUpdate: function () {
             // Get actual rendered positions
             const leftCircle = document.querySelector("#circle-left-group")
@@ -222,8 +241,8 @@ const CircleAnimation = ({
               ) {
                 gsap.to(trail.element, {
                   autoAlpha: trail.opacity,
-                  duration: 0.5,
-                  ease: "power1.inOut",
+                  duration: TRAIL_FADE_DURATION,
+                  ease: TRAIL_FADE_EASE,
                 })
 
                 trail.element.setAttribute("data-active", "true")
@@ -237,8 +256,8 @@ const CircleAnimation = ({
               ) {
                 gsap.set(trail.element, {
                   autoAlpha: trail.opacity,
-                  duration: 0.2,
-                  ease: "power1.inOut",
+                  duration: TRAIL_FADE_DURATION,
+                  ease: TRAIL_FADE_EASE,
                 })
 
                 trail.element.setAttribute("data-active", "true")
@@ -246,7 +265,7 @@ const CircleAnimation = ({
             })
           },
         },
-        RETURN_TIME
+        CIRCLES_SPLIT_START
       )
 
       /*********************************************************
@@ -257,8 +276,8 @@ const CircleAnimation = ({
         textLeftRef.current,
         {
           autoAlpha: 1,
-          duration: 0.5,
-          ease: "power1.inOut",
+          duration: TEXT_FADE_DURATION,
+          ease: TEXT_FADE_EASE,
         },
         TEXT_APPEAR_TIME
       )
@@ -267,53 +286,90 @@ const CircleAnimation = ({
         textRightRef.current,
         {
           autoAlpha: 1,
+          duration: TEXT_FADE_DURATION,
+          ease: TEXT_FADE_EASE,
         },
         TEXT_APPEAR_TIME
       )
 
-      // Scramble text animations
-
+      // Bottom text fade-in
       tl.to(
-        Array.from(textLeftRef.current?.querySelectorAll("p") || []),
+        textBottomRef.current,
         {
-          duration: SCRAMBLE_DURATION,
-          scrambleText: {
-            text: "{original}",
-            chars: "upperCase",
-
-            newClass: "text-white",
-          },
+          autoAlpha: 1,
+          duration: TEXT_FADE_DURATION,
+          ease: TEXT_FADE_EASE,
         },
-        TEXT_APPEAR_TIME
+        BOTTOM_TEXT_APPEAR_TIME
       )
 
-      tl.to(
-        Array.from(textRightRef.current?.querySelectorAll("p") || []),
-        {
-          duration: SCRAMBLE_DURATION,
-          scrambleText: {
-            text: "{original}",
-            chars: "lowerCase",
-
-            newClass: "text-white",
+      // Left text scrambling
+      const leftParagraphs = Array.from(textLeftRef.current?.querySelectorAll("p") || [])
+      leftParagraphs.forEach((p, index) => {
+        tl.to(
+          p,
+          {
+            duration: TEXT_SCRAMBLE_DURATION,
+            scrambleText: {
+              text: "{original}",
+              chars: "upperCase",
+              newClass: "text-white",
+            },
           },
-        },
-        TEXT_APPEAR_TIME
+          TEXT_APPEAR_TIME + index * TEXT_END_STAGGER
+        )
+      })
+
+      // Right text scrambling
+      const rightParagraphs = Array.from(
+        textRightRef.current?.querySelectorAll("p") || []
       )
+      rightParagraphs.forEach((p, index) => {
+        tl.to(
+          p,
+          {
+            duration: TEXT_SCRAMBLE_DURATION,
+            scrambleText: {
+              text: "{original}",
+              chars: "lowerCase",
+              newClass: "text-white",
+            },
+          },
+          TEXT_APPEAR_TIME + index * TEXT_END_STAGGER
+        )
+      })
+
+      // Bottom text scrambling
+      const bottomParagraphs = Array.from(
+        textBottomRef.current?.querySelectorAll("p") || []
+      )
+      bottomParagraphs.forEach((p, index) => {
+        tl.to(
+          p,
+          {
+            duration: BOTTOM_TEXT_SCRAMBLE_DURATION,
+            scrambleText: {
+              text: "{original}",
+              chars: "lowerCase",
+              newClass: "text-white",
+            },
+          },
+          BOTTOM_TEXT_APPEAR_TIME + index * TEXT_END_STAGGER
+        )
+      })
+
+      /*********************************************************
+       *  Now reveal the inside
+       ********************************************************/
 
       tl.to(
-        Array.from(textBottomRef.current?.querySelectorAll("p") || []),
+        "#inside",
         {
-          duration: SCRAMBLE_DURATION,
-          scrambleText: {
-            text: "{original}",
-            chars: "lowerCase",
-            revealDelay: 1.5,
-            speed: 0.8,
-            newClass: "text-white",
-          },
+          autoAlpha: 1,
+          duration: INSIDE_FADE_DURATION,
+          ease: INSIDE_FADE_EASE,
         },
-        TEXT_APPEAR_TIME
+        INSIDE_APPEAR_TIME
       )
     },
     { scope: animationRef }
