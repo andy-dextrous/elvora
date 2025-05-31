@@ -95,5 +95,6 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 export default SmoothScrollProvider
+export { ScrollTrigger } from "gsap/ScrollTrigger"
 export * from "@gsap/react"
 export * from "gsap"

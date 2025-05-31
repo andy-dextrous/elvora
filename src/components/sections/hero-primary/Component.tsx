@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { CMSLink } from "@/payload/components-old/cms-link"
+import { CMSLink } from "@/payload/components/cms-link"
 import type { HeroPrimaryBlock as HeroProps } from "@/payload/payload-types"
 import { gsap, useGSAP } from "@/providers/gsap"
 import Image from "next/image"

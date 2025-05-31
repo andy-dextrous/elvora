@@ -1,8 +1,8 @@
 import type { Metadata } from "next/types"
 
-import { CollectionArchive } from "@/payload/components-old/collection-archive"
-import { PageRange } from "@/payload/components-old/page-range"
-import { Pagination } from "@/payload/components-old/pagination"
+import { CollectionArchive } from "@/payload/components/collection-archive"
+import { PageRange } from "@/payload/components/page-range"
+import { Pagination } from "@/payload/components/pagination"
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
 import React from "react"

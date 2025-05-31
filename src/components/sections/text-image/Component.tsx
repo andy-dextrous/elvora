@@ -1,6 +1,6 @@
-import RichText from "@/payload/components-old/rich-text"
+import RichText from "@/payload/components/rich-text"
 import { cn } from "@/utilities/ui"
-import { CMSLink } from "@/payload/components-old/cms-link"
+import { CMSLink } from "@/payload/components/cms-link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import type {
