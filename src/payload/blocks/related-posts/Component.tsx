@@ -1,11 +1,9 @@
+import { Card } from "@/payload/components/card"
+import RichText from "@/payload/components/rich-text"
+import type { Post } from "@/payload/payload-types"
+import { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical"
 import clsx from "clsx"
 import React from "react"
-import RichText from "@/payload/components/rich-text"
-
-import type { Post } from "@/payload/payload-types"
-
-import { Card } from "@/payload/components/card"
-import { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical"
 
 export type RelatedPostsProps = {
   className?: string

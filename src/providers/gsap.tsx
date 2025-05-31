@@ -2,21 +2,47 @@
 
 import canUseDOM from "@/utilities/canUseDOM"
 import wildChildConfig from "@/wc.config"
+import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
-import gsap from "gsap"
+
 import { CustomEase } from "gsap/CustomEase"
-import { ScrollSmoother } from "gsap/dist/ScrollSmoother"
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger"
+import { CustomBounce } from "gsap/CustomBounce"
+
+import { DrawSVGPlugin } from "gsap/DrawSVGPlugin"
+import { Flip } from "gsap/Flip"
+import { MotionPathPlugin } from "gsap/MotionPathPlugin"
+import { MorphSVGPlugin } from "gsap/MorphSVGPlugin"
+import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { ScrollSmoother } from "gsap/ScrollSmoother"
+import { ScrollToPlugin } from "gsap/ScrollToPlugin"
 import { SplitText } from "gsap/SplitText"
+import { TextPlugin } from "gsap/TextPlugin"
 import { usePathname } from "next/navigation"
 import { createContext, useRef } from "react"
+import { GSDevTools } from "gsap/GSDevTools"
 
 /****************************************************
  * Setup GSAP Plugins and Defaults
  ****************************************************/
 
-if (canUseDOM) {
-  gsap.registerPlugin(ScrollTrigger, ScrollSmoother, useGSAP, SplitText, CustomEase)
+if (canUseDOM && wildChildConfig.gsap) {
+  gsap.registerPlugin(
+    useGSAP,
+    DrawSVGPlugin,
+    Flip,
+    MotionPathPlugin,
+    MorphSVGPlugin,
+    ScrambleTextPlugin,
+    ScrollTrigger,
+    ScrollSmoother,
+    ScrollToPlugin,
+    SplitText,
+    TextPlugin,
+    CustomEase,
+    CustomBounce,
+    GSDevTools
+  )
   gsap.defaults({
     ease: "power2.inOut",
     duration: 0.3,
@@ -47,7 +73,7 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
     () => {
       if (wildChildConfig.smoothScroll) {
         smootherRef.current = ScrollSmoother.create({
-          smooth: 1,
+          smooth: 1.5,
           effects: true,
           normalizeScroll: true,
         })
@@ -71,5 +97,8 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 export default SmoothScrollProvider
+
+export { ScrollTrigger } from "gsap/ScrollTrigger"
+export { GSDevTools } from "gsap/GSDevTools"
 export * from "@gsap/react"
 export * from "gsap"

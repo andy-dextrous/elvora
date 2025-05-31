@@ -3,6 +3,7 @@ interface WildChildConfig {
   gsap: boolean
   smoothScroll: boolean
   i18n: boolean | i18nConfig
+  gsapDevTools: boolean
 }
 
 interface i18nConfig {
@@ -15,8 +16,9 @@ interface i18nConfig {
 const wildChildConfig: WildChildConfig = {
   themeToggle: false,
   gsap: true,
-  smoothScroll: false, // depends on gsap as prerequisite
+  smoothScroll: true, // depends on gsap as prerequisite
   i18n: false,
+  gsapDevTools: true,
 }
 
 export default wildChildConfig

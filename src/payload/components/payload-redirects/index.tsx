@@ -1,4 +1,3 @@
-import type { Page, Post } from "@/payload/payload-types"
 import type React from "react"
 
 import { getCachedDocument } from "@/lib/queries/document"
@@ -14,7 +13,7 @@ interface Props {
 export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }) => {
   const redirects = await getCachedRedirects()()
 
-  const redirectItem = redirects.find(redirect => redirect.from === url)
+  const redirectItem = redirects.find((redirect: any) => redirect.from === url)
 
   if (redirectItem) {
     if (redirectItem.to?.url) {
@@ -27,7 +26,7 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
       const collection = redirectItem.to?.reference?.relationTo
       const id = redirectItem.to?.reference?.value
 
-      const document = (await getCachedDocument(collection, id)()) as Page | Post
+      const document = (await getCachedDocument(collection, id)()) as any
       redirectUrl = `${redirectItem.to?.reference?.relationTo !== "pages" ? `/${redirectItem.to?.reference?.relationTo}` : ""}/${
         document?.slug
       }`

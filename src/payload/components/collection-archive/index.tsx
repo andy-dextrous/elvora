@@ -4,7 +4,7 @@ import React from "react"
 import { Card, CardPostData } from "@/payload/components/card"
 
 export type Props = {
-  posts: CardPostData[]
+  posts: any[]
 }
 
 export const CollectionArchive: React.FC<Props> = props => {

@@ -3,6 +3,9 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
+/* ShadCN UI */
+@import "./ui.css";
+
 /* Custom Theme */
 @import "./theme.css";
 
@@ -11,6 +14,3 @@
 @import "./components.css";
 @import "./utilities.css";
 @import "./typography.css";
-
-/* ShadCN UI */
-@import "./ui.css";

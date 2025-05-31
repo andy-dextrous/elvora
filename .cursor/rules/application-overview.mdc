@@ -1,12 +1,12 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 
 # Overview
 
-This repo contains two primary modules: 
+This repo contains two primary modules:
   1. a typical Next JS project using Next 15+ and the App Router
   2. a Payload CMS admin dashboard that is used to provide all data to the front end
 
@@ -19,7 +19,7 @@ This repo contains two primary modules:
 
 ### Collections
 
-- This is set up as a **website** for small to medium sized businesses. 
+- This is set up as a **website** for small to medium sized businesses.
 - Collections are designed to mirror what is expected in a website-building CMS (WordPress is the biggest inspiration)
 - To modify styles in the dashboard, use either the global.scss file imported into the (payload)/layout.tsx or the scss files imported into each payload component
 - Payload form builder is installed and used for forms on the site
@@ -27,6 +27,7 @@ This repo contains two primary modules:
 ## NextJS Setup
 
 - The lib folder is used for server actions, including direct database queries, server logic
+- Server actions (marked with "use server" at the top) should not export utilities as well. Server action files can only export async functions. Theyt are alsmost exclusively used to interact with the database via the payload client.
 - providers for the app are stored inside the src/providers folder
 
 ## Packages
