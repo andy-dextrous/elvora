@@ -22,27 +22,29 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
 
     const TOTAL_DURATION = 5
     const ROTATIONS_DURING_DRAW = 3 // Number of rotations while circles are being drawn
-    const PIN_DURATION = "200%" // How long to pin (200% = 2x viewport height of scrolling)
+    const PIN_DURATION = "250%" // How long to pin (200% = 2x viewport height of scrolling)
     const DRAWSVG_START_TIME = 0
     const DRAWSVG_DURATION = TOTAL_DURATION * 0.5 // when circles finish drawing
     const CIRCLES_SPLIT_START = TOTAL_DURATION * 0.15 // at this time, circles start to split
-    const TEXT_APPEAR_TIME = TOTAL_DURATION * 0.2
+    const CIRCLE_MOVEMENT_DURATION = DRAWSVG_DURATION // circles take same time as drawing to return
+    const TEXT_APPEAR_TIME = TOTAL_DURATION * 0.3
     const TEXT_FADE_DURATION = TOTAL_DURATION * 0.2
     const TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.6
     const TEXT_END_STAGGER = 0.5 // Delay between each p element finishing
     const BOTTOM_TEXT_APPEAR_TIME = TOTAL_DURATION * 0.7 // Bottom text appears later
     const BOTTOM_TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.4 // Bottom text scramble duration
-    const INSIDE_FADE_DURATION = TOTAL_DURATION * 0.2
-    const INSIDE_APPEAR_TIME = TOTAL_DURATION - INSIDE_FADE_DURATION
-    const TRAIL_FADE_DURATION = TOTAL_DURATION * 0.05
+    const INSIDE_FADE_DURATION = TOTAL_DURATION * 0.1
+    const END_DELAY = 0.5 // Fixed delay after inside animation
+    const INSIDE_APPEAR_TIME = TOTAL_DURATION - INSIDE_FADE_DURATION - END_DELAY
+    const TRAIL_FADE_DURATION = TOTAL_DURATION * 0.2
 
     // Ease constants
     const DRAWSVG_EASE = "power2.inOut"
     const ROTATION_EASE = "none"
-    const CIRCLE_MOVEMENT_EASE = "power1.inOut"
+    const CIRCLE_MOVEMENT_EASE = "power3.inOut"
     const TEXT_FADE_EASE = "power1.out"
-    const INSIDE_FADE_EASE = "power1.in"
-    const TRAIL_FADE_EASE = "power1.inOut"
+    const INSIDE_FADE_EASE = "power4.inOut"
+    const TRAIL_FADE_EASE = "power4.out"
 
     /*********************************************************
      * Start by hiding all elements
@@ -136,9 +138,8 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
         pin: sectionRef.current,
         start: "top top",
         end: `+=${PIN_DURATION}`,
-        scrub: true,
+        scrub: 1,
         anticipatePin: 1,
-        markers: true,
       },
     })
 
@@ -167,75 +168,82 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     )
 
     /*********************************************************
-     *  Calculate trail elements once for performance
+     *  Calculate trailing circle reveal times
      ********************************************************/
 
-    const leftTrails = document.querySelectorAll("#circle-left-trails circle")
-    const rightTrails = document.querySelectorAll("#circle-right-trails circle")
+    const leftTrails = Array.from(document.querySelectorAll("#circle-left-trails circle"))
+    const rightTrails = Array.from(
+      document.querySelectorAll("#circle-right-trails circle")
+    )
 
-    const leftTrailData = Array.from(leftTrails).map(trail => ({
-      element: trail,
-      opacity: Number(trail.getAttribute("data-opacity")),
-      x: trail.getBoundingClientRect().x,
-    }))
+    leftTrails.forEach(trail => {
+      const trailCx = parseFloat(trail.getAttribute("cx") || "0")
+      const trailRadius = parseFloat(trail.getAttribute("r") || "0")
+      const trailOpacity = Number(trail.getAttribute("data-opacity"))
 
-    const rightTrailData = Array.from(rightTrails).map(trail => ({
-      element: trail,
-      opacity: Number(trail.getAttribute("data-opacity")),
-      x: trail.getBoundingClientRect().x,
-    }))
+      // Calculate when left edge of leading circle reaches left edge of trailing circle
+      // Leading circle's left edge starts at: leftCircleCenter + moveDistance - radius
+      // Trailing circle's left edge is at: trailCx - trailRadius
+      // Distance leading circle needs to travel to reach this trailing circle:
+      const leadingCircleLeftEdgeStart = leftCircleCenter + moveDistance - trailRadius
+      const trailLeftEdge = trailCx - trailRadius
+      const distanceToTrail = leadingCircleLeftEdgeStart - trailLeftEdge
+
+      // Convert to fraction of total movement
+      const movementProgress = distanceToTrail / moveDistance
+      const clampedProgress = Math.max(0, Math.min(1, movementProgress))
+      const revealTime = CIRCLES_SPLIT_START + clampedProgress * CIRCLE_MOVEMENT_DURATION
+
+      tl.to(
+        trail,
+        {
+          autoAlpha: trailOpacity,
+          duration: TRAIL_FADE_DURATION,
+          ease: TRAIL_FADE_EASE,
+        },
+        revealTime
+      )
+    })
+
+    rightTrails.forEach(trail => {
+      const trailCx = parseFloat(trail.getAttribute("cx") || "0")
+      const trailRadius = parseFloat(trail.getAttribute("r") || "0")
+      const trailOpacity = Number(trail.getAttribute("data-opacity"))
+
+      // Calculate when right edge of leading circle reaches right edge of trailing circle
+      // Leading circle's right edge starts at: rightCircleCenter - moveDistance + radius
+      // Trailing circle's right edge is at: trailCx + trailRadius
+      // Distance leading circle needs to travel to reach this trailing circle:
+      const leadingCircleRightEdgeStart = rightCircleCenter - moveDistance + trailRadius
+      const trailRightEdge = trailCx + trailRadius
+      const distanceToTrail = trailRightEdge - leadingCircleRightEdgeStart
+
+      // Convert to fraction of total movement
+      const movementProgress = distanceToTrail / moveDistance
+      const clampedProgress = Math.max(0, Math.min(1, movementProgress))
+      const revealTime = CIRCLES_SPLIT_START + clampedProgress * CIRCLE_MOVEMENT_DURATION
+
+      tl.to(
+        trail,
+        {
+          autoAlpha: trailOpacity,
+          duration: TRAIL_FADE_DURATION,
+          ease: TRAIL_FADE_EASE,
+        },
+        revealTime
+      )
+    })
 
     /*********************************************************
-     *  Now reveal the trails as they cross the circles
+     *  Move circles back to their original positions
      ********************************************************/
 
     tl.to(
       ["#circle-left #circle-left-group", "#circle-right #circle-right-group"],
       {
         x: 0,
-        duration: DRAWSVG_DURATION,
+        duration: CIRCLE_MOVEMENT_DURATION,
         ease: CIRCLE_MOVEMENT_EASE,
-        // onUpdate: function () {
-        //   // Get actual rendered positions
-        //   const leftCircle = document.querySelector("#circle-left-group")
-        //   const rightCircle = document.querySelector("#circle-right-group")
-        //   const transformedX = gsap.getProperty("#circle-left-group", "x")
-
-        //   if (!leftCircle || !rightCircle) return
-        //   const leftCircleRect = leftCircle.getBoundingClientRect()
-        //   const rightCircleRect = rightCircle.getBoundingClientRect()
-        //   // Left circle: reveal trails when circle passes them (moving right)
-
-        //   leftTrailData.forEach(trail => {
-        //     if (
-        //       leftCircleRect.x + parseFloat(transformedX.toString()) <= trail.x &&
-        //       trail.element.getAttribute("data-active") !== "true"
-        //     ) {
-        //       gsap.to(trail.element, {
-        //         autoAlpha: trail.opacity,
-        //         duration: TRAIL_FADE_DURATION,
-        //         ease: TRAIL_FADE_EASE,
-        //       })
-
-        //       trail.element.setAttribute("data-active", "true")
-        //     }
-        //   })
-
-        //   rightTrailData.forEach(trail => {
-        //     if (
-        //       rightCircleRect.x - parseFloat(transformedX.toString()) >= trail.x &&
-        //       trail.element.getAttribute("data-active") !== "true"
-        //     ) {
-        //       gsap.set(trail.element, {
-        //         autoAlpha: trail.opacity,
-        //         duration: TRAIL_FADE_DURATION,
-        //         ease: TRAIL_FADE_EASE,
-        //       })
-
-        //       trail.element.setAttribute("data-active", "true")
-        //     }
-        //   })
-        // },
       },
       CIRCLES_SPLIT_START
     )
