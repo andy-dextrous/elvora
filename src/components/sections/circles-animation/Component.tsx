@@ -40,30 +40,16 @@ const CircleAnimation = ({
   sectionRef: React.RefObject<HTMLDivElement | null>
 }) => {
   const animationRef = useRef<HTMLDivElement>(null)
+  const textLeftRef = useRef<HTMLDivElement>(null)
+  const textRightRef = useRef<HTMLDivElement>(null)
+  const textBottomRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
     () => {
-      // Set initial state - both circles completely hidden
-      gsap.set(".circle-path-primary", {
-        drawSVG: "0%",
-        transformOrigin: "center",
-      })
+      /*********************************************************
+       * Master Timeline
+       ********************************************************/
 
-      gsap.set(".circle-path-secondary", {
-        drawSVG: "0%",
-        rotation: 180,
-        transformOrigin: "center",
-      })
-
-      gsap.set("#secondary-group", {
-        transformOrigin: "center",
-      })
-
-      gsap.set("#primary-group", {
-        transformOrigin: "center",
-      })
-
-      // Create timeline with scroll control
       const tl = gsap.timeline({
         // scrollTrigger: {
         //   trigger: sectionRef.current,
@@ -74,41 +60,170 @@ const CircleAnimation = ({
         // },
       })
 
-      tl.to(".circle-path", {
-        drawSVG: "0 100%",
-        duration: 10,
-        ease: "power2.inOut",
+      /*********************************************************
+       * Constants
+       ********************************************************/
+
+      const DRAW_DURATION = 5
+      const ROTATION_DURATION = DRAW_DURATION / 3
+      const RETURN_TIME = DRAW_DURATION / 4
+
+      /*********************************************************
+       * Start by hiding all elements
+       ********************************************************/
+
+      tl.set(
+        [
+          "#circle-right-trails circle",
+          "#circle-left-trails circle",
+          "#inside",
+          textLeftRef.current,
+          textRightRef.current,
+          textBottomRef.current,
+        ],
+        {
+          autoAlpha: 0,
+        }
+      )
+
+      /*********************************************************
+       *  Calculate dynamic positioning based on circle centers
+       ********************************************************/
+
+      // Get the actual circle center positions from the SVG elements
+      const rightCircleElement = animationRef.current?.querySelector(
+        "#circle-right .lead-circle"
+      )
+      const leftCircleElement = animationRef.current?.querySelector(
+        "#circle-left .lead-circle"
+      )
+
+      const rightCircleCenter = parseFloat(rightCircleElement?.getAttribute("cx") || "0")
+      const leftCircleCenter = parseFloat(leftCircleElement?.getAttribute("cx") || "0")
+
+      // Calculate the distance between centers
+      const totalDistance = rightCircleCenter - leftCircleCenter
+
+      // Each circle should move half the distance toward the center
+      const moveDistance = totalDistance / 2
+
+      /*********************************************************
+       *  Then position primary circles on top of each other
+       ********************************************************/
+
+      tl.set("#circle-right #circle-right-group", {
+        x: -moveDistance, // Move left by half distance
       })
 
+      tl.set("#circle-left #circle-left-group", {
+        x: moveDistance, // Move right by half distance
+      })
+
+      /*********************************************************
+       *  Elements are in place, now show the container
+       ********************************************************/
+
+      tl.set(animationRef.current, {
+        autoAlpha: 1,
+      })
+
+      /*********************************************************
+       *  Now set up drawSVG for the trails
+       ********************************************************/
+
+      tl.set(["#circle-right .lead-circle", "#circle-left .lead-circle"], {
+        drawSVG: "0%",
+      })
+
+      /*********************************************************
+       *  Set the transform origin for the groups
+       *  This is needed for the rotation to work
+       ********************************************************/
+
+      tl.set(["#circle-left-group", "#circle-right-group"], {
+        transformOrigin: "center",
+      })
+
+      tl.set("#circle-left-group", {
+        rotation: 180,
+      })
+
+      /*********************************************************
+       *  Now reveal the circles
+       ********************************************************/
+
       tl.to(
-        "#primary-group",
+        ["#circle-left circle", "#circle-right circle"],
         {
-          x: 100,
-          duration: 3,
-          ease: "linear",
+          drawSVG: "0 100%",
+          duration: DRAW_DURATION,
+          ease: "power2.inOut",
         },
-        5
+        0
       )
 
       tl.to(
-        "#secondary-group",
+        "#circle-left-group, #circle-right-group",
         {
-          x: -100,
-          duration: 3,
-          ease: "linear",
-        },
-        5
-      )
-
-      tl.to(
-        "#secondary-group, #primary-group",
-        {
-          rotation: 360,
-          duration: 3,
+          rotation: "+=360",
+          duration: ROTATION_DURATION,
           ease: "none",
           repeat: -1,
         },
         0
+      )
+
+      /*********************************************************
+       *  Return circles to original position
+       *  As each circle crosses a trail circle, the trail
+       *  circle is revealed by autoAlpha
+       ********************************************************/
+
+      const leftTrails = document.querySelectorAll("#circle-left-trails circle")
+      const rightTrails = document.querySelectorAll("#circle-right-trails circle")
+
+      tl.to(
+        ["#circle-left #circle-left-group", "#circle-right #circle-right-group"],
+        {
+          x: 0,
+          duration: DRAW_DURATION,
+          ease: "power1.inOut",
+          onUpdate: function () {
+            const leftCircleX = Number(gsap.getProperty("#circle-left-group", "x"))
+            const rightCircleX = Number(gsap.getProperty("#circle-right-group", "x"))
+
+            leftTrails.forEach(trail => {
+              // Get the trail's original cx position
+              const trailCx = Number(trail.getAttribute("cx"))
+              const leftCircleCx = leftCircleCenter // Original position of left circle
+              const leftCircleCurrentX = leftCircleCx + leftCircleX // Current absolute position
+
+              // As left circle moves right, reveal trails when it passes them
+              if (leftCircleCurrentX >= trailCx) {
+                const trailOpacity = trail.getAttribute("data-opacity")
+                gsap.set(trail, {
+                  autoAlpha: parseFloat(trailOpacity || "0"),
+                })
+              }
+            })
+
+            rightTrails.forEach(trail => {
+              // Get the trail's original cx position
+              const trailCx = Number(trail.getAttribute("cx"))
+              const rightCircleCx = rightCircleCenter // Original position of right circle
+              const rightCircleCurrentX = rightCircleCx + rightCircleX // Current absolute position
+
+              // As right circle moves left, reveal trails when it passes them
+              if (rightCircleCurrentX <= trailCx) {
+                const trailOpacity = trail.getAttribute("data-opacity")
+                gsap.set(trail, {
+                  autoAlpha: parseFloat(trailOpacity || "0"),
+                })
+              }
+            })
+          },
+        },
+        RETURN_TIME
       )
     },
     { scope: animationRef }
@@ -117,25 +232,31 @@ const CircleAnimation = ({
   return (
     <div
       ref={animationRef}
-      className="relative flex h-full w-full items-center justify-center"
+      className="relative flex h-full w-full items-center justify-center opacity-0"
     >
       <div className="flex h-full w-full flex-col gap-10">
         <div className="relative">
           <SVGComponent />
           <div className="absolute inset-0 grid h-full w-full grid-cols-12 grid-rows-12">
-            <div className="gap-content col-span-3 col-start-2 row-span-6 row-start-4 flex flex-col items-center justify-center">
+            <div
+              ref={textLeftRef}
+              className="gap-content col-span-3 col-start-2 row-span-6 row-start-4 flex flex-col items-center justify-center"
+            >
               <p className="text-white">Revenue</p>
               <p className="text-white">Margin</p>
               <p className="text-white">Efficiency</p>
             </div>
-            <div className="gap-content col-span-3 col-start-9 row-span-6 row-start-4 flex flex-col items-center justify-center">
+            <div
+              ref={textRightRef}
+              className="gap-content col-span-3 col-start-9 row-span-6 row-start-4 flex flex-col items-center justify-center"
+            >
               <p className="text-white">Automation</p>
               <p className="text-white">Intelligence</p>
               <p className="text-white">Integration</p>
             </div>
           </div>
         </div>
-        <div className="flex w-full justify-center">
+        <div ref={textBottomRef} className="flex w-full justify-center">
           <p className="text-white">Transformation Delivered</p>
         </div>
       </div>
@@ -180,126 +301,149 @@ const SVGComponent = (props: React.SVGProps<SVGSVGElement>) => (
         </g>
       </mask>
     </defs>
-    <g id="Layer_1-2">
-      <g id="circle-reveal">
-        <g id="circle-right">
+
+    <g id="circle-reveal">
+      {/* Circle Right */}
+      <g id="circle-right">
+        <g id="circle-right-group">
           <circle
-            className="stroke-primary isolate fill-none opacity-10"
-            style={{ strokeWidth: "1.19px" }}
-            cx={580.78}
-            cy={316.1}
-            r={313.19}
-          />
-          <circle
-            className="stroke-primary isolate fill-none opacity-20"
-            style={{ strokeWidth: "1.19px" }}
-            cx={594.73}
-            cy={316.1}
-            r={313.19}
-          />
-          <circle
-            className="stroke-primary isolate fill-none opacity-30"
-            style={{ strokeWidth: "1.19px" }}
-            cx={608.68}
-            cy={316.1}
-            r={313.19}
-          />
-          <circle
-            className="stroke-primary isolate fill-none opacity-40"
-            style={{ strokeWidth: "1.19px" }}
-            cx={622.62}
-            cy={316.1}
-            r={313.19}
-          />
-          <circle
-            className="stroke-primary isolate fill-none opacity-50"
-            style={{ strokeWidth: "1.19px" }}
-            cx={636.57}
-            cy={316.1}
-            r={313.19}
-          />
-          <circle
-            className="stroke-primary isolate fill-none opacity-60"
-            style={{ strokeWidth: "1.19px" }}
-            cx={650.51}
-            cy={316.1}
-            r={313.19}
-          />
-          <circle
-            className="stroke-primary fill-none"
+            className="stroke-primary lead-circle transform-origin-center fill-none"
             style={{ strokeWidth: "1.19px" }}
             cx={664.46}
             cy={316.1}
             r={313.19}
           />
         </g>
-        <g id="circle-left">
+        <g id="circle-right-trails">
           <circle
-            className="stroke-secondary fill-none"
+            className="stroke-primary isolate fill-none"
+            style={{ strokeWidth: "1.19px" }}
+            cx={580.78}
+            cy={316.1}
+            r={313.19}
+            data-opacity={0.1}
+          />
+          <circle
+            className="stroke-primary isolate fill-none"
+            style={{ strokeWidth: "1.19px" }}
+            cx={594.73}
+            cy={316.1}
+            r={313.19}
+            data-opacity={0.2}
+          />
+          <circle
+            className="stroke-primary isolate fill-none"
+            style={{ strokeWidth: "1.19px" }}
+            cx={608.68}
+            cy={316.1}
+            r={313.19}
+            data-opacity={0.3}
+          />
+          <circle
+            className="stroke-primary isolate fill-none"
+            style={{ strokeWidth: "1.19px" }}
+            cx={622.62}
+            cy={316.1}
+            r={313.19}
+            data-opacity={0.4}
+          />
+          <circle
+            className="stroke-primary isolate fill-none"
+            style={{ strokeWidth: "1.19px" }}
+            cx={636.57}
+            cy={316.1}
+            r={313.19}
+            data-opacity={0.5}
+          />
+          <circle
+            className="stroke-primary isolate fill-none"
+            style={{ strokeWidth: "1.19px" }}
+            cx={650.51}
+            cy={316.1}
+            r={313.19}
+            data-opacity={0.6}
+          />
+        </g>
+      </g>
+      {/* Circle Left */}
+      <g id="circle-left">
+        <g id="circle-left-group">
+          <circle
+            className="stroke-secondary lead-circle fill-none"
             style={{ strokeWidth: "1.19px" }}
             cx={315.81}
             cy={316.1}
             r={313.19}
           />
+        </g>
+        <g id="circle-left-trails">
           <circle
-            className="stroke-secondary isolate fill-none opacity-60"
+            className="stroke-secondary isolate fill-none"
             style={{ strokeWidth: "1.19px" }}
             cx={329.76}
             cy={316.1}
             r={313.19}
+            data-opacity={0.6}
           />
           <circle
-            className="stroke-secondary isolate fill-none opacity-50"
+            className="stroke-secondary isolate fill-none"
             style={{ strokeWidth: "1.19px" }}
             cx={343.7}
             cy={316.1}
             r={313.19}
+            data-opacity={0.5}
           />
           <circle
-            className="stroke-secondary isolate fill-none opacity-40"
+            className="stroke-secondary isolate fill-none"
             style={{ strokeWidth: "1.19px" }}
             cx={357.65}
             cy={316.1}
             r={313.19}
+            data-opacity={0.4}
           />
           <circle
-            className="stroke-secondary isolate fill-none opacity-30"
+            className="stroke-secondary isolate fill-none"
             style={{ strokeWidth: "1.19px" }}
             cx={371.6}
             cy={316.1}
             r={313.19}
+            data-opacity={0.3}
           />
           <circle
-            className="stroke-secondary isolate fill-none opacity-20"
+            className="stroke-secondary isolate fill-none"
             style={{ strokeWidth: "1.19px" }}
             cx={385.54}
             cy={316.1}
             r={313.19}
+            data-opacity={0.2}
           />
           <circle
-            className="stroke-secondary isolate fill-none opacity-10"
+            className="stroke-secondary isolate fill-none"
             style={{ strokeWidth: "1.19px" }}
             cx={399.49}
             cy={316.1}
             r={313.19}
+            data-opacity={0.1}
           />
         </g>
-        <g id="inside">
-          <path
-            style={{ fill: "url(#linear-gradient)" }}
-            d="M490.14,55.16c84.09,56.29,139.46,152.15,139.46,260.94s-55.37,204.65-139.46,260.94c-84.09-56.29-139.46-152.15-139.46-260.94s55.37-204.65,139.46-260.94Z"
-          />
-          <g style={{ mask: "url(#mask)" }}>
-            <g id="logomark">
-              <path
-                className="fill-white"
-                d="M549.71,211.5h-119.55v209.19h119.55v-209.19Z"
-              />
-            </g>
+      </g>
+      {/* Inside */}
+      <g id="inside">
+        <path
+          style={{ fill: "url(#linear-gradient)" }}
+          d="M490.14,55.16c84.09,56.29,139.46,152.15,139.46,260.94s-55.37,204.65-139.46,260.94c-84.09-56.29-139.46-152.15-139.46-260.94s55.37-204.65,139.46-260.94Z"
+        />
+        <g style={{ mask: "url(#mask)" }}>
+          <g id="logomark">
+            <path
+              className="fill-white"
+              d="M549.71,211.5h-119.55v209.19h119.55v-209.19Z"
+            />
           </g>
         </g>
-        <rect id="frame" className="fill-none" width={981.74} height={631.55} />
       </g>
+      {/* Frame */}
+      <rect id="frame" className="fill-none" width={981.74} height={631.55} />
     </g>
   </svg>
 )
