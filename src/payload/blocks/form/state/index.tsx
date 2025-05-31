@@ -8,7 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/payload/components/ui/select"
+} from "@/payload/components-old/ui/select"
 import React from "react"
 import { Controller } from "react-hook-form"
 

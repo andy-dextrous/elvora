@@ -1,10 +1,10 @@
 import type { Metadata } from "next"
-import { PayloadRedirects } from "@/payload/components/payload-redirects"
+import { PayloadRedirects } from "@/payload/components-old/payload-redirects"
 import { draftMode } from "next/headers"
 import PostBody from "@/components/posts/post-body"
 import { PostHero } from "@/components/posts/post-hero"
 import { getPostBySlug, getPosts } from "@/lib/queries/post"
-import { LivePreviewListener } from "@/payload/components/live-preview-listener"
+import { LivePreviewListener } from "@/payload/components-old/live-preview-listener"
 import { generateMeta } from "@/utilities/generateMeta"
 
 type Args = {

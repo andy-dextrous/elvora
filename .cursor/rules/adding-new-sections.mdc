@@ -1,7 +1,7 @@
 ---
-description: 
-globs: 
-alwaysApply: true
+description: When asked to build a new section, strictly use these instructions.
+globs:
+alwaysApply: false
 ---
 
 # New sections are added to this app in a very specific way.
@@ -16,6 +16,7 @@ Below are some instructions for how sections are added to this website and CMS. 
 
 1. Create a new folder inside `src/components/sections`. Give the folder the section name you want. Use kebab case for all folders.
 2. Every section block needs 2 files - a config file and a React component. The convention is to call them `config.ts` and `Component.tsx` however this is not **_technically_** necessary.
+**PAUSE HERE** If the user does not request a design, do not create one. If no screenshot is provided or if no UI is described for you to build, simply create an empty config and empty component with a section in it. Otherwise proceed to 3.
 3. After creating these files, start by modifying the config file. First, examine your Figma design and decide how much control the client would like to have over this section. **You want to decide on the fields that you will create which will allow the site user to modify designs**. This will likely include the obvious choices: a title (text field), content (rich-text), buttons (array block containing button attributes like url, text, variant). You may, however want to expose deeper levels of customisation that make components extremely flexible. For instance:
 
 - Layout Options (left-right, right-left, stacked etc)
@@ -99,5 +100,5 @@ export const NewSectionComponent: React.FC<NewSectionBlock> = props => {
 5. When naming a section, use architectural/layout names that describe the style of layout it is. DO NOT name it after the content that is in an example. The idea is to create REUSABLE layouts. Keep names as generic as possible. ie, instead of service-card-grid - just call it card-grid.
 6. DO NOT add GSAP code unless asked to. Don't assume each section should have animation.
 7. Strictly follow the tailwin rules for handling typography. The design system in tailwind pre-handles MANY styles for spacing and typography. Don't add typography classes for styles that are established by the design system.
-8. Always look at `src/payload/collections/config.ts` to see what post types are in this repo. You want to use this knowledge to make decisions about whether to use a relationship/join field or not. 
+8. Always look at `src/payload/collections/config.ts` to see what post types are in this repo. You want to use this knowledge to make decisions about whether to use a relationship/join field or not.
 

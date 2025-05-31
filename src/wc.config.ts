@@ -15,7 +15,7 @@ interface i18nConfig {
 const wildChildConfig: WildChildConfig = {
   themeToggle: false,
   gsap: true,
-  smoothScroll: false, // depends on gsap as prerequisite
+  smoothScroll: true, // depends on gsap as prerequisite
   i18n: false,
 }
 

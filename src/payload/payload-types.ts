@@ -475,7 +475,7 @@ export interface Page {
   title: string;
   publishedAt?: string | null;
   categories?: (string | Category)[] | null;
-  sections: (HeroPrimaryBlock | TextImageBlock)[];
+  sections: (HeroPrimaryBlock | TextImageBlock | CirclesAnimationBlock)[];
   meta?: {
     title?: string | null;
     /**
@@ -732,6 +732,15 @@ export interface TextImageBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'text-image';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CirclesAnimationBlock".
+ */
+export interface CirclesAnimationBlock {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'circles-animation';
 }
 /**
  * Team members are used to display the team on the website. They are different to users, which are used for the admin panel.
@@ -1041,6 +1050,7 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         'hero-primary'?: T | HeroPrimaryBlockSelect<T>;
         'text-image'?: T | TextImageBlockSelect<T>;
+        'circles-animation'?: T | CirclesAnimationBlockSelect<T>;
       };
   meta?:
     | T
@@ -1119,6 +1129,14 @@ export interface TextImageBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CirclesAnimationBlock_select".
+ */
+export interface CirclesAnimationBlockSelect<T extends boolean = true> {
   id?: T;
   blockName?: T;
 }

@@ -1,6 +1,6 @@
 ---
 description: This describes the process you must follow for properly adding animations with GSAP
-globs: 
+globs:
 alwaysApply: false
 ---
 # How To Add GSAP Animations
@@ -8,7 +8,7 @@ alwaysApply: false
 - This app uses GSAP and its plugins for all advanced animations (not simple CSS interactions)
 - To properly import GSAP and register plugins, the [wc.config.ts](mdc:src/wc.config.ts) file must have gsap set to true
 - This is used by the [gsap.tsx](mdc:src/providers/gsap.tsx) provider which does some important things: it imports and registers plugins, then re-exports them for use in a registered, version-synced way
-- Make sure you import your gsap code from the provider, not the node modules, in order to have teh registered versions.
+- Make sure you import your gsap code from the provider, not the node modules, in order to have the registered versions.
 - Always make sure you add "use client" to a component that uses GSAP
 
 ## Example

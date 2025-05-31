@@ -1,5 +1,4 @@
 import Providers from "@/providers"
-import { Inter } from "next/font/google"
 import React from "react"
 
 import { Footer } from "@/components/footer"
@@ -10,12 +9,8 @@ import { WildChildAdminBar } from "@/payload/components/admin-bar"
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import parse from "html-react-parser"
 import { draftMode } from "next/headers"
-import "./css/globals.css"
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-})
+import "./css/globals.css"
 
 export async function generateMetadata() {
   const settings = await getSettings()
@@ -28,8 +23,13 @@ export async function generateMetadata() {
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
-  const { isEnabled } = await draftMode()
-  const { integrations } = await getSettings()
+  const [{ isEnabled }, settings, user] = await Promise.all([
+    draftMode(),
+    getSettings(),
+    getCurrentUser(),
+  ])
+
+  const { integrations } = settings
 
   /*******************************************************/
   /* Get Site Settings
@@ -40,27 +40,26 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const head = integrations?.head
   const bodyEnd = integrations?.bodyEnd
 
-  const isLoggedIn = await getCurrentUser()
-
   return (
-    <html lang="en" className={`${inter.variable} font-sans`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
         {gtmId && <link href="https://www.googletagmanager.com" rel="preconnect" />}
         {gaId && <link href="https://www.google-analytics.com" rel="preconnect" />}
+        <link rel="stylesheet" href="https://use.typekit.net/lth5ndr.css" />
         {head && parse(head)}
       </head>
 
-      <body className={isLoggedIn ? "relative !pt-[32px]" : ""}>
+      <body className={user ? "relative !pt-[32px]" : ""}>
         {gtmId && <GoogleTagManager gtmId={gtmId} />}
         {gaId && <GoogleAnalytics gaId={gaId} />}
         <Providers>
-          <WildChildAdminBar preview={isEnabled} />
+          <WildChildAdminBar preview={isEnabled} user={user} settings={settings} />
 
-          <Header />
+          {/* <Header /> */}
           {children}
-          <Footer />
+          {/* <Footer /> */}
 
           {bodyEnd && parse(bodyEnd)}
         </Providers>
