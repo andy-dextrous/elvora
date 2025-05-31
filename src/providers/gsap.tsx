@@ -20,12 +20,13 @@ import { SplitText } from "gsap/SplitText"
 import { TextPlugin } from "gsap/TextPlugin"
 import { usePathname } from "next/navigation"
 import { createContext, useRef } from "react"
+import { GSDevTools } from "gsap/GSDevTools"
 
 /****************************************************
  * Setup GSAP Plugins and Defaults
  ****************************************************/
 
-if (canUseDOM) {
+if (canUseDOM && wildChildConfig.gsap) {
   gsap.registerPlugin(
     useGSAP,
     DrawSVGPlugin,
@@ -39,7 +40,8 @@ if (canUseDOM) {
     SplitText,
     TextPlugin,
     CustomEase,
-    CustomBounce
+    CustomBounce,
+    GSDevTools
   )
   gsap.defaults({
     ease: "power2.inOut",
@@ -95,6 +97,8 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 export default SmoothScrollProvider
+
 export { ScrollTrigger } from "gsap/ScrollTrigger"
+export { GSDevTools } from "gsap/GSDevTools"
 export * from "@gsap/react"
 export * from "gsap"

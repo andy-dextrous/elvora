@@ -64,9 +64,11 @@ const CircleAnimation = ({
        * Constants
        ********************************************************/
 
-      const DRAW_DURATION = 5
-      const ROTATION_DURATION = DRAW_DURATION / 3
-      const RETURN_TIME = DRAW_DURATION / 4
+      const DRAWSVG_DURATION = 1.5
+      const ROTATION_DURATION = DRAWSVG_DURATION / 3
+      const RETURN_TIME = DRAWSVG_DURATION / 4
+      const TEXT_APPEAR_TIME = DRAWSVG_DURATION * 0.1
+      const SCRAMBLE_DURATION = DRAWSVG_DURATION / 2
 
       /*********************************************************
        * Start by hiding all elements
@@ -156,7 +158,7 @@ const CircleAnimation = ({
         ["#circle-left circle", "#circle-right circle"],
         {
           drawSVG: "0 100%",
-          duration: DRAW_DURATION,
+          duration: DRAWSVG_DURATION,
           ease: "power2.inOut",
         },
         0
@@ -174,56 +176,144 @@ const CircleAnimation = ({
       )
 
       /*********************************************************
-       *  Return circles to original position
-       *  As each circle crosses a trail circle, the trail
-       *  circle is revealed by autoAlpha
+       *  Calculate trail elements once for performance
        ********************************************************/
 
       const leftTrails = document.querySelectorAll("#circle-left-trails circle")
       const rightTrails = document.querySelectorAll("#circle-right-trails circle")
 
+      const leftTrailData = Array.from(leftTrails).map(trail => ({
+        element: trail,
+        opacity: Number(trail.getAttribute("data-opacity")),
+        x: trail.getBoundingClientRect().x,
+      }))
+
+      const rightTrailData = Array.from(rightTrails).map(trail => ({
+        element: trail,
+        opacity: Number(trail.getAttribute("data-opacity")),
+        x: trail.getBoundingClientRect().x,
+      }))
+
+      /*********************************************************
+       *  Now reveal the trails as they cross the circles
+       ********************************************************/
+
       tl.to(
         ["#circle-left #circle-left-group", "#circle-right #circle-right-group"],
         {
           x: 0,
-          duration: DRAW_DURATION,
+          duration: DRAWSVG_DURATION,
           ease: "power1.inOut",
           onUpdate: function () {
-            const leftCircleX = Number(gsap.getProperty("#circle-left-group", "x"))
-            const rightCircleX = Number(gsap.getProperty("#circle-right-group", "x"))
+            // Get actual rendered positions
+            const leftCircle = document.querySelector("#circle-left-group")
+            const rightCircle = document.querySelector("#circle-right-group")
+            const transformedX = gsap.getProperty("#circle-left-group", "x")
 
-            leftTrails.forEach(trail => {
-              // Get the trail's original cx position
-              const trailCx = Number(trail.getAttribute("cx"))
-              const leftCircleCx = leftCircleCenter // Original position of left circle
-              const leftCircleCurrentX = leftCircleCx + leftCircleX // Current absolute position
+            if (!leftCircle || !rightCircle) return
+            const leftCircleRect = leftCircle.getBoundingClientRect()
+            const rightCircleRect = rightCircle.getBoundingClientRect()
+            // Left circle: reveal trails when circle passes them (moving right)
 
-              // As left circle moves right, reveal trails when it passes them
-              if (leftCircleCurrentX >= trailCx) {
-                const trailOpacity = trail.getAttribute("data-opacity")
-                gsap.set(trail, {
-                  autoAlpha: parseFloat(trailOpacity || "0"),
+            leftTrailData.forEach(trail => {
+              if (
+                leftCircleRect.x + parseFloat(transformedX.toString()) <= trail.x &&
+                trail.element.getAttribute("data-active") !== "true"
+              ) {
+                gsap.to(trail.element, {
+                  autoAlpha: trail.opacity,
+                  duration: 0.5,
+                  ease: "power1.inOut",
                 })
+
+                trail.element.setAttribute("data-active", "true")
               }
             })
 
-            rightTrails.forEach(trail => {
-              // Get the trail's original cx position
-              const trailCx = Number(trail.getAttribute("cx"))
-              const rightCircleCx = rightCircleCenter // Original position of right circle
-              const rightCircleCurrentX = rightCircleCx + rightCircleX // Current absolute position
-
-              // As right circle moves left, reveal trails when it passes them
-              if (rightCircleCurrentX <= trailCx) {
-                const trailOpacity = trail.getAttribute("data-opacity")
-                gsap.set(trail, {
-                  autoAlpha: parseFloat(trailOpacity || "0"),
+            rightTrailData.forEach(trail => {
+              if (
+                rightCircleRect.x - parseFloat(transformedX.toString()) >= trail.x &&
+                trail.element.getAttribute("data-active") !== "true"
+              ) {
+                gsap.set(trail.element, {
+                  autoAlpha: trail.opacity,
+                  duration: 0.2,
+                  ease: "power1.inOut",
                 })
+
+                trail.element.setAttribute("data-active", "true")
               }
             })
           },
         },
         RETURN_TIME
+      )
+
+      /*********************************************************
+       *  Reveal text and scramble
+       ********************************************************/
+
+      tl.to(
+        textLeftRef.current,
+        {
+          autoAlpha: 1,
+          duration: 0.5,
+          ease: "power1.inOut",
+        },
+        TEXT_APPEAR_TIME
+      )
+
+      tl.to(
+        textRightRef.current,
+        {
+          autoAlpha: 1,
+        },
+        TEXT_APPEAR_TIME
+      )
+
+      // Scramble text animations
+
+      tl.to(
+        Array.from(textLeftRef.current?.querySelectorAll("p") || []),
+        {
+          duration: SCRAMBLE_DURATION,
+          scrambleText: {
+            text: "{original}",
+            chars: "upperCase",
+
+            newClass: "text-white",
+          },
+        },
+        TEXT_APPEAR_TIME
+      )
+
+      tl.to(
+        Array.from(textRightRef.current?.querySelectorAll("p") || []),
+        {
+          duration: SCRAMBLE_DURATION,
+          scrambleText: {
+            text: "{original}",
+            chars: "lowerCase",
+
+            newClass: "text-white",
+          },
+        },
+        TEXT_APPEAR_TIME
+      )
+
+      tl.to(
+        Array.from(textBottomRef.current?.querySelectorAll("p") || []),
+        {
+          duration: SCRAMBLE_DURATION,
+          scrambleText: {
+            text: "{original}",
+            chars: "lowerCase",
+            revealDelay: 1.5,
+            speed: 0.8,
+            newClass: "text-white",
+          },
+        },
+        TEXT_APPEAR_TIME
       )
     },
     { scope: animationRef }
