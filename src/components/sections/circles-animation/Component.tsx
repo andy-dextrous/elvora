@@ -25,7 +25,8 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
 
     const TOTAL_DURATION = 5
     const ROTATIONS_DURING_DRAW = 3 // Number of rotations while circles are being drawn
-    const PIN_DURATION = "250%" // How long to pin (200% = 2x viewport height of scrolling)
+    const SCRUB_SPEED = 2.5
+    const PIN_DURATION = `100% * ${SCRUB_SPEED}` // How long to pin (200% = 2x viewport height of scrolling)
     const DRAWSVG_START_TIME = 0.7
     const DRAWSVG_DURATION = TOTAL_DURATION * 0.5 // when circles finish drawing
     const CIRCLES_SPLIT_START = TOTAL_DURATION * 0.15 // at this time, circles start to split

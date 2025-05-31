@@ -28,7 +28,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
     <section className="relative z-10 flex h-screen items-center overflow-hidden bg-black">
       <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="relative h-full w-full">
-          <div className="absolute inset-0 z-10 bg-gradient-to-b from-purple-950/70 lg:from-purple-950 ltr:to-purple-950/60 lg:ltr:bg-gradient-to-r lg:ltr:to-purple-950/10 rtl:to-purple-950/80 lg:rtl:bg-gradient-to-l lg:rtl:to-purple-950/10" />
+          <div className="lg:from-dark-950 ltr:to-dark-950/60 lg:ltr:to-dark-950/10 rtl:to-dark-950/80 lg:rtl:to-dark-950/10 absolute inset-0 z-10 bg-gradient-to-b from-purple-950/70 lg:ltr:bg-gradient-to-r lg:rtl:bg-gradient-to-l" />
 
           <div className="bg-radial-home-hero absolute inset-y-0 left-0 z-10 w-[200%]" />
 
