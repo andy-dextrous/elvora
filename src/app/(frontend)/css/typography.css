@@ -31,7 +31,7 @@
   }
 
   h2 {
-    @apply font-heading text-h2 text-dark leading-none font-light tracking-normal;
+    @apply font-heading text-h2 text-dark leading-[1.1] font-light tracking-normal;
   }
 
   h3 {

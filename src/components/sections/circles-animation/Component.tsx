@@ -2,6 +2,7 @@
 
 import React, { useRef } from "react"
 import { useGSAP, gsap, ScrollTrigger, GSDevTools } from "@/providers/gsap"
+import { SplitText } from "gsap/SplitText"
 import type { CirclesAnimationBlock } from "@/payload/payload-types"
 
 /*************************************************************************/
@@ -14,6 +15,8 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
   const textLeftRef = useRef<HTMLDivElement>(null)
   const textRightRef = useRef<HTMLDivElement>(null)
   const textBottomRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const paragraphRef = useRef<HTMLParagraphElement>(null)
 
   useGSAP(() => {
     /*********************************************************
@@ -23,7 +26,7 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     const TOTAL_DURATION = 5
     const ROTATIONS_DURING_DRAW = 3 // Number of rotations while circles are being drawn
     const PIN_DURATION = "250%" // How long to pin (200% = 2x viewport height of scrolling)
-    const DRAWSVG_START_TIME = 0
+    const DRAWSVG_START_TIME = 0.7
     const DRAWSVG_DURATION = TOTAL_DURATION * 0.5 // when circles finish drawing
     const CIRCLES_SPLIT_START = TOTAL_DURATION * 0.15 // at this time, circles start to split
     const CIRCLE_MOVEMENT_DURATION = DRAWSVG_DURATION // circles take same time as drawing to return
@@ -38,6 +41,12 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     const INSIDE_APPEAR_TIME = TOTAL_DURATION - INSIDE_FADE_DURATION - END_DELAY
     const TRAIL_FADE_DURATION = TOTAL_DURATION * 0.2
 
+    const TITLE_START_TIME = 0.3
+    const TITLE_REVEAL_DURATION = TOTAL_DURATION * 0.2
+    const TITLE_LINE_STAGGER = 0.2
+    const PARAGRAPH_START_TIME = TOTAL_DURATION * 0.4 // Paragraph appears after title starts
+    const PARAGRAPH_FADE_DURATION = TOTAL_DURATION * 0.4 // Paragraph fade duration
+
     // Ease constants
     const DRAWSVG_EASE = "power2.inOut"
     const ROTATION_EASE = "none"
@@ -45,6 +54,8 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     const TEXT_FADE_EASE = "power1.out"
     const INSIDE_FADE_EASE = "power4.inOut"
     const TRAIL_FADE_EASE = "power4.out"
+    const TITLE_REVEAL_EASE = "power2.inOut"
+    const PARAGRAPH_FADE_EASE = "power1.out"
 
     /*********************************************************
      * Start by hiding all elements
@@ -58,6 +69,8 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
         textLeftRef.current,
         textRightRef.current,
         textBottomRef.current,
+        titleRef.current,
+        paragraphRef.current,
       ],
       {
         autoAlpha: 0,
@@ -144,6 +157,55 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     })
 
     /*********************************************************
+     * Title and Paragraph Animations
+     ********************************************************/
+
+    // Create SplitText for title with masking
+    const titleSplit = SplitText.create(titleRef.current, {
+      type: "lines",
+      mask: "lines",
+      linesClass: "title-line",
+    })
+
+    // Make title element visible (parent needs to be visible for children to show)
+    tl.set(
+      titleRef.current,
+      {
+        autoAlpha: 1,
+      },
+      TITLE_START_TIME
+    )
+
+    // Animate title lines from left with mask reveal
+    titleSplit.lines.forEach((line: Element, index: number) => {
+      tl.fromTo(
+        line,
+        {
+          x: -100,
+          autoAlpha: 0,
+        },
+        {
+          x: 0,
+          autoAlpha: 1,
+          duration: TITLE_REVEAL_DURATION,
+          ease: TITLE_REVEAL_EASE,
+        },
+        TITLE_START_TIME + index * TITLE_LINE_STAGGER
+      )
+    })
+
+    // Animate paragraph fade in
+    tl.to(
+      paragraphRef.current,
+      {
+        autoAlpha: 1,
+        duration: PARAGRAPH_FADE_DURATION,
+        ease: PARAGRAPH_FADE_EASE,
+      },
+      PARAGRAPH_START_TIME
+    )
+
+    /*********************************************************
      *  Now ready to animate
      ********************************************************/
 
@@ -169,6 +231,12 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
 
     /*********************************************************
      *  Calculate trailing circle reveal times
+     *
+     *  Calculate when left edge of leading circle reaches left edge of trailing circle
+     *  Leading circle's left edge starts at: leftCircleCenter + moveDistance - radius
+     *  Trailing circle's left edge is at: trailCx - trailRadius
+     *  Distance leading circle needs to travel to reach this trailing circle:
+     *
      ********************************************************/
 
     const leftTrails = Array.from(document.querySelectorAll("#circle-left-trails circle"))
@@ -181,10 +249,6 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
       const trailRadius = parseFloat(trail.getAttribute("r") || "0")
       const trailOpacity = Number(trail.getAttribute("data-opacity"))
 
-      // Calculate when left edge of leading circle reaches left edge of trailing circle
-      // Leading circle's left edge starts at: leftCircleCenter + moveDistance - radius
-      // Trailing circle's left edge is at: trailCx - trailRadius
-      // Distance leading circle needs to travel to reach this trailing circle:
       const leadingCircleLeftEdgeStart = leftCircleCenter + moveDistance - trailRadius
       const trailLeftEdge = trailCx - trailRadius
       const distanceToTrail = leadingCircleLeftEdgeStart - trailLeftEdge
@@ -355,10 +419,10 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     <section className="bg-dark flex min-h-screen items-center" ref={sectionRef}>
       <div className="container flex h-full items-center">
         <div className="flex flex-5 flex-col gap-10">
-          <h2 className="text-white">
+          <h2 ref={titleRef} className="text-white">
             Bridging Vision & <span className="text-gradient">Execution</span>
           </h2>
-          <p className="max-w-[460px] text-white">
+          <p ref={paragraphRef} className="max-w-[460px] text-white">
             Many organisations invest in digital tools yet still leak profit because
             strategy, finance and tech aren't aligned. Elvora builds the bridge between
             these worlds, embedding data-driven automation that converts process waste

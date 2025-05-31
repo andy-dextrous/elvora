@@ -73,7 +73,7 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
     () => {
       if (wildChildConfig.smoothScroll) {
         smootherRef.current = ScrollSmoother.create({
-          smooth: 1,
+          smooth: 1.5,
           effects: true,
           normalizeScroll: true,
         })
