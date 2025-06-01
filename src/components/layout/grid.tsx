@@ -19,35 +19,28 @@ interface GridLinesProps extends GridProps {
 }
 
 function GridLines({ children, className, fadeLines = false }: GridLinesProps) {
-  const lineClasses = fadeLines
-    ? "bg-gradient-to-b from-transparent to-95% to-white/5"
-    : "bg-white/7"
-
   return (
     <div
       className={cn(
-        "absolute inset-0 z-10 container grid auto-rows-auto grid-cols-[150px_150px_150px_1fr_150px_150px_150px] border-x border-white/7",
+        "absolute inset-0 z-10 container grid auto-rows-auto grid-cols-[var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_1fr_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)] border-x border-white/7",
         className
       )}
     >
-      {/* Left side - 3 vertical lines */}
-      <div className={cn("absolute top-0 bottom-0 left-[150px] w-px", lineClasses)} />
-      <div className={cn("absolute top-0 bottom-0 left-[300px] w-px", lineClasses)} />
-      <div className={cn("absolute top-0 bottom-0 left-[450px] w-px", lineClasses)} />
+      {[1, 2, 3, 4, 5, 6, 7].map(item => (
+        <div
+          key={item}
+          className={cn(
+            `col-span-1 col-start-${item} col-end-${item + 1} row-start-1 row-end-12 border-white/7`,
+            [2, 3, 4, 5].includes(item) && "xl:border-l",
+            [5, 6].includes(item) && "xl:border-r",
+            [2, 3].includes(item) && "lg:border-l",
+            [5, 6].includes(item) && "lg:border-r",
+            [2].includes(item) && "md:border-l",
+            [6].includes(item) && "md:border-r"
+          )}
+        />
+      ))}
 
-      {/* Right side - 3 vertical lines (mirror of left) */}
-      <div className={cn("absolute top-0 right-[150px] bottom-0 w-px", lineClasses)} />
-      <div className={cn("absolute top-0 right-[300px] bottom-0 w-px", lineClasses)} />
-      <div className={cn("absolute top-0 right-[450px] bottom-0 w-px", lineClasses)} />
-
-      {/* Grid column spacers - invisible but maintain grid structure */}
-      <div />
-      <div />
-      <div />
-      <div />
-      <div />
-      <div />
-      <div />
       {children}
     </div>
   )
@@ -61,7 +54,7 @@ function Grid({ children, className }: GridProps) {
   return (
     <div
       className={cn(
-        "relative z-20 container grid auto-rows-auto grid-cols-[150px_150px_150px_1fr_150px_150px_150px]",
+        "relative z-20 container grid auto-rows-auto grid-cols-[var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_1fr_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)]",
         className
       )}
     >

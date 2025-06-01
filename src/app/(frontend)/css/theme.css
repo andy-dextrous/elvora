@@ -39,6 +39,8 @@
 
   --spacing-card: var(--space-m);
   --spacing-card-content: var(--space-s);
+
+  --spacing-grid-col-width: clamp(1rem, 12.934vw + -1.587rem, 9.375rem);
 }
 
 /* Brand Color Shades - get from https://www.tailwindshades.com */

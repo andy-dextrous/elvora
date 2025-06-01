@@ -25,11 +25,11 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
     <section className="bg-dark relative flex h-[160vh] w-full flex-col justify-between overflow-hidden py-0">
       <div className="relative h-screen w-full">
         <Grid className="h-full grid-rows-10 pb-8">
-          <div className="col-span-3 col-start-2 row-span-10 row-start-1 flex h-full items-center">
+          <div className="col-span-7 col-start-1 row-span-10 row-start-1 flex h-full items-center lg:col-span-3 lg:col-start-2">
             <h1 className="text-white">Strategy Powered by Technology</h1>
           </div>
 
-          <div className="col-span-2 col-start-5 row-span-6 row-start-4 flex flex-col justify-center space-y-12">
+          <div className="col-span-2 col-start-6 row-span-6 row-start-4 flex flex-col justify-center space-y-12 lg:col-span-2 lg:col-start-5">
             <p className="font-light text-white">
               We fuse commercial insight with digital capability to unlock rapid, scalable
               growth.
@@ -98,7 +98,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
 const Background = ({ backgroundImage }: { backgroundImage: Media | null }) => {
   return (
     <Fragment>
-      <div className="pt-nav top-nav absolute inset-x-0 bottom-0">
+      <div className="pt-nav top-nav inset-x-section-x absolute bottom-0">
         <GridLines />
       </div>
       <div className="absolute inset-0 z-0 overflow-hidden">

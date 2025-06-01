@@ -8,7 +8,7 @@
   --font-sans: "helvetica-neue-lt-pro", sans-serif;
   --font-heading: "neue-haas-grotesk-display", sans-serif;
 
-  --text-h1: clamp(6rem, 3.824vw + 5.235rem, 8.5rem);
+  --text-h1: clamp(4rem, 6.95vw + 2.61rem, 8.5rem);
   --text-h2: clamp(4rem, 3.442vw + 3.312rem, 6.25rem);
   --text-h3: clamp(2rem, 1.721vw + 1.656rem, 3.125rem);
   --text-h4: clamp(1.25rem, 0.765vw + 1.097rem, 1.75rem);
