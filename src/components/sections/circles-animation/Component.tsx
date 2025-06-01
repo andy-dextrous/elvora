@@ -34,7 +34,7 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     const TEXT_FADE_DURATION = TOTAL_DURATION * 0.2
     const TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.5
     const TEXT_END_STAGGER = 0.5 // Delay between each p element finishing
-    const BOTTOM_TEXT_APPEAR_TIME = TOTAL_DURATION * 0.6 // Bottom text appears later
+    const BOTTOM_TEXT_APPEAR_TIME = TOTAL_DURATION * 0.5 // Bottom text appears later
     const BOTTOM_TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.3 // Bottom text scramble duration
     const INSIDE_FADE_DURATION = TOTAL_DURATION * 0.1
     const END_DELAY = 0.5 // Fixed delay after inside animation
@@ -417,7 +417,7 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
 
   return (
     <section className="bg-dark flex min-h-screen items-center" ref={sectionRef}>
-      <div className="container flex h-full items-center">
+      <div className="container-md flex h-full items-center">
         <div className="flex flex-5 flex-col gap-10">
           <h2 ref={titleRef} className="text-white">
             Bridging Vision & <span className="text-gradient">Execution</span>

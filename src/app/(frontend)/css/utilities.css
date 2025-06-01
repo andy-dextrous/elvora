@@ -1,7 +1,15 @@
 /* Utility Classes */
 
 @utility container {
-  @apply max-w-container mx-auto;
+  @apply max-w-container mx-auto w-full;
+}
+
+@utility container-md {
+  @apply max-w-container-md mx-auto w-full;
+}
+
+@utility container-sm {
+  @apply max-w-container-sm mx-auto w-full;
 }
 
 @utility stop-scroll {
