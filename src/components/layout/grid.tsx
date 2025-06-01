@@ -14,23 +14,31 @@ interface GridProps {
 /*  BACKGROUND GRID LINES - Shows visual grid structure
 /*************************************************************************/
 
-function GridLines({ children, className }: GridProps) {
+interface GridLinesProps extends GridProps {
+  fadeLines?: boolean
+}
+
+function GridLines({ children, className, fadeLines = false }: GridLinesProps) {
+  const lineClasses = fadeLines
+    ? "bg-gradient-to-b from-transparent to-95% to-white/5"
+    : "bg-white/7"
+
   return (
     <div
       className={cn(
-        "absolute inset-0 z-10 container grid auto-rows-auto grid-cols-[150px_150px_150px_1fr_150px_150px_150px] border-x border-white/10",
+        "absolute inset-0 z-10 container grid auto-rows-auto grid-cols-[150px_150px_150px_1fr_150px_150px_150px] border-x border-white/7",
         className
       )}
     >
       {/* Left side - 3 vertical lines */}
-      <div className="absolute top-0 bottom-0 left-[150px] w-px bg-white/10" />
-      <div className="absolute top-0 bottom-0 left-[300px] w-px bg-white/10" />
-      <div className="absolute top-0 bottom-0 left-[450px] w-px bg-white/10" />
+      <div className={cn("absolute top-0 bottom-0 left-[150px] w-px", lineClasses)} />
+      <div className={cn("absolute top-0 bottom-0 left-[300px] w-px", lineClasses)} />
+      <div className={cn("absolute top-0 bottom-0 left-[450px] w-px", lineClasses)} />
 
       {/* Right side - 3 vertical lines (mirror of left) */}
-      <div className="absolute top-0 right-[150px] bottom-0 w-px bg-white/10" />
-      <div className="absolute top-0 right-[300px] bottom-0 w-px bg-white/10" />
-      <div className="absolute top-0 right-[450px] bottom-0 w-px bg-white/10" />
+      <div className={cn("absolute top-0 right-[150px] bottom-0 w-px", lineClasses)} />
+      <div className={cn("absolute top-0 right-[300px] bottom-0 w-px", lineClasses)} />
+      <div className={cn("absolute top-0 right-[450px] bottom-0 w-px", lineClasses)} />
 
       {/* Grid column spacers - invisible but maintain grid structure */}
       <div />
@@ -70,12 +78,18 @@ interface GridContainerProps {
   children?: React.ReactNode
   className?: string
   showLines?: boolean
+  fadeLines?: boolean
 }
 
-function GridContainer({ children, className, showLines = true }: GridContainerProps) {
+function GridContainer({
+  children,
+  className,
+  showLines = true,
+  fadeLines = false,
+}: GridContainerProps) {
   return (
     <div className={cn("relative", className)}>
-      {showLines && <GridLines />}
+      {showLines && <GridLines fadeLines={fadeLines} />}
       <Grid>{children}</Grid>
     </div>
   )

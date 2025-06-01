@@ -29,21 +29,21 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
             <h1 className="text-white">Strategy Powered by Technology</h1>
           </div>
 
-          <div className="col-span-2 col-start-5 row-span-6 row-start-4 flex flex-col justify-center space-y-8">
-            <p className="text-white">
+          <div className="col-span-2 col-start-5 row-span-6 row-start-4 flex flex-col justify-center space-y-12">
+            <p className="font-light text-white">
               We fuse commercial insight with digital capability to unlock rapid, scalable
               growth.
             </p>
 
             <div className="space-y-4">
-              <Button variant="outline" size="lg" asChild className="w-full">
+              <Button variant="outlineGradient" size="lg" asChild className="w-full">
                 <Link href="/contact">
                   Discovery Call
                   <ArrowRightIcon className="!h-[14px] !w-[24px]" />
                 </Link>
               </Button>
 
-              <Button variant="outline" size="lg" className="w-full" asChild>
+              <Button variant="outlineGradient" size="lg" className="w-full" asChild>
                 <Link href="/contact">
                   See What We Do
                   <ArrowRightIcon className="!h-[14px] !w-[24px]" />
@@ -104,7 +104,7 @@ const Background = ({ backgroundImage }: { backgroundImage: Media | null }) => {
       <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="relative h-full w-full">
           {/* Top Down Fade */}
-          <div className="from-dark-950 absolute inset-0 z-10 bg-gradient-to-b from-20% to-transparent to-40%" />
+          <div className="from-dark-950 absolute inset-0 z-10 bg-gradient-to-b from-30% to-transparent to-60%" />
 
           {/* Background Image */}
           <div className="absolute inset-x-0 bottom-0 size-full">
@@ -124,7 +124,7 @@ const Background = ({ backgroundImage }: { backgroundImage: Media | null }) => {
           <div className="bg-primary/70 absolute -bottom-[148px] -left-[370px] z-5 h-[700px] w-[700px] blur-[350px]" />
 
           {/* Spotlight 2 - Chrysler Blue Spotlight */}
-          <div className="bg-secondary/60 absolute -right-[80.43px] -bottom-[405.61px] z-5 h-[1000px] w-[495.05px] -rotate-[15deg] blur-[350px]" />
+          <div className="bg-secondary/60 absolute -right-[80.43px] -bottom-[405.61px] z-5 h-[1200px] w-[495.05px] -rotate-[15deg] blur-[350px]" />
         </div>
       </div>
     </Fragment>

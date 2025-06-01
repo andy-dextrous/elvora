@@ -24,7 +24,14 @@ const buttonVariants = tv({
       ],
       outline: [
         "border border-white/20 bg-white/3 backdrop-blur-[5px]",
-        "font-heading text-sm font-medium text-white",
+        "text-white",
+        "hover:text-dark hover:bg-white",
+        "focus-visible:ring-white/50",
+      ],
+      outlineGradient: [
+        "gradient-border",
+        "bg-white/2 backdrop-blur-sm",
+        "text-white",
         "hover:text-dark hover:bg-white",
         "focus-visible:ring-white/50",
       ],
@@ -65,7 +72,6 @@ const buttonVariants = tv({
   },
   compoundVariants: [
     {
-      variant: "outline",
       size: ["sm", "default", "lg"],
       class: "!text-sm",
     },
