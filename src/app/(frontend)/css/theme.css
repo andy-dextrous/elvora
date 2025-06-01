@@ -25,10 +25,10 @@
   --spacing-section-xxl: clamp(7.0625rem, 18.164vw + 3.43rem, 18.9375rem);
 
   --spacing-logo: clamp(45px, 10vw, 60px);
-  --spacing-nav: clamp(50px, 10vh, 120px);
+  --spacing-nav: clamp(50px, 10vh, 80px);
 
   --spacing-content: var(--space-xs);
-  --spacing-container: var(--space-xl);
+  --spacing-container: 1528px;
   --spacing-column: clamp(2rem, 4vw, 4rem);
   --spacing-row: clamp(1rem, 4vw, 2rem);
   --spacing-grid: var(--space-m);

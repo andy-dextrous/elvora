@@ -8,7 +8,7 @@ import Image from "next/image"
 import React, { useRef } from "react"
 
 /****************************************************
- * Hero Component
+ * Hero Component
  ****************************************************/
 
 export const HeroPrimaryComponent: React.FC<HeroProps> = ({
@@ -17,57 +17,51 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
   backgroundImage,
   buttons,
 }) => {
-  const getBgUrl = () => {
-    if (backgroundImage) {
-      return (backgroundImage as Media).url
-    }
-    return "/assets/images/hero-default.jpg"
-  }
-
   return (
-    <section className="relative z-10 flex h-screen items-center overflow-hidden bg-black">
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="relative h-full w-full">
-          <div className="lg:from-dark-950 ltr:to-dark-950/60 lg:ltr:to-dark-950/10 rtl:to-dark-950/80 lg:rtl:to-dark-950/10 absolute inset-0 z-10 bg-gradient-to-b from-purple-950/70 lg:ltr:bg-gradient-to-r lg:rtl:bg-gradient-to-l" />
+    <section className="relative z-10 flex aspect-[1728/1614] w-full overflow-hidden bg-black py-0">
+      {/* Content */}
 
-          <div className="bg-radial-home-hero absolute inset-y-0 left-0 z-10 w-[200%]" />
-
-          <div className="absolute inset-0 rtl:scale-x-[-1]">
-            <Image
-              src={getBgUrl() || "/assets/images/hero-default.jpg"}
-              alt={heading || "Hero Background"}
-              className="absolute inset-0 h-full w-full object-cover object-[80%_50%]"
-              fill
-              priority
-              quality={100}
-              sizes="100vw"
-              loading="eager"
-            />
-          </div>
-        </div>
+      <div className="pt-nav z-20 container h-screen">
+        <h1 className="text-white">
+          Strategy
+          <br /> Powered By <br />
+          Technology
+        </h1>
       </div>
 
-      <div className="relative z-20 container">
-        <div className="gap-content-lg flex w-full flex-col items-start text-white">
-          <div className="lg:gap-content flex flex-col gap-6">
-            <h1 className="w-full text-white md:max-w-[20ch]">{heading}</h1>
-
-            <p className="max-w-[70ch] text-white">{content}</p>
-            <div className="flex gap-4">
-              {buttons?.map(({ button }, i) => (
-                <CMSLink key={i} {...button.link} className="hover:cursor-pointer">
-                  <Button
-                    variant={button.buttonType === "primary" ? "default" : "secondary"}
-                    size="lg"
-                  >
-                    {button.link.label}
-                  </Button>
-                </CMSLink>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Background */}
+      <Background backgroundImage={backgroundImage as Media} />
     </section>
+  )
+}
+
+const Background = ({ backgroundImage }: { backgroundImage: Media | null }) => {
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="relative h-full w-full">
+        {/* Top Down Fade */}
+        <div className="from-dark-950 absolute inset-0 z-10 bg-gradient-to-b from-20% to-transparent to-40%" />
+
+        {/* Background Image */}
+        <div className="absolute inset-x-0 bottom-0 aspect-[3000/2843] w-full">
+          <Image
+            src={(backgroundImage as Media).url || "https://picsum.photos/1728/1260"}
+            alt={"Hero Background"}
+            className="absolute inset-0 h-full w-full object-cover object-[80%_50%]"
+            fill
+            priority
+            quality={100}
+            sizes="100vw"
+            loading="eager"
+          />
+        </div>
+
+        {/* Ellipse 1 - Royal Purple Spotlight */}
+        <div className="bg-primary/70 absolute -bottom-[148px] -left-[370px] z-5 h-[700px] w-[700px] blur-[350px]" />
+
+        {/* Ellipse 2 - Chrysler Blue Spotlight */}
+        <div className="bg-secondary/60 absolute -right-[80.43px] -bottom-[405.61px] z-5 h-[1000px] w-[495.05px] -rotate-[15deg] blur-[350px]" />
+      </div>
+    </div>
   )
 }

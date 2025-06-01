@@ -3,4 +3,11 @@
 */
 
 @layer components {
+  .hero-overlay {
+    @apply absolute inset-0 z-10;
+    background-blend-mode: normal, normal, overlay, normal;
+    background-size: cover;
+    background-position: 80% 50% !important;
+    background-repeat: no-repeat !important;
+  }
 }

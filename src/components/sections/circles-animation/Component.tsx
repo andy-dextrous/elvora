@@ -25,8 +25,7 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
 
     const TOTAL_DURATION = 5
     const ROTATIONS_DURING_DRAW = 3 // Number of rotations while circles are being drawn
-    const SCRUB_SPEED = 2.5
-    const PIN_DURATION = `100% * ${SCRUB_SPEED}` // How long to pin (200% = 2x viewport height of scrolling)
+    const PIN_DURATION = "300%" // How long to pin (400% = 4x viewport height of scrolling)
     const DRAWSVG_START_TIME = 0.7
     const DRAWSVG_DURATION = TOTAL_DURATION * 0.5 // when circles finish drawing
     const CIRCLES_SPLIT_START = TOTAL_DURATION * 0.15 // at this time, circles start to split
@@ -42,9 +41,9 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     const INSIDE_APPEAR_TIME = TOTAL_DURATION - INSIDE_FADE_DURATION - END_DELAY
     const TRAIL_FADE_DURATION = TOTAL_DURATION * 0.2
 
-    const TITLE_START_TIME = 0.3
-    const TITLE_REVEAL_DURATION = TOTAL_DURATION * 0.2
-    const TITLE_LINE_STAGGER = 0.2
+    const TITLE_START_TIME = 0
+    const TITLE_REVEAL_DURATION = TOTAL_DURATION * 0.3
+    const TITLE_LINE_STAGGER = 0.4
     const PARAGRAPH_START_TIME = TOTAL_DURATION * 0.4 // Paragraph appears after title starts
     const PARAGRAPH_FADE_DURATION = TOTAL_DURATION * 0.4 // Paragraph fade duration
 
@@ -55,7 +54,7 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     const TEXT_FADE_EASE = "power1.out"
     const INSIDE_FADE_EASE = "power4.inOut"
     const TRAIL_FADE_EASE = "power4.out"
-    const TITLE_REVEAL_EASE = "power2.inOut"
+    const TITLE_REVEAL_EASE = "power3.out"
     const PARAGRAPH_FADE_EASE = "power1.out"
 
     /*********************************************************

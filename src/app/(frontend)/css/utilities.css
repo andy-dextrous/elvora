@@ -1,7 +1,7 @@
 /* Utility Classes */
 
 @utility container {
-  @apply mx-auto;
+  @apply max-w-container mx-auto;
 }
 
 @utility stop-scroll {

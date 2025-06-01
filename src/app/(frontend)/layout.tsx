@@ -57,9 +57,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
         <Providers>
           <WildChildAdminBar preview={isEnabled} user={user} settings={settings} />
 
-          {/* <Header /> */}
+          <Header />
           {children}
-          {/* <Footer /> */}
+          <Footer />
 
           {bodyEnd && parse(bodyEnd)}
         </Providers>

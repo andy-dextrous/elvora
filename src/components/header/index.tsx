@@ -14,7 +14,7 @@ export async function Header() {
   )()
 
   return (
-    <header className="logo-height relative z-20 h-(--nav-height) border-b border-gray-100 bg-white px-(--section-padding-x)">
+    <header className="h-nav px-section-x fixed inset-x-0 top-0 z-20 border-b border-white/10">
       <div className="container h-full">
         <div className="flex h-full items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
