@@ -43,7 +43,7 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
 
     const TITLE_START_TIME = 0
     const TITLE_REVEAL_DURATION = TOTAL_DURATION * 0.3
-    const TITLE_LINE_STAGGER = 0.4
+    const TITLE_LINE_STAGGER = 0.2
     const PARAGRAPH_START_TIME = TOTAL_DURATION * 0.4 // Paragraph appears after title starts
     const PARAGRAPH_FADE_DURATION = TOTAL_DURATION * 0.4 // Paragraph fade duration
 

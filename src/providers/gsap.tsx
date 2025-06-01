@@ -87,9 +87,7 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
 
   return wildChildConfig.smoothScroll ? (
     <GSAPContext.Provider value={{ smootherInstance: smootherRef.current }}>
-      <div id="smooth-wrapper">
-        <div id="smooth-content">{children}</div>
-      </div>
+      {children}
     </GSAPContext.Provider>
   ) : (
     children

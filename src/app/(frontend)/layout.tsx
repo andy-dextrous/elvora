@@ -58,8 +58,13 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           <WildChildAdminBar preview={isEnabled} user={user} settings={settings} />
 
           <Header />
-          {children}
-          <Footer />
+
+          <div id="smooth-wrapper">
+            <div id="smooth-content">
+              {children}
+              <Footer />
+            </div>
+          </div>
 
           {bodyEnd && parse(bodyEnd)}
         </Providers>

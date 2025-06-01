@@ -14,7 +14,7 @@ export async function Header() {
   )()
 
   return (
-    <header className="h-nav px-section-x fixed inset-x-0 top-0 z-20 border-b border-white/10">
+    <header className="h-nav px-section-x bg-dark/40 fixed inset-x-0 top-0 z-[1000] border-b border-white/10 backdrop-blur-lg">
       <div className="container h-full border-x-1 border-white/10 px-8">
         <div className="flex h-full items-center justify-between">
           <Link

@@ -19,6 +19,7 @@ type ChildItemType = {
   hasChildren?: boolean | null
   subItems?: Array<{ link: NavItemLink }> | null
 }
+
 type SubItemType = {
   link: NavItemLink
 }
@@ -34,13 +35,14 @@ export const HeaderNavigation: React.FC<{ data: HeaderType }> = ({ data }) => {
     <NavigationMenu className="hidden md:flex" orientation="vertical">
       <NavigationMenuList>
         {navItems.map(({ item }, i: number) => {
+          console.log(item)
+
           if (item?.hasDropdown && item?.subItems && item?.subItems?.length > 0) {
             return <NavItemWithDropdown key={i} item={item} />
           } else {
             return <NavItem key={i} link={item?.link} />
           }
         })}
-        <SearchNavItem />
       </NavigationMenuList>
     </NavigationMenu>
   )
@@ -54,7 +56,9 @@ const NavItem: React.FC<{ link: NavItemLink }> = ({ link }) => {
   return (
     <NavigationMenuItem>
       <NavigationMenuLink asChild>
-        <CMSLink {...link}>{link.label}</CMSLink>
+        <CMSLink className="text-sm !font-light text-white uppercase" {...link}>
+          {link.label}
+        </CMSLink>
       </NavigationMenuLink>
     </NavigationMenuItem>
   )
