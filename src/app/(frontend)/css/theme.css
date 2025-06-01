@@ -14,7 +14,7 @@
 /* Spacing - applies to padding, margin, width & height */
 
 @theme {
-  --spacing-section-x: clamp(1rem, 4vw, 4rem);
+  --spacing-section-x: clamp(1rem, 6.954vw + -0.391rem, 6.25rem);
   --spacing-section-y: clamp(1rem, 10vw, 4rem);
 
   --spacing-section-xs: clamp(1.6875rem, 1.243vw + 1.439rem, 2.5rem);
@@ -68,9 +68,17 @@
 
   --color-dark: oklch(14.557% 0.00884 273.86);
   --color-dark-50: oklch(96.23% 0.005 286.3);
+  --color-dark-100: oklch(96.23% 0.005 286.3);
   --color-dark-600: oklch(33.41% 0.04 274.2);
   --color-dark-700: oklch(29.75% 0.033 274.52);
   --color-dark-800: oklch(25.96% 0.027 275.01);
   --color-dark-900: oklch(22.1% 0.022 276.46);
   --color-dark-950: oklch(14.557% 0.00884 273.86);
+}
+
+/* Border Colors */
+
+@theme {
+  --color-dark-border: color-mix(in oklab, var(--color-dark) 7%, transparent);
+  --color-light-border: color-mix(in oklab, var(--color-white) 7%, transparent);
 }

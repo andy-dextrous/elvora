@@ -22,7 +22,7 @@ function GridLines({ children, className, fadeLines = false }: GridLinesProps) {
   return (
     <div
       className={cn(
-        "absolute inset-0 z-10 container grid auto-rows-auto grid-cols-[var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_1fr_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)] border-x border-white/7",
+        "border-light-border absolute inset-0 z-10 grid auto-rows-auto grid-cols-[repeat(3,var(--spacing-grid-col-width))_1fr_repeat(3,var(--spacing-grid-col-width))] border-x",
         className
       )}
     >
@@ -30,7 +30,7 @@ function GridLines({ children, className, fadeLines = false }: GridLinesProps) {
         <div
           key={item}
           className={cn(
-            `col-span-1 col-start-${item} col-end-${item + 1} row-start-1 row-end-12 border-white/7`,
+            `col-span-1 col-start-${item} col-end-${item + 1} border-light-border row-start-1 row-end-12`,
             [2, 3, 4, 5].includes(item) && "xl:border-l",
             [5, 6].includes(item) && "xl:border-r",
             [2, 3].includes(item) && "lg:border-l",
@@ -54,7 +54,7 @@ function Grid({ children, className }: GridProps) {
   return (
     <div
       className={cn(
-        "relative z-20 container grid auto-rows-auto grid-cols-[var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_1fr_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)_var(--spacing-grid-col-width)]",
+        "relative z-20 grid auto-rows-auto grid-cols-[repeat(3,var(--spacing-grid-col-width))_1fr_repeat(3,var(--spacing-grid-col-width))]",
         className
       )}
     >

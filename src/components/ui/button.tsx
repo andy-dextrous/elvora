@@ -23,7 +23,7 @@ const buttonVariants = tv({
         "text-white shadow-xs hover:opacity-90",
       ],
       outline: [
-        "border border-white/20 bg-white/3 backdrop-blur-[5px]",
+        "border-light-border border bg-white/3 backdrop-blur-[5px]",
         "text-white",
         "hover:text-dark hover:bg-white",
         "focus-visible:ring-white/50",

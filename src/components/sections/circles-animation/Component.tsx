@@ -416,7 +416,10 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
   })
 
   return (
-    <section className="bg-dark flex min-h-screen items-center" ref={sectionRef}>
+    <section
+      className="bg-dark side-border-light flicker-mask flex min-h-screen items-center"
+      ref={sectionRef}
+    >
       <div className="container-md flex h-full items-center">
         <div className="flex flex-5 flex-col gap-10">
           <h2 ref={titleRef} className="text-white">

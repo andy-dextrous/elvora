@@ -475,7 +475,7 @@ export interface Page {
   title: string;
   publishedAt?: string | null;
   categories?: (string | Category)[] | null;
-  sections: (HeroPrimaryBlock | TextImageBlock | CirclesAnimationBlock)[];
+  sections: (HeroPrimaryBlock | TextImageBlock | CirclesAnimationBlock | ServiceCardsListBlock)[];
   meta?: {
     title?: string | null;
     /**
@@ -741,6 +741,19 @@ export interface CirclesAnimationBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'circles-animation';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServiceCardsListBlock".
+ */
+export interface ServiceCardsListBlock {
+  /**
+   * Placeholder field - to be replaced with actual fields
+   */
+  placeholder?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'service-cards-list';
 }
 /**
  * Team members are used to display the team on the website. They are different to users, which are used for the admin panel.
@@ -1051,6 +1064,7 @@ export interface PagesSelect<T extends boolean = true> {
         'hero-primary'?: T | HeroPrimaryBlockSelect<T>;
         'text-image'?: T | TextImageBlockSelect<T>;
         'circles-animation'?: T | CirclesAnimationBlockSelect<T>;
+        'service-cards-list'?: T | ServiceCardsListBlockSelect<T>;
       };
   meta?:
     | T
@@ -1137,6 +1151,15 @@ export interface TextImageBlockSelect<T extends boolean = true> {
  * via the `definition` "CirclesAnimationBlock_select".
  */
 export interface CirclesAnimationBlockSelect<T extends boolean = true> {
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServiceCardsListBlock_select".
+ */
+export interface ServiceCardsListBlockSelect<T extends boolean = true> {
+  placeholder?: T;
   id?: T;
   blockName?: T;
 }

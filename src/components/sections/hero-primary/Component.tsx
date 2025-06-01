@@ -12,6 +12,49 @@ import Link from "next/link"
 import React, { Fragment } from "react"
 
 /****************************************************
+ * Hero Content Component
+ ****************************************************/
+
+const HeroContent: React.FC<{ variant?: "default" | "outlineGradient" }> = ({
+  variant = "default",
+}) => {
+  return (
+    <Fragment>
+      <p className="font-light text-white">
+        We fuse commercial insight with digital capability to unlock rapid, scalable
+        growth.
+      </p>
+
+      <div className="space-y-4">
+        <Button
+          variant={variant === "outlineGradient" ? "outlineGradient" : undefined}
+          size="lg"
+          asChild
+          className="w-full"
+        >
+          <Link href="/contact">
+            Discovery Call
+            <ArrowRightIcon className="!h-[14px] !w-[24px]" />
+          </Link>
+        </Button>
+
+        <Button
+          variant={variant === "outlineGradient" ? "outlineGradient" : undefined}
+          size="lg"
+          className="w-full"
+          asChild
+        >
+          <Link href="/contact">
+            See What We Do
+            <ArrowRightIcon className="!h-[14px] !w-[24px]" />
+          </Link>
+        </Button>
+      </div>
+    </Fragment>
+  )
+}
+
+/****************************************************
  * Hero Component
  ****************************************************/
 
@@ -28,50 +71,12 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
           <div className="gap-content col-span-full row-span-12 row-start-1 flex h-full flex-col justify-center md:col-span-5 md:col-start-2 lg:col-span-5 lg:col-start-2 lg:row-span-10 xl:col-span-3 xl:col-start-2">
             <h1 className="text-white">Strategy Powered by Technology</h1>
             <div className="gap-content flex flex-col items-start justify-center xl:hidden">
-              <p className="font-light text-white">
-                We fuse commercial insight with digital capability to unlock rapid,
-                scalable growth.
-              </p>
-
-              <div className="space-y-4">
-                <Button size="lg" asChild className="w-full">
-                  <Link href="/contact">
-                    Discovery Call
-                    <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-                  </Link>
-                </Button>
-
-                <Button size="lg" className="w-full" asChild>
-                  <Link href="/contact">
-                    See What We Do
-                    <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-                  </Link>
-                </Button>
-              </div>
+              <HeroContent />
             </div>
           </div>
 
           <div className="col-span-full row-span-4 row-start-1 hidden flex-col justify-center space-y-12 md:col-span-5 md:col-start-2 md:row-span-3 md:row-start-6 lg:col-span-2 lg:col-start-6 lg:row-span-6 lg:row-start-4 xl:col-start-5 xl:flex">
-            <p className="font-light text-white">
-              We fuse commercial insight with digital capability to unlock rapid, scalable
-              growth.
-            </p>
-
-            <div className="space-y-4">
-              <Button variant="outlineGradient" size="lg" asChild className="w-full">
-                <Link href="/contact">
-                  Discovery Call
-                  <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-                </Link>
-              </Button>
-
-              <Button variant="outlineGradient" size="lg" className="w-full" asChild>
-                <Link href="/contact">
-                  See What We Do
-                  <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-                </Link>
-              </Button>
-            </div>
+            <HeroContent variant="outlineGradient" />
           </div>
 
           {/* Bottom Left - Timestamp */}
