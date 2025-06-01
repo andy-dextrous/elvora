@@ -36,7 +36,7 @@ export const MobileNav: React.FC<{ data: HeaderType }> = ({ data }) => {
       <SheetTrigger asChild>
         <Button
           variant="ghost"
-          size="icon"
+          icon
           className="hover:bg-accent/50 z-50 flex size-12 items-center justify-center rounded-full md:hidden"
         >
           <Menu className="h-6 w-6 transition-transform duration-200" />
@@ -51,7 +51,7 @@ export const MobileNav: React.FC<{ data: HeaderType }> = ({ data }) => {
           <SheetHeader className="flex items-center justify-between border-b p-4">
             <Button
               variant="ghost"
-              size="icon"
+              icon
               className="absolute top-6 right-6 z-50"
               onClick={() => setOpen(false)}
             >
