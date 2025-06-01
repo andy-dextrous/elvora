@@ -27,7 +27,7 @@
   --spacing-logo: clamp(45px, 10vw, 60px);
   --spacing-nav: clamp(50px, 10vh, 80px);
 
-  --spacing-content: var(--space-xs);
+  --spacing-content: var(--space-m);
 
   --spacing-container: 1528px;
   --spacing-container-md: 1326px;
@@ -40,7 +40,7 @@
   --spacing-card: var(--space-m);
   --spacing-card-content: var(--space-s);
 
-  --spacing-grid-col-width: clamp(1rem, 12.934vw + -1.587rem, 9.375rem);
+  --spacing-grid-col-width: clamp(1rem, 17.632vw + -7.463rem, 9.375rem);
 }
 
 /* Brand Color Shades - get from https://www.tailwindshades.com */
