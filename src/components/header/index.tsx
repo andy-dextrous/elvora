@@ -1,10 +1,10 @@
 import { HeaderNavigation } from "@/components/header/nav"
 import { getCachedGlobal } from "@/lib/queries/globals"
 import type { Header } from "@/payload/payload-types"
-import Image from "next/image"
 import Link from "next/link"
 
 import type { Config } from "payload"
+import LogoPrimaryLight from "../logos/logo-light"
 import { MobileNav } from "./mobile-nav"
 
 export async function Header() {
@@ -15,10 +15,14 @@ export async function Header() {
 
   return (
     <header className="h-nav px-section-x fixed inset-x-0 top-0 z-20 border-b border-white/10">
-      <div className="container h-full">
+      <div className="container h-full border-x-1 border-white/10 px-8">
         <div className="flex h-full items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3">
-            <Image src="/assets/logos/logo.svg" alt="Logo" width={160} height={40} />
+          <Link
+            href="/"
+            className="flex items-center space-x-3"
+            aria-label="Return to Elvora homepage"
+          >
+            <LogoPrimaryLight width={208} height={54} />
           </Link>
           <HeaderNavigation data={headerData} />
           <MobileNav data={headerData} />

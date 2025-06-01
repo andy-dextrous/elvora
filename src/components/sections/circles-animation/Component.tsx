@@ -480,7 +480,7 @@ const SVGComponent = (props: React.SVGProps<SVGSVGElement>) => (
   >
     <defs>
       <linearGradient
-        id="linear-gradient"
+        id="circles-aniimation-linear-gradient"
         x1={350.68}
         y1={396.03}
         x2={629.6}
@@ -636,7 +636,7 @@ const SVGComponent = (props: React.SVGProps<SVGSVGElement>) => (
       {/* Inside */}
       <g id="inside">
         <path
-          style={{ fill: "url(#linear-gradient)" }}
+          style={{ fill: "url(#circles-aniimation-linear-gradient)" }}
           d="M490.14,55.16c84.09,56.29,139.46,152.15,139.46,260.94s-55.37,204.65-139.46,260.94c-84.09-56.29-139.46-152.15-139.46-260.94s55.37-204.65,139.46-260.94Z"
         />
         <g style={{ mask: "url(#mask)" }}>
