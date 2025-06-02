@@ -41,25 +41,7 @@ export const SectionName: Block = {
     group: "Hero Sections", // Use the admin group if you want this section to be grouped with other types (eg all hereos together)
   },
   interfaceName: "NewSectionBlock", // This is used by Payload to create the types for this section. They will be imported into your component.
-  fields: [
-    // fields are how we declare the data we want to be obtained from the admin. https://payloadcms.com/docs/fields/overview
-    {
-      name: "heading",
-      type: "text",
-      required: true,
-    },
-    {
-      name: "content",
-      type: "richText",
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
-        },
-      }),
-      label: false,
-      required: true,
-    },
-  ],
+  fields: Don't add fields yet if asked to create aen empty section- simply omit the fields property.
 }
 ```
 

@@ -2,6 +2,7 @@ import { HeroPrimaryComponent } from "@/components/sections/hero-primary/Compone
 import { TextImageComponent } from "@/components/sections/text-image/Component"
 import CirclesAnimationComponent from "@/components/sections/circles-animation/Component"
 import { ServiceCardsListComponent } from "@/components/sections/service-cards-list/Component"
+import { TestimonialsComponent } from "@/components/sections/testimonials/Component"
 import React, { Fragment } from "react"
 
 /*******************************************************/
@@ -13,6 +14,7 @@ const sectionsMap: Record<string, React.ComponentType<any>> = {
   "text-image": TextImageComponent,
   "circles-animation": CirclesAnimationComponent,
   "service-cards-list": ServiceCardsListComponent,
+  testimonials: TestimonialsComponent,
 }
 
 /*******************************************************/

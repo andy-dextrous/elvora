@@ -475,7 +475,7 @@ export interface Page {
   title: string;
   publishedAt?: string | null;
   categories?: (string | Category)[] | null;
-  sections: (HeroPrimaryBlock | TextImageBlock | CirclesAnimationBlock | ServiceCardsListBlock)[];
+  sections: (HeroPrimaryBlock | TextImageBlock | CirclesAnimationBlock | ServiceCardsListBlock | TestimonialsBlock)[];
   meta?: {
     title?: string | null;
     /**
@@ -754,6 +754,31 @@ export interface ServiceCardsListBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'service-cards-list';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsBlock".
+ */
+export interface TestimonialsBlock {
+  heading: string;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'testimonials';
 }
 /**
  * Team members are used to display the team on the website. They are different to users, which are used for the admin panel.
@@ -1065,6 +1090,7 @@ export interface PagesSelect<T extends boolean = true> {
         'text-image'?: T | TextImageBlockSelect<T>;
         'circles-animation'?: T | CirclesAnimationBlockSelect<T>;
         'service-cards-list'?: T | ServiceCardsListBlockSelect<T>;
+        testimonials?: T | TestimonialsBlockSelect<T>;
       };
   meta?:
     | T
@@ -1160,6 +1186,16 @@ export interface CirclesAnimationBlockSelect<T extends boolean = true> {
  */
 export interface ServiceCardsListBlockSelect<T extends boolean = true> {
   placeholder?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsBlock_select".
+ */
+export interface TestimonialsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  content?: T;
   id?: T;
   blockName?: T;
 }
