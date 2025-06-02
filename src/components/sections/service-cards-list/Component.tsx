@@ -125,11 +125,11 @@ const CustomAccordion = ({ cards }: { cards: any }) => {
           value={`item-${index}`}
           className="border-dark-border hover:bg-neutral !hover:cursor-pointer w-full border-b"
         >
-          <div className="container-md gap-section-x flex">
+          <div className="flex w-full">
             {/* Accordion Content */}
-            <div className="gap-content-lg flex w-1/2 flex-col items-start">
+            <div className="flex w-1/2 flex-col items-start">
               <Accordion.Header className="w-full">
-                <Accordion.Trigger className="group gap-content flex w-full items-center py-8 data-[state=open]:py-20">
+                <Accordion.Trigger className="group gap-content pl-container-md-offset flex w-full items-center py-8 hover:cursor-pointer data-[state=open]:pt-20">
                   <span className="group-data-[state=open]:hidden">
                     <PlusIcon />
                   </span>
@@ -140,14 +140,13 @@ const CustomAccordion = ({ cards }: { cards: any }) => {
                 </Accordion.Trigger>
               </Accordion.Header>
 
-              <Accordion.Content className="gap-content flex flex-col data-[state=closed]:hidden">
+              <Accordion.Content className="gap-content pr-section-x pb-section-x pl-container-md-offset flex flex-col data-[state=closed]:hidden">
                 <h3>{card.accordionContent[0].title}</h3>
                 <p>{card.accordionContent[0].description}</p>
                 <Button className="self-start">Discover {card.accordionTitle}</Button>
               </Accordion.Content>
             </div>
 
-            {/* Accordion Image - Only show when open */}
             <Accordion.Content className="h-auto w-1/2 data-[state=closed]:hidden">
               <div
                 className="h-full w-full"

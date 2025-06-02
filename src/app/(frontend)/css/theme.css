@@ -20,7 +20,31 @@
   --spacing-container: clamp(19.375rem, -0.7906rem + 100.8278vw, 95.5rem);
   --spacing-container-md: clamp(17.5rem, 0.1821rem + 86.5894vw, 82.875rem);
   --spacing-container-sm: clamp(17.5rem, 5.447rem + 60.2649vw, 63rem);
+}
 
+/* Custom Calcs */
+
+/* This is the the offset padding to use to get a fullwidth element to
+imitate where the edges of the containers would be. */
+
+@theme {
+  --spacing-container-md-offset: calc(
+    (100vw - (var(--spacing-section-x) * 2) - var(--spacing-container)) / 2
+  );
+
+  --spacing-container-md-offset: calc(
+    (100vw - (var(--spacing-section-x) * 2) - var(--spacing-container-md)) / 2
+  );
+
+  --spacing-container-sm-offset: calc(
+    (100vw - (var(--spacing-section-x) * 2) - var(--spacing-container-sm)) / 2
+  );
+}
+
+/* Grid Lines */
+/* This is used to control the responsive grid widths in the design. */
+
+@theme {
   --spacing-grid-col-width: max(
     var(--spacing-section-x),
     clamp(1rem, 17.632vw + -7.463rem, 9.375rem)
@@ -61,7 +85,7 @@
   --color-dark-950: oklch(14.557% 0.00884 273.86);
 }
 
-/* Border Colors */
+/* Role-based Colors */
 
 @theme {
   --color-dark-border: color-mix(in oklab, var(--color-dark) 7%, transparent);
