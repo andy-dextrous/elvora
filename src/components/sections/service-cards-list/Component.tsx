@@ -21,7 +21,8 @@ const cards = [
         title: "Business Intelligence & AI: From Strategy to Implementation",
         description:
           "We harness the power of your data to uncover actionable insights, drive predictive decision-making, and fuel AI-driven efficiency. Whether you're looking to optimise operations or elevate strategy with smart automation, our BI & AI services turn complexity into clarity.",
-        image: "https://picsum.photos/1080/1080",
+        image:
+          "https://res.cloudinary.com/wild-creative/image/upload/v1748834618/glass_floor_gbeo9g.jpg",
       },
     ],
   },
@@ -32,7 +33,8 @@ const cards = [
         title: "Revenue & Profit Optimisation: Maximizing Business Value",
         description:
           "Strategic solutions to enhance revenue streams and optimize profit margins through data-driven decision making.",
-        image: "https://picsum.photos/1080/1080",
+        image:
+          "https://res.cloudinary.com/wild-creative/image/upload/v1748834618/glass_floor_gbeo9g.jpg",
       },
     ],
   },
@@ -43,7 +45,8 @@ const cards = [
         title: "Sales & Marketing Alignment: Unified Growth Strategy",
         description:
           "Align your sales and marketing teams to create seamless customer journeys and drive sustainable growth.",
-        image: "https://picsum.photos/1080/1080",
+        image:
+          "https://res.cloudinary.com/wild-creative/image/upload/v1748834618/glass_floor_gbeo9g.jpg",
       },
     ],
   },
@@ -54,7 +57,8 @@ const cards = [
         title: "Lean & Agile Operations: Efficiency Through Innovation",
         description:
           "Transform your operations with lean methodologies and agile practices to increase efficiency and adaptability.",
-        image: "https://picsum.photos/1080/1080",
+        image:
+          "https://res.cloudinary.com/wild-creative/image/upload/v1748834618/glass_floor_gbeo9g.jpg",
       },
     ],
   },
@@ -65,7 +69,8 @@ const cards = [
         title: "Supply Chain Efficiency: Optimizing Flow & Control",
         description:
           "Streamline your supply chain operations to reduce costs and improve delivery performance.",
-        image: "https://picsum.photos/1080/1080",
+        image:
+          "https://res.cloudinary.com/wild-creative/image/upload/v1748834618/glass_floor_gbeo9g.jpg",
       },
     ],
   },
@@ -76,7 +81,8 @@ const cards = [
         title: "Cloud & Infrastructure: Modern Digital Foundation",
         description:
           "Build and maintain scalable, secure cloud infrastructure to support your digital transformation journey.",
-        image: "https://picsum.photos/1080/1080",
+        image:
+          "https://res.cloudinary.com/wild-creative/image/upload/v1748834618/glass_floor_gbeo9g.jpg",
       },
     ],
   },
@@ -87,7 +93,8 @@ const cards = [
         title: "CRM & ERP Implementation: Integrated Business Systems",
         description:
           "Expert implementation of CRM and ERP solutions to streamline processes and enhance customer relationships.",
-        image: "https://picsum.photos/1080/1080",
+        image:
+          "https://res.cloudinary.com/wild-creative/image/upload/v1748834618/glass_floor_gbeo9g.jpg",
       },
     ],
   },

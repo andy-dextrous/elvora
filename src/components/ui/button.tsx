@@ -64,11 +64,16 @@ const buttonVariants = tv({
         "has-[>svg]:px-3",
       ],
       sm: [
-        "h-8 gap-1.5 px-3 text-xs",
-        "[&_svg:not([class*='size-'])]:size-4",
+        "h-8 gap-2 px-3 py-2 !text-xs",
+        "[&_svg:not([class*='size-'])]:size-6",
         "has-[>svg]:px-2.5",
       ],
-      lg: ["gap-4 px-8 py-6 text-base", "[&_svg:not([class*='size-'])]:size-6"],
+      md: [
+        "h-10 gap-3 px-6 py-4 text-sm",
+        "[&_svg:not([class*='size-'])]:size-6",
+        "has-[>svg]:px-5",
+      ],
+      lg: ["gap-4 px-8 py-6 text-sm", "[&_svg:not([class*='size-'])]:size-6"],
     },
     icon: {
       true: [
@@ -80,12 +85,8 @@ const buttonVariants = tv({
   },
   compoundVariants: [
     {
-      size: ["sm", "default", "lg"],
-      class: "!text-sm",
-    },
-    {
       layout: ["default", "centered"],
-      size: ["default", "sm", "lg"],
+      size: ["default", "sm", "md", "lg"],
       class: "[&>svg]:h-6 [&>svg]:w-6",
     },
   ],

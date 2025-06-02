@@ -43,7 +43,7 @@
   }
 
   h5 {
-    @apply font-heading text-h5 text-dark leading-tight font-semibold tracking-tight;
+    @apply font-heading text-h5 text-dark leading-tight font-light tracking-normal;
   }
 
   h6 {

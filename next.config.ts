@@ -26,6 +26,10 @@ const nextConfig = {
         hostname: "logoipsum.com",
         protocol: "https",
       },
+      {
+        hostname: "res.cloudinary.com",
+        protocol: "https",
+      },
     ],
   },
   reactStrictMode: true,

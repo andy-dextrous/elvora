@@ -14,6 +14,14 @@
       1;
   }
 
+  .article-image-gradient {
+    background: linear-gradient(
+      140.3deg,
+      rgba(68, 0, 255, 0) 41.78%,
+      rgba(68, 0, 255, 0.5) 100%
+    );
+  }
+
   .side-border-dark {
     position: relative;
     &::before {
