@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import * as Accordion from "@radix-ui/react-accordion"
 import PlusIcon from "@/components/icons/plus"
 import MinusIcon from "@/components/icons/minus"
 import { Button } from "@/components/ui/button"
 import type { ServiceCardsListBlock } from "@/payload/payload-types"
-import Image from "next/image"
 import { cn } from "@/utilities/ui"
 
 /*************************************************************************/
@@ -118,69 +117,46 @@ export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props 
 /*************************************************************************/
 
 const CustomAccordion = ({ cards }: { cards: any }) => {
-  const [openIndex, setOpenIndex] = useState<number>(0) // First one open on load
-
-  /*************************************************************************/
-  /*  EVENT HANDLERS
-  /*************************************************************************/
-
-  function handleAccordionClick(index: number) {
-    if (openIndex === index) {
-      // If clicking the open item, close it
-      setOpenIndex(-1)
-    } else {
-      // Open the clicked item
-      setOpenIndex(index)
-    }
-  }
-
   return (
-    <div>
-      {cards.map((card: any, index: any) => {
-        const isOpen = openIndex === index
-
-        return (
-          <div
-            key={index}
-            className="border-dark-border hover:bg-neutral w-full border-b hover:cursor-pointer"
-            id={`accordion-trigger-${index}`}
-            onClick={() => handleAccordionClick(index)}
-          >
-            <div className="container-md gap-section-x flex">
-              {/* Accordion Content */}
-              <div
-                className={cn(
-                  "gap-content-lg flex w-1/2 flex-col items-start",
-                  isOpen ? "py-20" : "py-8"
-                )}
-              >
-                {/* Trigger Title */}
-                <div className="gap-content flex items-center">
-                  {isOpen ? <MinusIcon /> : <PlusIcon />}
+    <Accordion.Root type="single" defaultValue="item-0" collapsible>
+      {cards.map((card: any, index: any) => (
+        <Accordion.Item
+          key={index}
+          value={`item-${index}`}
+          className="border-dark-border hover:bg-neutral !hover:cursor-pointer w-full border-b"
+        >
+          <div className="container-md gap-section-x flex">
+            {/* Accordion Content */}
+            <div className="gap-content-lg flex w-1/2 flex-col items-start">
+              <Accordion.Header className="w-full">
+                <Accordion.Trigger className="group gap-content flex w-full items-center py-8 data-[state=open]:py-20">
+                  <span className="group-data-[state=open]:hidden">
+                    <PlusIcon />
+                  </span>
+                  <span className="group-data-[state=closed]:hidden">
+                    <MinusIcon />
+                  </span>
                   <h4>{card.accordionTitle}</h4>
-                </div>
+                </Accordion.Trigger>
+              </Accordion.Header>
 
-                {/* Content - Only show when open */}
-                {isOpen && (
-                  <div className="gap-content flex flex-col">
-                    <h3>{card.accordionContent[0].title}</h3>
-                    <p>{card.accordionContent[0].description}</p>
-                    <Button className="self-start">Discover {card.accordionTitle}</Button>
-                  </div>
-                )}
-              </div>
-
-              {/* Accordion Image - Only show when open */}
-              {isOpen && (
-                <div
-                  className="h-auto w-1/2"
-                  style={{ backgroundImage: `url(${card.accordionContent[0].image})` }}
-                />
-              )}
+              <Accordion.Content className="gap-content flex flex-col data-[state=closed]:hidden">
+                <h3>{card.accordionContent[0].title}</h3>
+                <p>{card.accordionContent[0].description}</p>
+                <Button className="self-start">Discover {card.accordionTitle}</Button>
+              </Accordion.Content>
             </div>
+
+            {/* Accordion Image - Only show when open */}
+            <Accordion.Content className="h-auto w-1/2 data-[state=closed]:hidden">
+              <div
+                className="h-full w-full"
+                style={{ backgroundImage: `url(${card.accordionContent[0].image})` }}
+              />
+            </Accordion.Content>
           </div>
-        )
-      })}
-    </div>
+        </Accordion.Item>
+      ))}
+    </Accordion.Root>
   )
 }
