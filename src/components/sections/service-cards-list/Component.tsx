@@ -6,6 +6,7 @@ import MinusIcon from "@/components/icons/minus"
 import { Button } from "@/components/ui/button"
 import type { ServiceCardsListBlock } from "@/payload/payload-types"
 import Image from "next/image"
+import { cn } from "@/utilities/ui"
 
 /*************************************************************************/
 /*  SERVICE CARDS LIST COMPONENT
@@ -18,7 +19,7 @@ const cards = [
       {
         title: "Business Intelligence & AI: From Strategy to Implementation",
         description:
-          "We help businesses optimize their operations and improve their bottom line.",
+          "We harness the power of your data to uncover actionable insights, drive predictive decision-making, and fuel AI-driven efficiency. Whether you're looking to optimise operations or elevate strategy with smart automation, our BI & AI services turn complexity into clarity.",
         image: "https://picsum.photos/1080/1080",
       },
     ],
@@ -147,9 +148,14 @@ const CustomAccordion = ({ cards }: { cards: any }) => {
           >
             <div className="container-md gap-section-x flex">
               {/* Accordion Content */}
-              <div className="gap-content-lg flex w-1/2 flex-col items-start py-8">
+              <div
+                className={cn(
+                  "gap-content-lg flex w-1/2 flex-col items-start",
+                  isOpen ? "py-20" : "py-8"
+                )}
+              >
                 {/* Trigger Title */}
-                <div className="gap-content flex items-center py-8">
+                <div className="gap-content flex items-center">
                   {isOpen ? <MinusIcon /> : <PlusIcon />}
                   <h4>{card.accordionTitle}</h4>
                 </div>
@@ -159,21 +165,17 @@ const CustomAccordion = ({ cards }: { cards: any }) => {
                   <div className="gap-content flex flex-col">
                     <h3>{card.accordionContent[0].title}</h3>
                     <p>{card.accordionContent[0].description}</p>
-                    <Button className="self-start">Learn More</Button>
+                    <Button className="self-start">Discover {card.accordionTitle}</Button>
                   </div>
                 )}
               </div>
 
               {/* Accordion Image - Only show when open */}
               {isOpen && (
-                <div className="h-auto w-1/2">
-                  <Image
-                    src={card.accordionContent[0].image}
-                    alt={card.accordionTitle}
-                    width={1080}
-                    height={1080}
-                  />
-                </div>
+                <div
+                  className="h-auto w-1/2"
+                  style={{ backgroundImage: `url(${card.accordionContent[0].image})` }}
+                />
               )}
             </div>
           </div>

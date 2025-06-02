@@ -19,7 +19,7 @@ const buttonVariants = tv({
   variants: {
     variant: {
       default: [
-        "from-primary to-secondary bg-gradient-to-r",
+        "from-secondary-700 to-primary bg-gradient-to-r",
         "text-white shadow-xs hover:opacity-90",
       ],
       outline: [
