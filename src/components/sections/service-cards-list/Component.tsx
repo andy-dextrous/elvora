@@ -6,6 +6,8 @@ import MinusIcon from "@/components/icons/minus"
 import { Button } from "@/components/ui/button"
 import type { ServiceCardsListBlock } from "@/payload/payload-types"
 import { cn } from "@/utilities/ui"
+import Link from "next/link"
+import ArrowRightIcon from "@/components/icons/arrow-right"
 
 /*************************************************************************/
 /*  SERVICE CARDS LIST COMPONENT
@@ -108,6 +110,17 @@ export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props 
       <div className="border-dark-border w-full border-t">
         <CustomAccordion cards={cards} />
       </div>
+      <div className="container-sm mt-section-x">
+        <div className="flex items-center justify-between">
+          <p>Didn't find what you're looking for? Explore our full capabilities</p>
+          <Button asChild>
+            <Link href="/services">
+              View All Services
+              <ArrowRightIcon className="!h-[14px] !w-[24px]" />
+            </Link>
+          </Button>
+        </div>
+      </div>
     </section>
   )
 }
@@ -125,11 +138,11 @@ const CustomAccordion = ({ cards }: { cards: any }) => {
           value={`item-${index}`}
           className="border-dark-border hover:bg-neutral !hover:cursor-pointer w-full border-b"
         >
-          <div className="flex w-full">
+          <div className="flex w-full flex-col lg:flex-row">
             {/* Accordion Content */}
-            <div className="flex w-1/2 flex-col items-start">
+            <div className="flex w-full flex-col items-start lg:w-1/2">
               <Accordion.Header className="w-full">
-                <Accordion.Trigger className="group gap-content pl-container-md-offset flex w-full items-center py-8 hover:cursor-pointer data-[state=open]:pt-20">
+                <Accordion.Trigger className="group gap-content pl-section-x lg:pl-container-md-offset flex w-full items-center py-6 hover:cursor-pointer data-[state=open]:pt-12 lg:py-8 lg:data-[state=open]:pt-20">
                   <span className="group-data-[state=open]:hidden">
                     <PlusIcon />
                   </span>
@@ -140,16 +153,16 @@ const CustomAccordion = ({ cards }: { cards: any }) => {
                 </Accordion.Trigger>
               </Accordion.Header>
 
-              <Accordion.Content className="gap-content pr-section-x pb-section-x pl-container-md-offset flex flex-col data-[state=closed]:hidden">
+              <Accordion.Content className="gap-content pb-section-xs pl-section-x pr-section-x lg:pb-section-x lg:pl-container-md-offset lg:pr-section-x flex flex-col data-[state=closed]:hidden">
                 <h3>{card.accordionContent[0].title}</h3>
                 <p>{card.accordionContent[0].description}</p>
                 <Button className="self-start">Discover {card.accordionTitle}</Button>
               </Accordion.Content>
             </div>
 
-            <Accordion.Content className="h-auto w-1/2 data-[state=closed]:hidden">
+            <Accordion.Content className="h-64 w-full data-[state=closed]:hidden md:h-80 lg:h-auto lg:w-1/2">
               <div
-                className="h-full w-full"
+                className="h-full w-full bg-cover bg-center"
                 style={{ backgroundImage: `url(${card.accordionContent[0].image})` }}
               />
             </Accordion.Content>
