@@ -118,6 +118,8 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
   const timestampTimeRef = useRef<HTMLDivElement>(null)
   const scrollTextRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const backgroundContainerRef = useRef<HTMLDivElement>(null)
+  const backgroundImageRef = useRef<HTMLImageElement>(null)
 
   useGSAP(() => {
     let isUAE = true
@@ -219,6 +221,18 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
       revertOnComplete: true,
     })
 
+    // Gentle continuous zoom on background image
+    if (backgroundImageRef.current) {
+      gsap.to(backgroundImageRef.current, {
+        scale: 1.1,
+        duration: 16,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut",
+        force3D: true,
+      })
+    }
+
     // Single master timeline controlling both animations
     const masterTimeline = gsap.timeline({
       repeat: -1,
@@ -278,18 +292,30 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
       </Grid>
 
       {/* Background */}
-      <Background backgroundImage={backgroundImage as Media} />
+      <Background
+        backgroundImage={backgroundImage as Media}
+        containerRef={backgroundContainerRef}
+        imageRef={backgroundImageRef}
+      />
     </section>
   )
 }
 
-const Background = ({ backgroundImage }: { backgroundImage: Media | null }) => {
+const Background = ({
+  backgroundImage,
+  containerRef,
+  imageRef,
+}: {
+  backgroundImage: Media | null
+  containerRef: React.RefObject<HTMLDivElement | null>
+  imageRef: React.RefObject<HTMLImageElement | null>
+}) => {
   return (
     <Fragment>
       <div className="pt-nav top-nav inset-x-section-x absolute bottom-0">
         <GridLines />
       </div>
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden">
         <div className="relative h-full w-full">
           {/* Top Down Fade */}
           <div className="from-dark-950 absolute inset-0 z-10 bg-gradient-to-b from-10% to-transparent to-100% lg:from-30% lg:to-transparent lg:to-60%" />
@@ -297,6 +323,7 @@ const Background = ({ backgroundImage }: { backgroundImage: Media | null }) => {
           {/* Background Image */}
           <div className="absolute inset-x-0 bottom-0 size-full">
             <Image
+              ref={imageRef}
               src={(backgroundImage as Media).url || "https://picsum.photos/1728/1260"}
               alt={"Hero Background"}
               className="absolute inset-0 h-full w-full object-cover object-[50%_50%] lg:object-[80%_50%]"
