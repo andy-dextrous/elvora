@@ -1,6 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import PlusIcon from "@/components/icons/plus"
+import MinusIcon from "@/components/icons/minus"
 import { Button } from "@/components/ui/button"
 import type { ServiceCardsListBlock } from "@/payload/payload-types"
 import Image from "next/image"
@@ -110,42 +112,73 @@ export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props 
   )
 }
 
+/*************************************************************************/
+/*  ACCORDION COMPONENT
+/*************************************************************************/
+
 const CustomAccordion = ({ cards }: { cards: any }) => {
+  const [openIndex, setOpenIndex] = useState<number>(0) // First one open on load
+
+  /*************************************************************************/
+  /*  EVENT HANDLERS
+  /*************************************************************************/
+
+  function handleAccordionClick(index: number) {
+    if (openIndex === index) {
+      // If clicking the open item, close it
+      setOpenIndex(-1)
+    } else {
+      // Open the clicked item
+      setOpenIndex(index)
+    }
+  }
+
   return (
     <div>
-      {cards.map((card: any, index: any) => (
-        <div
-          key={index}
-          className="border-dark-border hover:bg-neutral w-full border-b hover:cursor-pointer"
-          id={`accordion-trigger-${index}`}
-        >
-          <div className="container-md gap-section-x flex">
-            {/* Accordion Content */}
-            <div className="gap-content-lg flex w-1/2 flex-col items-start py-8">
-              {/* Trigger Title */}
-              <div className="gap-content flex items-center py-8">
-                <PlusIcon />
-                <h4>{card.accordionTitle}</h4>
-              </div>
-              <div className="gap-content flex flex-col">
-                <h3>{card.accordionContent[0].title}</h3>
-                <p>{card.accordionContent[0].description}</p>
-                <Button className="self-start">Learn More</Button>
-              </div>
-            </div>
+      {cards.map((card: any, index: any) => {
+        const isOpen = openIndex === index
 
-            {/* Accordion Image */}
-            <div className="h-auto w-1/2">
-              <Image
-                src={card.accordionContent[0].image}
-                alt={card.accordionTitle}
-                width={1080}
-                height={1080}
-              />
+        return (
+          <div
+            key={index}
+            className="border-dark-border hover:bg-neutral w-full border-b hover:cursor-pointer"
+            id={`accordion-trigger-${index}`}
+            onClick={() => handleAccordionClick(index)}
+          >
+            <div className="container-md gap-section-x flex">
+              {/* Accordion Content */}
+              <div className="gap-content-lg flex w-1/2 flex-col items-start py-8">
+                {/* Trigger Title */}
+                <div className="gap-content flex items-center py-8">
+                  {isOpen ? <MinusIcon /> : <PlusIcon />}
+                  <h4>{card.accordionTitle}</h4>
+                </div>
+
+                {/* Content - Only show when open */}
+                {isOpen && (
+                  <div className="gap-content flex flex-col">
+                    <h3>{card.accordionContent[0].title}</h3>
+                    <p>{card.accordionContent[0].description}</p>
+                    <Button className="self-start">Learn More</Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Accordion Image - Only show when open */}
+              {isOpen && (
+                <div className="h-auto w-1/2">
+                  <Image
+                    src={card.accordionContent[0].image}
+                    alt={card.accordionTitle}
+                    width={1080}
+                    height={1080}
+                  />
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
