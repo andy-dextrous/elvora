@@ -1,3 +1,5 @@
+"use client"
+
 import RichText from "@/payload/components/rich-text"
 import { cn } from "@/utilities/ui"
 import { CMSLink } from "@/payload/components/cms-link"
@@ -7,12 +9,25 @@ import type {
   Media,
   TextImageBlock as TextImageBlockProps,
 } from "@/payload/payload-types"
+import { useGSAP, gsap } from "@/providers/gsap"
+import { useRef } from "react"
 
 export const TextImageComponent: React.FC<TextImageBlockProps> = props => {
   const { heading, content, image: imageProp, imagePosition, buttons } = props
   const image = imageProp as Media
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   const imageUrl = image?.url || "https://picsum.photos/700/400"
+
+  useGSAP(() => {
+    gsap.effects.titleReveal(titleRef.current, {
+      trigger: {
+        trigger: titleRef.current,
+        start: "top 90%",
+        end: "bottom 40%",
+      },
+    })
+  })
 
   return (
     <section>
@@ -23,7 +38,9 @@ export const TextImageComponent: React.FC<TextImageBlockProps> = props => {
         )}
       >
         <div className="flex flex-1 flex-col items-start gap-4">
-          <h2 className="text-2xl font-bold">{heading}</h2>
+          <h2 ref={titleRef} className="title-hidden text-2xl font-bold">
+            {heading}
+          </h2>
           <div className="prose max-w-none">
             <RichText data={content} />
           </div>

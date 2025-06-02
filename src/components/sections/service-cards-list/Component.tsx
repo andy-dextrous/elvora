@@ -8,6 +8,8 @@ import type { ServiceCardsListBlock } from "@/payload/payload-types"
 import { cn } from "@/utilities/ui"
 import Link from "next/link"
 import ArrowRightIcon from "@/components/icons/arrow-right"
+import { useGSAP, gsap } from "@/providers/gsap"
+import { useRef } from "react"
 
 /*************************************************************************/
 /*  SERVICE CARDS LIST COMPONENT
@@ -101,10 +103,22 @@ const cards = [
 ] as any
 
 export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props => {
+  const titleRef = useRef<HTMLHeadingElement>(null)
+
+  useGSAP(() => {
+    gsap.effects.titleReveal(titleRef.current, {
+      trigger: {
+        trigger: titleRef.current,
+        start: "top 90%",
+        end: "bottom 40%",
+      },
+    })
+  })
+
   return (
     <section className="side-border-dark pt-section-xl">
       <div className="container-sm gap-content-lg mb-section-x flex flex-col items-center">
-        <h2>
+        <h2 ref={titleRef} className="title-hidden">
           Commercial, Operational{" "}
           <span className="text-gradient">& Technology Services</span>
         </h2>

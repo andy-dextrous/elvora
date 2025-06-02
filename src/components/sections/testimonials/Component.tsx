@@ -16,14 +16,27 @@ import {
   LogoipGohissum,
 } from "@/components/icons/partner-logos"
 import Quotation from "@/components/icons/quotation"
+import { useGSAP, gsap } from "@/providers/gsap"
+import { useRef } from "react"
 
 export const TestimonialsComponent: React.FC<TestimonialsBlock> = props => {
   const { heading, content } = props
+  const titleRef = useRef<HTMLHeadingElement>(null)
+
+  useGSAP(() => {
+    gsap.effects.titleReveal(titleRef.current, {
+      trigger: {
+        trigger: titleRef.current,
+        start: "top 90%",
+        end: "bottom 40%",
+      },
+    })
+  })
 
   return (
     <section className="bg-dark-50 side-border-dark">
       <div className="container-sm gap-content-lg mb-section-x flex flex-col items-start">
-        <h2>
+        <h2 ref={titleRef} className="title-hidden">
           Trusted By <br />
           <span className="text-gradient">Forward-Thinkers</span>
         </h2>

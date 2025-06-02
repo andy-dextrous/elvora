@@ -22,6 +22,9 @@ import { usePathname } from "next/navigation"
 import { createContext, useRef } from "react"
 import { GSDevTools } from "gsap/GSDevTools"
 
+// Import effects to register them
+import "./gsap/effects"
+
 /****************************************************
  * Setup GSAP Plugins and Defaults
  ****************************************************/

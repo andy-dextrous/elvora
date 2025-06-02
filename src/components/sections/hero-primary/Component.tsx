@@ -7,9 +7,10 @@ import SpeechBubble from "@/components/icons/speech-bubble"
 import { Grid, GridLines } from "@/components/layout/grid"
 import { Button } from "@/components/ui/button"
 import type { HeroPrimaryBlock as HeroProps, Media } from "@/payload/payload-types"
+import { useGSAP, gsap } from "@/providers/gsap"
 import Image from "next/image"
 import Link from "next/link"
-import React, { Fragment } from "react"
+import React, { Fragment, useRef } from "react"
 
 /****************************************************
  * Hero Content Component
@@ -55,6 +56,55 @@ const HeroContent: React.FC<{ variant?: "default" | "outlineGradient" }> = ({
 }
 
 /****************************************************
+ * Hero Timestamp Component
+ ****************************************************/
+
+const HeroTimestamp: React.FC = () => {
+  const dateRef = useRef<HTMLDivElement>(null)
+  const timeRef = useRef<HTMLDivElement>(null)
+
+  return (
+    <div className="z-10 col-span-1 col-start-1 row-span-2 row-start-10 hidden items-end xl:flex">
+      <div className="text-sm text-white">
+        <div ref={dateRef}>Mon, 16th May 2025</div>
+        <div ref={timeRef}>02:00 AM (GMT+4)</div>
+      </div>
+    </div>
+  )
+}
+
+/****************************************************
+ * Hero Scroll Indicator Component
+ ****************************************************/
+
+const HeroScrollIndicator: React.FC<{
+  textRef: React.RefObject<HTMLDivElement | null>
+}> = ({ textRef }) => {
+  const arrowRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    // Only arrow bounce animation here - continuous and independent
+    const bounceTimeline = gsap.timeline({
+      defaults: { duration: 0.7, ease: "power1.inOut" },
+      yoyo: true,
+      repeat: -1,
+    })
+    bounceTimeline.to(arrowRef.current, { y: 20 })
+  })
+
+  return (
+    <div className="col-span-1 col-start-4 row-span-1 row-start-11 flex flex-col items-center justify-end space-y-4 text-white">
+      <div ref={textRef} className="text-xs font-light tracking-[0.4em] uppercase">
+        Scroll Down
+      </div>
+      <div ref={arrowRef}>
+        <ArrowDownIcon />
+      </div>
+    </div>
+  )
+}
+
+/****************************************************
  * Hero Component
  ****************************************************/
 
@@ -64,12 +114,128 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
   backgroundImage,
   buttons,
 }) => {
+  const timestampDateRef = useRef<HTMLDivElement>(null)
+  const timestampTimeRef = useRef<HTMLDivElement>(null)
+  const scrollTextRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+
+  useGSAP(() => {
+    let isUAE = true
+
+    function getCurrentTimes() {
+      const now = new Date()
+
+      // UAE Time (GMT+4)
+      const uaeDate = new Intl.DateTimeFormat("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Asia/Dubai",
+      }).format(now)
+
+      const uaeTime = new Intl.DateTimeFormat("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Dubai",
+      }).format(now)
+
+      // Ireland Time (GMT+0/+1)
+      const irelandDate = new Intl.DateTimeFormat("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Europe/Dublin",
+      }).format(now)
+
+      const irelandTime = new Intl.DateTimeFormat("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Europe/Dublin",
+      }).format(now)
+
+      return {
+        uae: {
+          date: uaeDate,
+          time: `${uaeTime} (GMT+4)`,
+        },
+        ireland: {
+          date: irelandDate,
+          time: `${irelandTime} (GMT+0)`,
+        },
+      }
+    }
+
+    function animateElements() {
+      const times = getCurrentTimes()
+      const current = isUAE ? times.uae : times.ireland
+
+      // Animate timestamp
+      gsap.to(timestampDateRef.current, {
+        duration: 2,
+        scrambleText: {
+          text: current.date,
+          chars: "lowerCase",
+          newClass: "text-sm text-white",
+        },
+      })
+
+      gsap.to(timestampTimeRef.current, {
+        duration: 2,
+        scrambleText: {
+          text: current.time,
+          chars: "lowerCase",
+          newClass: "text-sm text-white",
+        },
+      })
+
+      // Animate scroll text
+      gsap.to(scrollTextRef.current, {
+        duration: 2,
+        scrambleText: {
+          text: "{original}",
+          chars: "lowerCase",
+          newClass: "text-xs font-light tracking-[0.4em] uppercase text-white",
+        },
+      })
+
+      isUAE = !isUAE
+    }
+
+    // Set initial timestamp
+    const initialTimes = getCurrentTimes()
+    if (timestampDateRef.current && timestampTimeRef.current) {
+      timestampDateRef.current.textContent = initialTimes.uae.date
+      timestampTimeRef.current.textContent = initialTimes.uae.time
+    }
+
+    // Title reveal animation
+    gsap.effects.titleReveal(titleRef.current, {
+      duration: 2,
+      stagger: 0.3,
+      revertOnComplete: true,
+    })
+
+    // Single master timeline controlling both animations
+    const masterTimeline = gsap.timeline({
+      repeat: -1,
+      repeatDelay: 8, // 10 seconds total (2 second animation + 8 second delay)
+    })
+
+    masterTimeline.call(animateElements)
+  })
+
   return (
     <section className="bg-dark relative flex h-auto w-full flex-col justify-between overflow-hidden py-0 lg:h-[160vh]">
       <div className="relative h-screen w-full">
         <Grid className="h-full grid-rows-10 pb-8">
           <div className="gap-content col-span-full row-span-12 row-start-1 flex h-full flex-col justify-center md:col-span-5 md:col-start-2 lg:col-span-5 lg:col-start-2 lg:row-span-10 xl:col-span-3 xl:col-start-2">
-            <h1 className="max-w-[10ch] text-white">Strategy Powered by Technology</h1>
+            <h1 ref={titleRef} className="title-hidden max-w-[10ch] text-white">
+              Strategy Powered by Technology
+            </h1>
             <div className="gap-content flex flex-col items-start justify-center xl:hidden">
               <HeroContent />
             </div>
@@ -79,21 +245,16 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
             <HeroContent variant="outlineGradient" />
           </div>
 
-          {/* Bottom Left - Timestamp */}
+          {/* Timestamp */}
           <div className="z-10 col-span-1 col-start-1 row-span-2 row-start-10 hidden items-end xl:flex">
             <div className="text-sm text-white">
-              <div>Mon, 16th May 2025</div>
-              <div>02:00 AM (GMT+10)</div>
+              <div ref={timestampDateRef}>Mon, 16th May 2025</div>
+              <div ref={timestampTimeRef}>02:00 AM (GMT+4)</div>
             </div>
           </div>
 
-          {/* Bottom Center - Scroll Indicator */}
-          <div className="col-span-1 col-start-4 row-span-1 row-start-11 flex flex-col items-center justify-end space-y-4 text-white">
-            <div className="text-xs font-light tracking-[0.4em] uppercase">
-              Scroll Down
-            </div>
-            <ArrowDownIcon />
-          </div>
+          {/* Scroll Indicator */}
+          <HeroScrollIndicator textRef={scrollTextRef} />
 
           {/* Bottom Right - Contact Icons */}
           <div className="col-span-3 col-start-7 row-span-2 row-start-10 hidden items-end justify-end space-x-4 lg:flex">
