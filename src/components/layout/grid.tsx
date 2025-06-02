@@ -30,7 +30,7 @@ function GridLines({ children, className, fadeLines = false }: GridLinesProps) {
         <div
           key={item}
           className={cn(
-            `col-span-1 col-start-${item} col-end-${item + 1} border-light-border row-start-1 row-end-12`,
+            `col-span-1 col-start-${item} col-end-${item + 1} border-light-border row-span-full row-start-1`,
             [2, 3, 4, 5].includes(item) && "xl:border-l",
             [5, 6].includes(item) && "xl:border-r",
             [2, 3].includes(item) && "lg:border-l",

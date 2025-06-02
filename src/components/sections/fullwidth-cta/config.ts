@@ -1,11 +1,8 @@
 import type { Block } from "payload"
 
-export const LatestArticles: Block = {
-  slug: "latest-articles",
-  admin: {
-    group: "Content Sections",
-  },
-  interfaceName: "LatestArticlesBlock",
+export const FullwidthCta: Block = {
+  slug: "fullwidth-cta",
+  interfaceName: "FullwidthCtaBlock",
   fields: [
     {
       name: "placeholder",

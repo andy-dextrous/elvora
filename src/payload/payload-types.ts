@@ -483,6 +483,7 @@ export interface Page {
     | TestimonialsBlock
     | InfoGridBlock
     | LatestArticlesBlock
+    | FullwidthCtaBlock
   )[];
   meta?: {
     title?: string | null;
@@ -802,9 +803,26 @@ export interface InfoGridBlock {
  * via the `definition` "LatestArticlesBlock".
  */
 export interface LatestArticlesBlock {
+  /**
+   * Placeholder field - to be replaced with actual fields
+   */
+  placeholder?: string | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'latest-articles';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FullwidthCtaBlock".
+ */
+export interface FullwidthCtaBlock {
+  /**
+   * Placeholder field - to be replaced with actual fields
+   */
+  placeholder?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'fullwidth-cta';
 }
 /**
  * Team members are used to display the team on the website. They are different to users, which are used for the admin panel.
@@ -1119,6 +1137,7 @@ export interface PagesSelect<T extends boolean = true> {
         testimonials?: T | TestimonialsBlockSelect<T>;
         'info-grid'?: T | InfoGridBlockSelect<T>;
         'latest-articles'?: T | LatestArticlesBlockSelect<T>;
+        'fullwidth-cta'?: T | FullwidthCtaBlockSelect<T>;
       };
   meta?:
     | T
@@ -1240,6 +1259,16 @@ export interface InfoGridBlockSelect<T extends boolean = true> {
  * via the `definition` "LatestArticlesBlock_select".
  */
 export interface LatestArticlesBlockSelect<T extends boolean = true> {
+  placeholder?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FullwidthCtaBlock_select".
+ */
+export interface FullwidthCtaBlockSelect<T extends boolean = true> {
+  placeholder?: T;
   id?: T;
   blockName?: T;
 }

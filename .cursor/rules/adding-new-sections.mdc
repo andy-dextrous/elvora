@@ -41,7 +41,7 @@ export const SectionName: Block = {
     group: "Hero Sections", // Use the admin group if you want this section to be grouped with other types (eg all hereos together)
   },
   interfaceName: "NewSectionBlock", // This is used by Payload to create the types for this section. They will be imported into your component.
-  fields: Don't add fields yet if asked to create aen empty section- simply omit the fields property.
+  fields:[] Don't add fields yet if asked to create aen empty section- simply add an empty array.
 }
 ```
 

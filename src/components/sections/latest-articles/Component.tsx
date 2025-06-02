@@ -57,13 +57,13 @@ export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
       </div>
       <div className="border-dark-border w-full border-t">
         <div className="py-section-md container-md">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
             {articles.map(article => (
               <article
                 key={article.id}
                 className="border-light-border flex flex-col border"
               >
-                <div className="relative mb-6 aspect-[4/3] overflow-hidden">
+                <div className="relative mb-4 aspect-[4/3] overflow-hidden md:mb-6">
                   <Image
                     src={article.image}
                     alt={article.title}
@@ -72,9 +72,9 @@ export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
                   />
                   <div className="article-image-gradient absolute inset-0" />
                 </div>
-                <div className="flex flex-1 flex-col p-8">
-                  <h5 className="mb-4 text-white">{article.title}</h5>
-                  <p className="mb-6 flex-1 text-sm font-light text-white/80">
+                <div className="flex flex-1 flex-col p-4 md:p-6 lg:p-8">
+                  <h5 className="mb-3 text-white md:mb-4">{article.title}</h5>
+                  <p className="mb-4 flex-1 text-sm font-light text-white/80 md:mb-6">
                     {article.description}
                   </p>
                   <Button
@@ -95,12 +95,12 @@ export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
         </div>
       </div>
       <div className="mt-section-x container-sm">
-        <div className="gap-content flex items-center justify-between">
+        <div className="gap-content flex flex-col items-start space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
           <p className="text-white">
             Stay ahead of the curve: tap into Elvora's ongoing research and field
             experience to navigate rapid technological change with confidence.
           </p>
-          <Button asChild>
+          <Button asChild className="md:shrink-0">
             <Link href="/blog">
               View All Insights
               <ArrowRightIcon className="!h-[14px] !w-[24px]" />

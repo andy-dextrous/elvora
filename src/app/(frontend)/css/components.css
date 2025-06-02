@@ -22,6 +22,32 @@
     );
   }
 
+  .cta-overlay-depth {
+    background: radial-gradient(
+      53.09% 69.9% at 70.4% 31.94%,
+      rgba(0, 0, 0, 0.03) 0%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    mix-blend-mode: plus-darker;
+  }
+
+  .cta-overlay-spotlight {
+    background: radial-gradient(
+      67.41% 86.41% at 73.99% 10.24%,
+      color-mix(in oklab, theme(colors.primary-500) 30%, transparent) 0%,
+      theme(colors.primary-500) 100%
+    );
+    mix-blend-mode: hard-light;
+  }
+
+  .cta-overlay-base {
+    background: radial-gradient(
+      53.09% 69.9% at 70.4% 31.94%,
+      color-mix(in oklab, theme(colors.primary-500) 24%, transparent) 0%,
+      color-mix(in oklab, theme(colors.primary-500) 80%, transparent) 100%
+    );
+  }
+
   .side-border-dark {
     position: relative;
     &::before {

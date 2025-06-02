@@ -5,6 +5,7 @@ import { ServiceCardsListComponent } from "@/components/sections/service-cards-l
 import { TestimonialsComponent } from "@/components/sections/testimonials/Component"
 import { InfoGridComponent } from "@/components/sections/info-grid/Component"
 import { LatestArticlesComponent } from "@/components/sections/latest-articles/Component"
+import { FullwidthCtaComponent } from "@/components/sections/fullwidth-cta/Component"
 import React, { Fragment } from "react"
 
 /*******************************************************/
@@ -19,6 +20,7 @@ const sectionsMap: Record<string, React.ComponentType<any>> = {
   testimonials: TestimonialsComponent,
   "info-grid": InfoGridComponent,
   "latest-articles": LatestArticlesComponent,
+  "fullwidth-cta": FullwidthCtaComponent,
 }
 
 /*******************************************************/
