@@ -172,3 +172,8 @@ After setting up the site as a Vercel project, go to project -> settings and tur
 ## Bugs
 
 - Slug behaviour
+
+## Resources
+
+https://www.svgviewer.dev/svg-to-react-jsx
+https://www.tailwindshades.com
