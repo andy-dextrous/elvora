@@ -144,14 +144,21 @@ const Background = ({ backgroundImage }: { backgroundImage: Media | null }) => {
               quality={100}
               sizes="100vw"
               loading="eager"
+              data-speed="0.8"
             />
           </div>
 
           {/* Spotlight 1 - Royal Purple Spotlight */}
-          <div className="bg-primary/30 lg:bg-primary/70 absolute -bottom-[148px] -left-[370px] z-5 h-[700px] w-[700px] blur-[350px]" />
+          <div
+            className="bg-primary/30 lg:bg-primary/70 absolute -bottom-[148px] -left-[370px] z-5 h-[700px] w-[700px] blur-[350px]"
+            data-speed="0.8"
+          />
 
           {/* Spotlight 2 - Chrysler Blue Spotlight */}
-          <div className="bg-secondary/30 lg:bg-secondary/60 absolute -right-[80.43px] -bottom-[405.61px] z-5 h-[1200px] w-[495.05px] -rotate-[15deg] blur-[350px]" />
+          <div
+            className="bg-secondary/30 lg:bg-secondary/60 absolute -right-[80.43px] -bottom-[405.61px] z-5 h-[1200px] w-[495.05px] -rotate-[15deg] blur-[350px]"
+            data-speed="1.2"
+          />
         </div>
       </div>
     </Fragment>

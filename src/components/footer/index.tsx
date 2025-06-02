@@ -13,6 +13,7 @@ import {
   FaEnvelope,
 } from "react-icons/fa"
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5"
+import LogomarkOutline from "../logos/logomark-outline"
 
 /*************************************************************************/
 /*  STATIC FOOTER DATA
@@ -77,17 +78,19 @@ export async function Footer() {
       {/* Background Spotlights */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Spotlight 1 - Royal Purple Spotlight */}
-        <div className="bg-primary/30 lg:bg-primary/70 absolute -bottom-[148px] -left-[370px] z-5 h-[700px] w-[700px] blur-[350px]" />
+        <div className="bg-primary/30 lg:bg-primary/40 absolute -bottom-[50%] -left-[370px] z-5 h-[400px] w-[400px] blur-[350px]" />
 
         {/* Spotlight 2 - Chrysler Blue Spotlight */}
-        <div className="bg-secondary/30 lg:bg-secondary/60 absolute -right-[80.43px] -bottom-[405.61px] z-5 h-[1200px] w-[495.05px] -rotate-[15deg] blur-[350px]" />
+        <div className="bg-secondary/30 lg:bg-secondary/60 absolute -right-[180.43px] -bottom-[405.61px] z-5 h-[600px] w-[495.05px] -rotate-[15deg] blur-[350px]" />
       </div>
 
-      <div className="relative z-10 container py-16">
+      {/* <LogomarkOutline className="absolute bottom-0 left-0 z-0" /> */}
+
+      <div className="relative z-10 container px-12 py-16">
         {/* Logo Row - Larger and spans full width */}
-        <div className="mb-12">
+        <div className="pb-16">
           <Link href="/" className="block">
-            <LogoPrimaryLight className="h-12 w-auto" />
+            <LogoPrimaryLight className="h-20 w-auto" />
           </Link>
         </div>
 

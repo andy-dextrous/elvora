@@ -26,7 +26,7 @@ export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
                 Watch a fast demo and see how intelligent automation transforms your
                 workflow: less effort, more results.
               </p>
-              <Button variant="outline" size="lg" asChild className="self-start">
+              <Button variant="white" size="lg" asChild className="self-start">
                 <Link href="/demo">
                   Watch Demo
                   <ArrowRightIcon className="!h-[14px] !w-[24px]" />
@@ -60,25 +60,18 @@ const Background = () => {
             <Image
               src="https://res.cloudinary.com/wild-creative/image/upload/v1748834621/meeting_3_hbtmkr.jpg"
               alt="Escalator Background"
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-[-10%] h-[110%] w-[110%] object-cover"
               fill
               priority
               quality={100}
-              sizes="100vw"
+              sizes="110vw"
+              data-speed="0.8"
             />
           </div>
 
-          {/* Royal Purple Overlay with Complex Gradient
-          <div className="bg-primary/40 absolute inset-0 z-5" />
-
-          {/* Overlay 1 - Black gradient for depth */}
+          <div className="bg-primary/70 absolute inset-0 z-5" />
+          <div className="from-secondary-600/80 to-primary-600/60 absolute inset-0 z-5 bg-linear-to-r opacity-80 mix-blend-hard-light" />
           <div className="cta-overlay-depth absolute inset-0 z-6 mix-blend-plus-darker" />
-
-          {/* Overlay 2 - Primary purple spotlight */}
-          <div className="cta-overlay-spotlight absolute inset-0 z-7 mix-blend-hard-light" />
-
-          {/* Overlay 3 - Primary purple depth */}
-          <div className="cta-overlay-base absolute inset-0 z-8" />
         </div>
       </div>
     </Fragment>
