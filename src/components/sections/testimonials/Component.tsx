@@ -85,6 +85,33 @@ const testimonials = [
     company: "Noventa",
     LogoComponent: LogoipGohissum,
   },
+  {
+    id: 4,
+    quote:
+      "Sensys didn't just deliver a solution — they helped reshape our entire digital strategy. The clarity and speed were unmatched.",
+    name: "Justin Kenter",
+    title: "Head of Digital Transformation",
+    company: "LumenX",
+    LogoComponent: LogoipLorum,
+  },
+  {
+    id: 5,
+    quote:
+      "From our first workshop to the final rollout, the Sensys team felt like an extension of our own. Reliable, sharp, and truly collaborative.",
+    name: "Daniel Ross",
+    title: "CTO",
+    company: "Vireon Systems",
+    LogoComponent: LogoipSpanum,
+  },
+  {
+    id: 6,
+    quote:
+      "What impressed us most was their ability to simplify complex processes while delivering with confidence.",
+    name: "Sarah Chen",
+    title: "COO",
+    company: "Noventa",
+    LogoComponent: LogoipGohissum,
+  },
 ]
 
 /*******************************************************/

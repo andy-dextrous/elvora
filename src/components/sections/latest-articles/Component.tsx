@@ -47,8 +47,7 @@ export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
     <section className="bg-dark side-border-light flicker-mask">
       <div className="container-sm gap-content-lg mb-section-x flex flex-col items-start">
         <h2 className="text-white">
-          Expert
-          <span className="text-gradient">Insights</span>
+          Expert <span className="text-gradient">Insights</span>
         </h2>
         <p className="font-light text-white">
           Stay ahead of the curve: tap into Elvora's ongoing research and field experience
@@ -79,7 +78,7 @@ export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
                   </p>
                   <Button
                     variant="outlineGradient"
-                    size="sm"
+                    size="md"
                     asChild
                     className="self-start"
                   >

@@ -98,5 +98,19 @@ export default SmoothScrollProvider
 
 export { ScrollTrigger } from "gsap/ScrollTrigger"
 export { GSDevTools } from "gsap/GSDevTools"
+export { ScrollSmoother } from "gsap/ScrollSmoother"
+export { GSAPContext }
+export { Draggable } from "gsap/Draggable"
+export { EaselPlugin } from "gsap/EaselPlugin"
+export { EasePack } from "gsap/EasePack"
+export { Flip } from "gsap/Flip"
+export { InertiaPlugin } from "gsap/InertiaPlugin"
+export { MorphSVGPlugin } from "gsap/MorphSVGPlugin"
+export { MotionPathPlugin } from "gsap/MotionPathPlugin"
+export { Observer } from "gsap/Observer"
+export { PixiPlugin } from "gsap/PixiPlugin"
+export { ScrollToPlugin } from "gsap/ScrollToPlugin"
+export { TextPlugin } from "gsap/TextPlugin"
+
 export * from "@gsap/react"
 export * from "gsap"
