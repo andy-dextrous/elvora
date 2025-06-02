@@ -1,15 +1,151 @@
+"use client"
+
+import PlusIcon from "@/components/icons/plus"
+import { Button } from "@/components/ui/button"
 import type { ServiceCardsListBlock } from "@/payload/payload-types"
+import Image from "next/image"
 
 /*************************************************************************/
 /*  SERVICE CARDS LIST COMPONENT
 /*************************************************************************/
 
+const cards = [
+  {
+    accordionTitle: "Business Intelligence & AI",
+    accordionContent: [
+      {
+        title: "Business Intelligence & AI: From Strategy to Implementation",
+        description:
+          "We help businesses optimize their operations and improve their bottom line.",
+        image: "https://picsum.photos/1080/1080",
+      },
+    ],
+  },
+  {
+    accordionTitle: "Revenue & Profit Optimisation",
+    accordionContent: [
+      {
+        title: "Revenue & Profit Optimisation: Maximizing Business Value",
+        description:
+          "Strategic solutions to enhance revenue streams and optimize profit margins through data-driven decision making.",
+        image: "https://picsum.photos/1080/1080",
+      },
+    ],
+  },
+  {
+    accordionTitle: "Sales & Marketing Alignment",
+    accordionContent: [
+      {
+        title: "Sales & Marketing Alignment: Unified Growth Strategy",
+        description:
+          "Align your sales and marketing teams to create seamless customer journeys and drive sustainable growth.",
+        image: "https://picsum.photos/1080/1080",
+      },
+    ],
+  },
+  {
+    accordionTitle: "Lean & Agile Operations",
+    accordionContent: [
+      {
+        title: "Lean & Agile Operations: Efficiency Through Innovation",
+        description:
+          "Transform your operations with lean methodologies and agile practices to increase efficiency and adaptability.",
+        image: "https://picsum.photos/1080/1080",
+      },
+    ],
+  },
+  {
+    accordionTitle: "Supply Chain Efficiency",
+    accordionContent: [
+      {
+        title: "Supply Chain Efficiency: Optimizing Flow & Control",
+        description:
+          "Streamline your supply chain operations to reduce costs and improve delivery performance.",
+        image: "https://picsum.photos/1080/1080",
+      },
+    ],
+  },
+  {
+    accordionTitle: "Cloud & Infrastructure",
+    accordionContent: [
+      {
+        title: "Cloud & Infrastructure: Modern Digital Foundation",
+        description:
+          "Build and maintain scalable, secure cloud infrastructure to support your digital transformation journey.",
+        image: "https://picsum.photos/1080/1080",
+      },
+    ],
+  },
+  {
+    accordionTitle: "CRM & ERP Implementation",
+    accordionContent: [
+      {
+        title: "CRM & ERP Implementation: Integrated Business Systems",
+        description:
+          "Expert implementation of CRM and ERP solutions to streamline processes and enhance customer relationships.",
+        image: "https://picsum.photos/1080/1080",
+      },
+    ],
+  },
+] as any
+
 export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props => {
   return (
-    <section className="side-border-dark">
-      <div className="container">
-        <p>Service Cards List Section - Ready for implementation</p>
+    <section className="side-border-dark pt-section-xl">
+      <div className="container-sm gap-content-lg mb-section-x flex flex-col items-center">
+        <h2>
+          Commercial, Operational{" "}
+          <span className="text-gradient">& Technology Services</span>
+        </h2>
+        <p>
+          We combine business insight with technical excellence to help leaders accelerate
+          transformation. From strategy creation to full-stack implementation, Elvora
+          delivers integrated services that unlock growth, margin, and momentum.
+        </p>
+      </div>
+      <div className="border-dark-border w-full border-t">
+        <CustomAccordion cards={cards} />
       </div>
     </section>
+  )
+}
+
+const CustomAccordion = ({ cards }: { cards: any }) => {
+  return (
+    <div>
+      {cards.map((card: any, index: any) => (
+        <div
+          key={index}
+          className="border-dark-border hover:bg-neutral w-full border-b hover:cursor-pointer"
+          id={`accordion-trigger-${index}`}
+        >
+          <div className="container-md gap-section-x flex">
+            {/* Accordion Content */}
+            <div className="gap-content-lg flex w-1/2 flex-col items-start py-8">
+              {/* Trigger Title */}
+              <div className="gap-content flex items-center py-8">
+                <PlusIcon />
+                <h4>{card.accordionTitle}</h4>
+              </div>
+              <div className="gap-content flex flex-col">
+                <h3>{card.accordionContent[0].title}</h3>
+                <p>{card.accordionContent[0].description}</p>
+                <Button className="self-start">Learn More</Button>
+              </div>
+            </div>
+
+            {/* Accordion Image */}
+            <div className="h-auto w-1/2">
+              <Image
+                src={card.accordionContent[0].image}
+                alt={card.accordionTitle}
+                width={1080}
+                height={1080}
+              />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }

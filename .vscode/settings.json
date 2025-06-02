@@ -17,5 +17,7 @@
   },
   "tailwindCSS.experimental.classRegex": [
     ["([\"'`][^\"'`]*.*?[\"'`])", "[\"'`]([^\"'`]*).*?[\"'`]"]
-  ]
+  ],
+  "fluid-fonts.maxViewport": 1528,
+  "fluid-fonts.units": "px"
 }

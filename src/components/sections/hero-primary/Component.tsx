@@ -69,7 +69,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
       <div className="relative h-screen w-full">
         <Grid className="h-full grid-rows-10 pb-8">
           <div className="gap-content col-span-full row-span-12 row-start-1 flex h-full flex-col justify-center md:col-span-5 md:col-start-2 lg:col-span-5 lg:col-start-2 lg:row-span-10 xl:col-span-3 xl:col-start-2">
-            <h1 className="text-white">Strategy Powered by Technology</h1>
+            <h1 className="max-w-[10ch] text-white">Strategy Powered by Technology</h1>
             <div className="gap-content flex flex-col items-start justify-center xl:hidden">
               <HeroContent />
             </div>

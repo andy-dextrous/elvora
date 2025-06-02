@@ -1,46 +1,30 @@
-/* Default Overrides of Tailwind CSS */
-
-@theme {
-  --spacing: 0.25rem;
-
-  --space-xs: clamp(0.85rem, 0.134vw + 0.823rem, 0.9375rem);
-  --space-s: clamp(1.125rem, 0.191vw + 1.087rem, 1.25rem);
-  --space-m: clamp(1.5rem, 0.574vw + 1.385rem, 1.875rem);
-  --space-l: clamp(2rem, 1.243vw + 1.751rem, 2.8125rem);
-  --space-xl: clamp(2.6563rem, 2.39vw + 2.178rem, 4.2188rem);
-  --space-xxl: clamp(3.6rem, 4.173vw + 2.765rem, 6.3281rem);
-}
-
 /* Spacing - applies to padding, margin, width & height */
 
 @theme {
-  --spacing-section-x: clamp(1rem, 6.954vw + -0.391rem, 6.25rem);
-  --spacing-section-y: clamp(1rem, 10vw, 4rem);
-
+  --spacing-section-x: clamp(3.125rem, 2.2972rem + 4.1391vw, 6.25rem);
+  --spacing-section-y: clamp(1rem, 6.954vw + -0.391rem, 6.25rem);
   --spacing-section-xs: clamp(1.6875rem, 1.243vw + 1.439rem, 2.5rem);
   --spacing-section-sm: clamp(2.25rem, 2.294vw + 1.791rem, 3.75rem);
   --spacing-section-md: clamp(3rem, 4.015vw + 2.197rem, 5.625rem);
   --spacing-section-lg: clamp(4rem, 6.788vw + 2.642rem, 8.4375rem);
-  --spacing-section-xl: clamp(5.3125rem, 11.233vw + 3.066rem, 12.6563rem);
+  --spacing-section-xl: clamp(5.5rem, 9.272vw + 3.646rem, 12.5rem); /* 200px */
   --spacing-section-xxl: clamp(7.0625rem, 18.164vw + 3.43rem, 18.9375rem);
 
   --spacing-logo: clamp(45px, 10vw, 60px);
   --spacing-nav: clamp(50px, 10vh, 80px);
 
-  --spacing-content: var(--space-m);
+  --spacing-content: clamp(0.9375rem, 0.7719rem + 0.8278vw, 1.5625rem);
+  --spacing-content-sm: clamp(0.625rem, 0.4594rem + 0.8278vw, 1.25rem);
+  --spacing-content-lg: clamp(1.875rem, 1.5439rem + 1.6556vw, 3.125rem);
 
-  --spacing-container: 1528px;
-  --spacing-container-md: 1326px;
-  --spacing-container-sm: 1008px;
+  --spacing-container: clamp(19.375rem, -0.7906rem + 100.8278vw, 95.5rem);
+  --spacing-container-md: clamp(17.5rem, 0.1821rem + 86.5894vw, 82.875rem);
+  --spacing-container-sm: clamp(17.5rem, 5.447rem + 60.2649vw, 63rem);
 
-  --spacing-column: clamp(2rem, 4vw, 4rem);
-  --spacing-row: clamp(1rem, 4vw, 2rem);
-  --spacing-grid: var(--space-m);
-
-  --spacing-card: var(--space-m);
-  --spacing-card-content: var(--space-s);
-
-  --spacing-grid-col-width: clamp(1rem, 17.632vw + -7.463rem, 9.375rem);
+  --spacing-grid-col-width: max(
+    var(--spacing-section-x),
+    clamp(1rem, 17.632vw + -7.463rem, 9.375rem)
+  );
 }
 
 /* Brand Color Shades - get from https://www.tailwindshades.com */
