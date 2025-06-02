@@ -475,7 +475,14 @@ export interface Page {
   title: string;
   publishedAt?: string | null;
   categories?: (string | Category)[] | null;
-  sections: (HeroPrimaryBlock | TextImageBlock | CirclesAnimationBlock | ServiceCardsListBlock | TestimonialsBlock)[];
+  sections: (
+    | HeroPrimaryBlock
+    | TextImageBlock
+    | CirclesAnimationBlock
+    | ServiceCardsListBlock
+    | TestimonialsBlock
+    | InfoGridBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -779,6 +786,15 @@ export interface TestimonialsBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'testimonials';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "InfoGridBlock".
+ */
+export interface InfoGridBlock {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'info-grid';
 }
 /**
  * Team members are used to display the team on the website. They are different to users, which are used for the admin panel.
@@ -1091,6 +1107,7 @@ export interface PagesSelect<T extends boolean = true> {
         'circles-animation'?: T | CirclesAnimationBlockSelect<T>;
         'service-cards-list'?: T | ServiceCardsListBlockSelect<T>;
         testimonials?: T | TestimonialsBlockSelect<T>;
+        'info-grid'?: T | InfoGridBlockSelect<T>;
       };
   meta?:
     | T
@@ -1196,6 +1213,14 @@ export interface ServiceCardsListBlockSelect<T extends boolean = true> {
 export interface TestimonialsBlockSelect<T extends boolean = true> {
   heading?: T;
   content?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "InfoGridBlock_select".
+ */
+export interface InfoGridBlockSelect<T extends boolean = true> {
   id?: T;
   blockName?: T;
 }

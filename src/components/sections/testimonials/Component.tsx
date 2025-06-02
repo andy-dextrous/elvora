@@ -132,7 +132,7 @@ const TestimonialSlider = () => {
       >
         {testimonials.map(testimonial => (
           <SwiperSlide key={testimonial.id}>
-            <article className="border-dark-border flex h-[300px] flex-col justify-between border-y border-r p-4 md:h-[350px] md:p-6 lg:h-[400px] lg:p-8">
+            <article className="border-dark-border flex h-[300px] flex-col justify-between border-r border-b p-4 md:h-[350px] md:p-6 lg:h-[400px] lg:p-8">
               <div className="mb-4 md:mb-6 lg:mb-8">
                 <Quotation className="text-primary mb-4 h-12 w-12" />
                 <blockquote className="text-h4 font-light">

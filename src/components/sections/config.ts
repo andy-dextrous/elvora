@@ -3,6 +3,7 @@ import { TextImage } from "@/components/sections/text-image/config"
 import { CirclesAnimation } from "@/components/sections/circles-animation/config"
 import { ServiceCardsList } from "@/components/sections/service-cards-list/config"
 import { Testimonials } from "@/components/sections/testimonials/config"
+import { InfoGrid } from "@/components/sections/info-grid/config"
 
 export const sectionBlocks = [
   HeroPrimary,
@@ -10,4 +11,5 @@ export const sectionBlocks = [
   CirclesAnimation,
   ServiceCardsList,
   Testimonials,
+  InfoGrid,
 ]
