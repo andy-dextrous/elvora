@@ -482,6 +482,7 @@ export interface Page {
     | ServiceCardsListBlock
     | TestimonialsBlock
     | InfoGridBlock
+    | LatestArticlesBlock
   )[];
   meta?: {
     title?: string | null;
@@ -797,6 +798,15 @@ export interface InfoGridBlock {
   blockType: 'info-grid';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LatestArticlesBlock".
+ */
+export interface LatestArticlesBlock {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'latest-articles';
+}
+/**
  * Team members are used to display the team on the website. They are different to users, which are used for the admin panel.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1108,6 +1118,7 @@ export interface PagesSelect<T extends boolean = true> {
         'service-cards-list'?: T | ServiceCardsListBlockSelect<T>;
         testimonials?: T | TestimonialsBlockSelect<T>;
         'info-grid'?: T | InfoGridBlockSelect<T>;
+        'latest-articles'?: T | LatestArticlesBlockSelect<T>;
       };
   meta?:
     | T
@@ -1221,6 +1232,14 @@ export interface TestimonialsBlockSelect<T extends boolean = true> {
  * via the `definition` "InfoGridBlock_select".
  */
 export interface InfoGridBlockSelect<T extends boolean = true> {
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LatestArticlesBlock_select".
+ */
+export interface LatestArticlesBlockSelect<T extends boolean = true> {
   id?: T;
   blockName?: T;
 }

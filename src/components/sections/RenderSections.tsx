@@ -4,6 +4,7 @@ import CirclesAnimationComponent from "@/components/sections/circles-animation/C
 import { ServiceCardsListComponent } from "@/components/sections/service-cards-list/Component"
 import { TestimonialsComponent } from "@/components/sections/testimonials/Component"
 import { InfoGridComponent } from "@/components/sections/info-grid/Component"
+import { LatestArticlesComponent } from "@/components/sections/latest-articles/Component"
 import React, { Fragment } from "react"
 
 /*******************************************************/
@@ -17,6 +18,7 @@ const sectionsMap: Record<string, React.ComponentType<any>> = {
   "service-cards-list": ServiceCardsListComponent,
   testimonials: TestimonialsComponent,
   "info-grid": InfoGridComponent,
+  "latest-articles": LatestArticlesComponent,
 }
 
 /*******************************************************/
