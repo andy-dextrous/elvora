@@ -28,6 +28,12 @@ const buttonVariants = tv({
         "hover:text-dark hover:bg-white",
         "focus-visible:ring-white/50",
       ],
+      outlineDark: [
+        "border-dark-border border bg-white/3 backdrop-blur-[5px]",
+        "text-dark",
+        "hover:text-dark hover:bg-white",
+        "focus-visible:ring-white/50",
+      ],
       outlineGradient: [
         "gradient-border",
         "bg-white/2 backdrop-blur-sm",
@@ -39,6 +45,8 @@ const buttonVariants = tv({
         "bg-secondary text-secondary-foreground shadow-xs",
         "hover:bg-secondary/80",
       ],
+      white: ["text-dark bg-white", "hover:bg-white/90"],
+      dark: ["bg-dark text-white", "hover:bg-dark/90"],
       ghost: [
         "bg-white/5 backdrop-blur-[5px]",
         "text-white hover:bg-white/10 hover:text-white",
