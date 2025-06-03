@@ -18,10 +18,10 @@ import React, { Fragment, useRef } from "react"
  ****************************************************/
 
 const HeroContent: React.FC<{
-  variant?: "default" | "outlineGradient"
   content?: string
   buttons?: HeroProps["buttons"]
-}> = ({ variant = "default", content, buttons }) => {
+  buttonAppearance?: "default" | "outlineGradient"
+}> = ({ content, buttons, buttonAppearance = "default" }) => {
   return (
     <Fragment>
       {content && <p className="font-light text-white">{content}</p>}
@@ -32,7 +32,7 @@ const HeroContent: React.FC<{
             <CMSLink
               key={index}
               {...buttonItem.button.link}
-              appearance={variant === "outlineGradient" ? "outlineGradient" : "default"}
+              appearance={buttonAppearance}
               size="lg"
               className="w-full"
             >
@@ -93,6 +93,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
   content,
   backgroundImage,
   buttons,
+  usp,
 }) => {
   const timestampDateRef = useRef<HTMLDivElement>(null)
   const timestampTimeRef = useRef<HTMLDivElement>(null)
@@ -290,7 +291,11 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
               "xl:col-start-5 xl:flex"
             )}
           >
-            <HeroContent variant="outlineGradient" content={content} buttons={buttons} />
+            <HeroContent
+              content={content}
+              buttons={buttons}
+              buttonAppearance="outlineGradient"
+            />
           </div>
 
           {/* Timestamp */}
@@ -345,9 +350,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
           )}
         >
           <p ref={uspRef} className="pr-10 pl-12 text-white/90">
-            Elvora bridges the gap between strategic intent and operational delivery,
-            integrating commercial planning, finance, lean processes and technology to
-            drive measurable growth and sustained profitability.
+            {usp}
           </p>
         </div>
       </Grid>

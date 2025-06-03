@@ -624,16 +624,16 @@ export interface HeroPrimaryBlock {
   heading: string;
   content: string;
   /**
+   * The unique selling proposition text that appears below the hero content
+   */
+  usp: string;
+  /**
    * Optional background image for the hero section
    */
   backgroundImage?: (string | null) | Media;
   buttons?:
     | {
         button: {
-          /**
-           * Select the button type
-           */
-          buttonType?: ('primary' | 'secondary') | null;
           link: {
             type?: ('reference' | 'custom') | null;
             newTab?: boolean | null;
@@ -1207,6 +1207,7 @@ export interface PagesSelect<T extends boolean = true> {
 export interface HeroPrimaryBlockSelect<T extends boolean = true> {
   heading?: T;
   content?: T;
+  usp?: T;
   backgroundImage?: T;
   buttons?:
     | T
@@ -1214,7 +1215,6 @@ export interface HeroPrimaryBlockSelect<T extends boolean = true> {
         button?:
           | T
           | {
-              buttonType?: T;
               link?:
                 | T
                 | {

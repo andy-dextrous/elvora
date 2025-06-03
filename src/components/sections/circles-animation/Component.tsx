@@ -1,14 +1,14 @@
 "use client"
 
-import React, { useRef } from "react"
-import { useGSAP, gsap, ScrollTrigger, GSDevTools } from "@/providers/gsap"
-import { SplitText } from "gsap/SplitText"
-import type { CirclesAnimationBlock } from "@/payload/payload-types"
-import parse from "html-react-parser"
 import RichText from "@/payload/components/frontend/rich-text"
+import type { CirclesAnimationBlock } from "@/payload/payload-types"
+import { gsap, useGSAP } from "@/providers/gsap"
+import { SplitText } from "gsap/SplitText"
+import parse from "html-react-parser"
+import React, { useRef } from "react"
 
 /*************************************************************************/
-/*  CIRCLES ANIMATION COMPONENT
+/*  CIRCLES ANIMATION COMPONENT∏
 /*************************************************************************/
 
 const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {

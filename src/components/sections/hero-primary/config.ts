@@ -29,6 +29,17 @@ export const HeroPrimary: Block = {
           label: false,
           required: true,
         },
+        {
+          name: "usp",
+          type: "textarea",
+          admin: {
+            rows: 3,
+            description:
+              "The unique selling proposition text that appears below the hero content",
+          },
+          label: "USP Text",
+          required: true,
+        },
       ],
     },
     {
@@ -65,19 +76,7 @@ export const HeroPrimary: Block = {
             {
               name: "button",
               type: "group",
-              fields: [
-                {
-                  name: "buttonType",
-                  type: "select",
-                  label: "Button type",
-                  defaultValue: "primary",
-                  options: ["primary", "secondary"],
-                  admin: {
-                    description: "Select the button type",
-                  },
-                },
-                link(),
-              ],
+              fields: [link()],
             },
           ],
         },
