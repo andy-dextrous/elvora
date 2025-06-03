@@ -1,21 +1,20 @@
 "use client"
 
+import ArrowRightIcon from "@/components/icons/arrow-right"
+import MinusIcon from "@/components/icons/minus"
+import PlusIcon from "@/components/icons/plus"
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import PlusIcon from "@/components/icons/plus"
-import MinusIcon from "@/components/icons/minus"
 import { Button } from "@/components/ui/button"
 import type { ServiceCardsListBlock } from "@/payload/payload-types"
-import { cn } from "@/utilities/ui"
-import Link from "next/link"
-import ArrowRightIcon from "@/components/icons/arrow-right"
-import { useGSAP, gsap, ScrollTrigger } from "@/providers/gsap"
-import { useRef } from "react"
+import { gsap, useGSAP, useSmoothContext, ScrollTrigger } from "@/providers/gsap"
 import Image from "next/image"
+import Link from "next/link"
+import { useRef } from "react"
 
 /*************************************************************************/
 /*  SERVICE CARDS LIST COMPONENT
@@ -157,8 +156,18 @@ export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props 
 /*************************************************************************/
 
 const CustomAccordion = ({ cards }: { cards: any }) => {
-  const handleValueChange = (value: string) => {
-    ScrollTrigger.refresh()
+  const { smootherInstance } = useSmoothContext()
+
+  const handleValueChange = () => {
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        ScrollTrigger.refresh()
+
+        if (smootherInstance) {
+          smootherInstance.refresh()
+        }
+      }, 300) // Reduced timeout since we're using requestAnimationFrame
+    })
   }
 
   return (

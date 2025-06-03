@@ -1,6 +1,6 @@
 ---
 description: This shows how the website's html should be laid out
-globs: 
+globs:
 alwaysApply: false
 ---
 

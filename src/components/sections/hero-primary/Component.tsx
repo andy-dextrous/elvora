@@ -8,6 +8,7 @@ import { Grid, GridLines } from "@/components/layout/grid"
 import { Button } from "@/components/ui/button"
 import type { HeroPrimaryBlock as HeroProps, Media } from "@/payload/payload-types"
 import { useGSAP, gsap } from "@/providers/gsap"
+import { cn } from "@/utilities/ui"
 import Image from "next/image"
 import Link from "next/link"
 import React, { Fragment, useRef } from "react"
@@ -75,7 +76,14 @@ const HeroScrollIndicator: React.FC<{
   })
 
   return (
-    <div className="col-span-1 col-start-4 row-span-1 row-start-11 flex flex-col items-center justify-end space-y-4 text-white">
+    <div
+      className={cn(
+        // Base styles
+        "flex flex-col items-center justify-end space-y-4 text-white",
+        // Grid positioning
+        "col-span-1 col-start-4 row-span-1 row-start-11"
+      )}
+    >
       <div ref={textRef} className="text-xs font-light tracking-[0.4em] uppercase">
         Scroll Down
       </div>
@@ -237,25 +245,76 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
   })
 
   return (
-    <section className="bg-dark relative flex h-auto w-full flex-col justify-between overflow-hidden py-0 lg:h-[160vh]">
+    <section
+      className={cn(
+        // Base styles
+        "bg-dark relative flex w-full flex-col justify-between overflow-hidden py-0",
+        // Mobile
+        "h-auto",
+        // Desktop
+        "lg:h-[160vh]"
+      )}
+    >
       <div className="relative h-screen w-full">
         <Grid className="h-full grid-rows-10 pb-8">
-          <div className="gap-content col-span-full row-span-12 row-start-1 flex h-full flex-col justify-center md:col-span-5 md:col-start-2 lg:col-span-5 lg:col-start-2 lg:row-span-10 xl:col-span-3 xl:col-start-2">
+          <div
+            className={cn(
+              // Base styles
+              "gap-content flex h-full flex-col justify-center",
+              // Mobile
+              "col-span-full row-span-12 row-start-1",
+              // Tablet
+              "md:col-span-5 md:col-start-2",
+              // Desktop
+              "lg:col-span-5 lg:col-start-2 lg:row-span-10",
+              // XL
+              "xl:col-span-3 xl:col-start-2"
+            )}
+          >
             <h1 ref={titleRef} className="title-hidden max-w-[10ch] text-white">
               Strategy Powered by Technology
             </h1>
-            <div className="gap-content flex flex-col items-start justify-center xl:hidden">
+            <div
+              className={cn(
+                // Base styles
+                "gap-content flex flex-col items-start justify-center",
+                // XL
+                "xl:hidden"
+              )}
+            >
               <HeroContent />
             </div>
           </div>
 
-          <div className="col-span-full row-span-4 row-start-1 hidden flex-col justify-center space-y-12 md:col-span-5 md:col-start-2 md:row-span-3 md:row-start-6 lg:col-span-2 lg:col-start-6 lg:row-span-6 lg:row-start-4 xl:col-start-5 xl:flex">
+          <div
+            className={cn(
+              // Base styles
+              "hidden flex-col justify-center space-y-12",
+              // Mobile
+              "col-span-full row-span-4 row-start-1",
+              // Tablet
+              "md:col-span-5 md:col-start-2 md:row-span-3 md:row-start-6",
+              // Small Laptops
+              "lg:col-span-2 lg:col-start-6 lg:row-span-6 lg:row-start-4",
+              // Large Laptops +
+              "xl:col-start-5 xl:flex"
+            )}
+          >
             <HeroContent variant="outlineGradient" />
           </div>
 
           {/* Timestamp */}
-          <div className="z-10 col-span-1 col-start-1 row-span-2 row-start-10 hidden items-end xl:flex">
-            <div className="text-sm text-white">
+          <div
+            className={cn(
+              // Base styles
+              "z-10 hidden items-end text-sm text-white",
+              // Grid positioning
+              "col-span-1 col-start-1 row-span-2 row-start-10",
+              // XL
+              "xl:flex"
+            )}
+          >
+            <div>
               <div ref={timestampDateRef}>Mon, 16th May 2025</div>
               <div ref={timestampTimeRef}>02:00 AM (GMT+4)</div>
             </div>
@@ -265,7 +324,16 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
           <HeroScrollIndicator textRef={scrollTextRef} />
 
           {/* Bottom Right - Contact Icons */}
-          <div className="col-span-3 col-start-7 row-span-2 row-start-10 hidden items-end justify-end space-x-4 lg:flex">
+          <div
+            className={cn(
+              // Base styles
+              "hidden items-end justify-end space-x-4",
+              // Grid positioning
+              "col-span-3 col-start-7 row-span-2 row-start-10",
+              // Desktop
+              "lg:flex"
+            )}
+          >
             <Button icon variant="ghost">
               <Envelope className="!h-6 !w-6" />
             </Button>
@@ -276,7 +344,16 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
         </Grid>
       </div>
       <Grid className="h-auto grid-rows-[1fr_auto_auto] py-8">
-        <div className="mb-section-y col-span-7 col-start-1 mt-40 flex items-center border-l-1 border-white lg:col-span-1 lg:col-start-4 lg:mt-0">
+        <div
+          className={cn(
+            // Base styles
+            "mb-section-y flex items-center border-l-1 border-white",
+            // Mobile
+            "col-span-7 col-start-1 mt-40",
+            // Desktop
+            "lg:col-span-1 lg:col-start-4 lg:mt-0"
+          )}
+        >
           <p ref={uspRef} className="pr-10 pl-12 text-white/90">
             Elvora bridges the gap between strategic intent and operational delivery,
             integrating commercial planning, finance, lean processes and technology to
@@ -312,7 +389,16 @@ const Background = ({
       <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden">
         <div className="relative h-full w-full">
           {/* Top Down Fade */}
-          <div className="from-dark-950 absolute inset-0 z-10 bg-gradient-to-b from-10% to-transparent to-100% lg:from-30% lg:to-transparent lg:to-60%" />
+          <div
+            className={cn(
+              // Base styles
+              "from-dark-950 absolute inset-0 z-10 bg-gradient-to-b to-transparent",
+              // Mobile
+              "from-10% to-100%",
+              // Desktop
+              "lg:from-30% lg:to-60%"
+            )}
+          />
 
           {/* Background Image */}
           <div className="absolute inset-x-0 bottom-0 size-full">
@@ -320,7 +406,14 @@ const Background = ({
               ref={imageRef}
               src={(backgroundImage as Media).url || "https://picsum.photos/1728/1260"}
               alt={"Hero Background"}
-              className="absolute inset-0 h-full w-full object-cover object-[50%_50%] lg:object-[80%_50%]"
+              className={cn(
+                // Base styles
+                "absolute inset-0 h-full w-full object-cover",
+                // Mobile
+                "object-[50%_50%]",
+                // Desktop
+                "lg:object-[80%_50%]"
+              )}
               fill
               priority
               quality={100}
@@ -332,13 +425,29 @@ const Background = ({
 
           {/* Spotlight 1 - Royal Purple Spotlight */}
           <div
-            className="bg-primary/30 lg:bg-primary/70 absolute -bottom-[148px] -left-[370px] z-5 h-[700px] w-[700px] blur-[350px]"
+            className={cn(
+              // Base styles
+              "absolute z-5 h-[700px] w-[700px] blur-[350px]",
+              "-bottom-[148px] -left-[370px]",
+              // Mobile
+              "bg-primary/30",
+              // Desktop
+              "lg:bg-primary/70"
+            )}
             data-speed="0.8"
           />
 
           {/* Spotlight 2 - Chrysler Blue Spotlight */}
           <div
-            className="bg-secondary/30 lg:bg-secondary/60 absolute -right-[80.43px] -bottom-[405.61px] z-5 h-[1200px] w-[495.05px] -rotate-[15deg] blur-[350px]"
+            className={cn(
+              // Base styles
+              "absolute z-5 h-[1200px] w-[495.05px] -rotate-[15deg] blur-[350px]",
+              "-right-[80.43px] -bottom-[405.61px]",
+              // Mobile
+              "bg-secondary/30",
+              // Desktop
+              "lg:bg-secondary/60"
+            )}
             data-speed="1.2"
           />
         </div>

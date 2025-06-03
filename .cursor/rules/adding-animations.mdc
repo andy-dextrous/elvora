@@ -15,7 +15,8 @@ alwaysApply: false
 
 This is an example of how to use GSAP inside a component. Note a few things:
 - always place animation code inside the useGSAP hook
-- use refs to scope the animation code to a parent container. This allows you to avoid adding and using cumbersome classnames or data-attributes. The scoping means you can use standard selectors without affecting other elements outside the parent.
+- use refs to scope the animation code to a parent container. This allows you to avoid adding and using cumbersome classnames or data-attributes. The scoping means you can use standard selectors without affecting other elements outside the parent. This is good for readability.
+
 
 ``` tsx
 import { useGSAP, gsap } from "@/providers/gsap"
