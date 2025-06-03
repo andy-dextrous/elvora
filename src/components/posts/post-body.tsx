@@ -1,5 +1,5 @@
 import { RelatedPosts } from "@/payload/blocks/related-posts/Component"
-import RichText from "@/payload/components/rich-text"
+import RichText from "@/payload/components/frontend/rich-text"
 import { Post } from "@/payload/payload-types"
 
 export default function PostBody({ post }: { post: Post }) {

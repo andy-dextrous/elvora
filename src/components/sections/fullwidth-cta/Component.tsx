@@ -1,5 +1,3 @@
-"use client"
-
 import type { FullwidthCtaBlock } from "@/payload/payload-types"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -7,33 +5,19 @@ import ArrowRightIcon from "@/components/icons/arrow-right"
 import Image from "next/image"
 import { Grid, GridLines } from "@/components/layout/grid"
 import { Fragment } from "react"
-import { useGSAP, gsap } from "@/providers/gsap"
-import { useRef } from "react"
 
 /*************************************************************************/
 /*  FULLWIDTH CTA COMPONENT
 /*************************************************************************/
 
 export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
-  const titleRef = useRef<HTMLHeadingElement>(null)
-
-  useGSAP(() => {
-    gsap.effects.titleReveal(titleRef.current, {
-      trigger: {
-        trigger: titleRef.current,
-        start: "top 90%",
-        end: "bottom 40%",
-      },
-    })
-  })
-
   return (
     <section className="relative flex h-screen w-full flex-col justify-center overflow-hidden py-0">
       <div className="relative h-full w-full">
         <Grid className="h-full grid-rows-10">
           <div className="col-span-full row-span-6 row-start-3 flex flex-col justify-center md:col-span-5 md:col-start-2 lg:col-span-5 lg:col-start-2 xl:col-span-3 xl:col-start-2">
             <div className="flex max-w-[500px] flex-col">
-              <h2 ref={titleRef} className="title-hidden text-white">
+              <h2 className="title-hidden text-white">
                 See the Difference
                 <br />
                 in Minutes

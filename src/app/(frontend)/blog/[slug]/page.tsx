@@ -1,11 +1,13 @@
 import type { Metadata } from "next"
-import { PayloadRedirects } from "@/payload/components/payload-redirects"
+import { PayloadRedirects } from "@/payload/components/frontend/payload-redirects"
 import { draftMode } from "next/headers"
 import PostBody from "@/components/posts/post-body"
 import { PostHero } from "@/components/posts/post-hero"
 import { getPostBySlug, getPosts } from "@/lib/queries/post"
-import { LivePreviewListener } from "@/payload/components/live-preview-listener"
+import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { generateMeta } from "@/utilities/generateMeta"
+import { getCurrentUser } from "@/lib/queries/user"
+import { cn } from "@/utilities/ui"
 
 type Args = {
   params: Promise<{
@@ -18,11 +20,17 @@ export default async function Post({ params: paramsPromise }: Args) {
   const { slug = "" } = await paramsPromise
   const url = "/blog/" + slug
   const post = await getPostBySlug({ slug })
+  const user = await getCurrentUser()
 
   if (!post) return <PayloadRedirects url={url} />
 
   return (
-    <main data-collection="posts" data-single-type="post" data-id={post.id}>
+    <main
+      data-collection="posts"
+      data-single-type="post"
+      data-id={post.id}
+      className={cn(user ? "relative !mt-[32px]" : "")}
+    >
       <PayloadRedirects disableNotFound url={url} />
       {draft && <LivePreviewListener />}
       <article className="pt-16 pb-16">

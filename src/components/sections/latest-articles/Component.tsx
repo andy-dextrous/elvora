@@ -1,12 +1,8 @@
-"use client"
-
 import type { LatestArticlesBlock } from "@/payload/payload-types"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import ArrowRightIcon from "@/components/icons/arrow-right"
 import Image from "next/image"
-import { useGSAP, gsap } from "@/providers/gsap"
-import { useRef } from "react"
 
 /*************************************************************************/
 /*  STATIC DATA FOR LATEST ARTICLES
@@ -47,22 +43,10 @@ const articles = [
 /*************************************************************************/
 
 export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
-  const titleRef = useRef<HTMLHeadingElement>(null)
-
-  useGSAP(() => {
-    gsap.effects.titleReveal(titleRef.current, {
-      trigger: {
-        trigger: titleRef.current,
-        start: "top 90%",
-        end: "bottom 40%",
-      },
-    })
-  })
-
   return (
     <section className="bg-dark side-border-light flicker-mask">
       <div className="container-sm gap-content-lg mb-section-x flex flex-col items-start">
-        <h2 ref={titleRef} className="title-hidden text-white">
+        <h2 className="title-hidden text-white">
           Expert <span className="text-gradient">Insights</span>
         </h2>
         <p className="font-light text-white">

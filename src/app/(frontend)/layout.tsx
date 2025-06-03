@@ -3,9 +3,10 @@ import React from "react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
+import { GlobalAnimations } from "@/components/layout/global-animations"
 import { getSettings } from "@/lib/queries/globals"
 import { getCurrentUser } from "@/lib/queries/user"
-import { WildChildAdminBar } from "@/payload/components/admin-bar"
+import { WildChildAdminBar } from "@/payload/components/backend/admin-bar"
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import parse from "html-react-parser"
 import { draftMode } from "next/headers"
@@ -54,18 +55,18 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <body className={user ? "relative !pt-[32px]" : ""}>
         {gtmId && <GoogleTagManager gtmId={gtmId} />}
         {gaId && <GoogleAnalytics gaId={gaId} />}
+
         <Providers>
           <WildChildAdminBar preview={isEnabled} user={user} settings={settings} />
-
-          <Header />
-
-          <div id="smooth-wrapper">
-            <div id="smooth-content">
-              {children}
-              <Footer />
+          <GlobalAnimations>
+            <Header />
+            <div id="smooth-wrapper">
+              <div id="smooth-content">
+                {children}
+                <Footer />
+              </div>
             </div>
-          </div>
-
+          </GlobalAnimations>
           {bodyEnd && parse(bodyEnd)}
         </Providers>
       </body>

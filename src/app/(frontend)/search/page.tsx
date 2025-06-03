@@ -1,11 +1,13 @@
 import type { Metadata } from "next/types"
 
-import { CollectionArchive } from "@/payload/components/collection-archive"
+import { CollectionArchive } from "@/payload/components/frontend/collection-archive"
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
 import React from "react"
 import { Search } from "@/payload/search/components"
-import { CardPostData } from "@/payload/components/card"
+import { CardPostData } from "@/payload/components/frontend/card"
+import { getCurrentUser } from "@/lib/queries/user"
+import { cn } from "@/utilities/ui"
 
 type Args = {
   searchParams: Promise<{
@@ -15,6 +17,7 @@ type Args = {
 export default async function Page({ searchParams: searchParamsPromise }: Args) {
   const { q: query } = await searchParamsPromise
   const payload = await getPayload({ config: configPromise })
+  const user = await getCurrentUser()
 
   const posts = await payload.find({
     collection: "search",
@@ -59,7 +62,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
   })
 
   return (
-    <div className="pt-24 pb-24">
+    <main className={cn(user ? "relative !mt-[32px]" : "")}>
       <div className="container mb-16">
         <div className="prose dark:prose-invert max-w-none text-center">
           <h1 className="mb-8 lg:mb-16">Search</h1>
@@ -75,7 +78,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
       ) : (
         <div className="container">No results found.</div>
       )}
-    </div>
+    </main>
   )
 }
 

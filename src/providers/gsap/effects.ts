@@ -33,7 +33,7 @@ gsap.registerEffect({
       duration: 1.5,
       stagger: 0.2,
       ease: "power3.out",
-      slideDistance: -100, // Now as percentage for xPercent
+      slideDistance: -100, // in percent
       trigger: null,
       timeline: null,
       startTime: 0,

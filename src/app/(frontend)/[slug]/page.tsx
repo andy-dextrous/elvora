@@ -1,13 +1,14 @@
 import { RenderSections } from "@/components/sections/RenderSections"
 import { getAllPages, getPageBySlug } from "@/lib/queries/page"
-import { LivePreviewListener } from "@/payload/components/live-preview-listener"
-import { PayloadRedirects } from "@/payload/components/payload-redirects"
+import { getCurrentUser } from "@/lib/queries/user"
+import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
+import { PayloadRedirects } from "@/payload/components/frontend/payload-redirects"
 import { generateMeta } from "@/utilities/generateMeta"
+import { cn } from "@/utilities/ui"
 import { Metadata } from "next"
 import { draftMode } from "next/headers"
 import { redirect } from "next/navigation"
 import { type RequiredDataFromCollectionSlug } from "payload"
-import { Fragment } from "react"
 
 type Args = {
   params: Promise<{
@@ -16,7 +17,8 @@ type Args = {
 }
 
 export default async function Page({ params: paramsPromise }: Args) {
-  const { isEnabled: draft } = await draftMode()
+  const [{ isEnabled: draft }, user] = await Promise.all([draftMode(), getCurrentUser()])
+
   const { slug = "" } = await paramsPromise
   const url = "/" + slug
 
@@ -37,7 +39,12 @@ export default async function Page({ params: paramsPromise }: Args) {
   const { sections = [] } = page
 
   return (
-    <main data-collection="pages" data-single-type="page" data-id={page.id}>
+    <main
+      data-collection="pages"
+      data-single-type="page"
+      data-id={page.id}
+      className={cn(user ? "relative !mt-[32px]" : "")}
+    >
       {/* Only use PayloadRedirects for non-home pages to prevent infinite loops */}
       {slug !== "home" && <PayloadRedirects disableNotFound url={url} />}
       {draft && <LivePreviewListener />}

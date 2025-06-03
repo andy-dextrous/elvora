@@ -1,17 +1,20 @@
 import type { Metadata } from "next/types"
 
-import { CollectionArchive } from "@/payload/components/collection-archive"
-import { PageRange } from "@/payload/components/page-range"
-import { Pagination } from "@/payload/components/pagination"
+import { CollectionArchive } from "@/payload/components/frontend/collection-archive"
+import { PageRange } from "@/payload/components/frontend/page-range"
+import { Pagination } from "@/payload/components/frontend/pagination"
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
 import React from "react"
+import { cn } from "@/utilities/ui"
+import { getCurrentUser } from "@/lib/queries/user"
 
 export const dynamic = "force-static"
 export const revalidate = 600
 
 export default async function Page() {
   const payload = await getPayload({ config: configPromise })
+  const user = await getCurrentUser()
 
   const posts =
     (await payload.find({
@@ -28,7 +31,7 @@ export default async function Page() {
     })) || []
 
   return (
-    <div className="pt-24 pb-24">
+    <main className={cn(user ? "relative !mt-[32px]" : "")}>
       <div className="container mb-16">
         <div className="prose dark:prose-invert max-w-none">
           <h1>Posts</h1>
@@ -51,7 +54,7 @@ export default async function Page() {
           <Pagination page={posts.page} totalPages={posts.totalPages} />
         )}
       </div>
-    </div>
+    </main>
   )
 }
 

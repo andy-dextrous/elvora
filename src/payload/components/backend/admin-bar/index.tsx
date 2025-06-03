@@ -7,8 +7,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu"
-import { Toaster } from "../ui/sonner"
+} from "../../ui/dropdown-menu"
+import { Toaster } from "../../ui/sonner"
 import ClearCache from "./clear-cache"
 import EditCurrentPage from "./edit-current-page"
 import Preview from "./exit-preview"

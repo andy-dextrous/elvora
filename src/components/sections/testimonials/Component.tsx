@@ -1,6 +1,6 @@
 "use client"
 
-import RichText from "@/payload/components/rich-text"
+import RichText from "@/payload/components/frontend/rich-text"
 import type { TestimonialsBlock } from "@/payload/payload-types"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Navigation, Autoplay } from "swiper/modules"

@@ -1,8 +1,4 @@
-"use client"
-
 import type { InfoGridBlock } from "@/payload/payload-types"
-import { useGSAP, gsap } from "@/providers/gsap"
-import { useRef } from "react"
 
 /*************************************************************************/
 /*  STATIC DATA FOR INFO GRID CARDS
@@ -40,22 +36,10 @@ const processSteps = [
 /*************************************************************************/
 
 export const InfoGridComponent: React.FC<InfoGridBlock> = props => {
-  const titleRef = useRef<HTMLHeadingElement>(null)
-
-  useGSAP(() => {
-    gsap.effects.titleReveal(titleRef.current, {
-      trigger: {
-        trigger: titleRef.current,
-        start: "top 90%",
-        end: "bottom 40%",
-      },
-    })
-  })
-
   return (
     <section className="bg-dark side-border-light">
       <div className="container-sm gap-content-lg mb-section-x flex flex-col items-start">
-        <h2 ref={titleRef} className="title-hidden text-white">
+        <h2 className="title-hidden text-white">
           How We Turn
           <br />
           <span className="text-gradient">Strategy Into Results</span>

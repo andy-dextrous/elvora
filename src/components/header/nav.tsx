@@ -6,7 +6,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
-import { CMSLink } from "@/payload/components/cms-link"
+import { CMSLink } from "@/payload/components/frontend/cms-link"
 import type { Header as HeaderType } from "@/payload/payload-types"
 import { SearchIcon } from "lucide-react"
 import Link from "next/link"
@@ -55,7 +55,7 @@ const NavItem: React.FC<{ link: NavItemLink }> = ({ link }) => {
     <NavigationMenuItem>
       <NavigationMenuLink asChild>
         <CMSLink className="text-sm !font-light text-white uppercase" {...link}>
-          {link.label}
+          {link?.label}
         </CMSLink>
       </NavigationMenuLink>
     </NavigationMenuItem>
@@ -105,7 +105,7 @@ const NestedDropdownItem: React.FC<{ child: ChildItemType }> = ({ child }) => {
             key={k}
             className="hover:bg-accent hover:text-accent-foreground block cursor-pointer rounded-md p-3 leading-none transition-colors select-none"
           >
-            <CMSLink {...subItem.link}>{subItem.link.label}</CMSLink>
+            <CMSLink {...subItem.link}>{subItem.link?.label}</CMSLink>
           </li>
         ))}
       </ul>
@@ -120,7 +120,7 @@ const NestedDropdownItem: React.FC<{ child: ChildItemType }> = ({ child }) => {
 const DropdownLink: React.FC<{ child: ChildItemType }> = ({ child }) => {
   return (
     <li className="hover:bg-accent hover:text-accent-foreground block cursor-pointer rounded-md p-3 leading-none transition-colors select-none">
-      <CMSLink {...child.link}>{child.link.label}</CMSLink>
+      <CMSLink {...child.link}>{child.link?.label}</CMSLink>
     </li>
   )
 }

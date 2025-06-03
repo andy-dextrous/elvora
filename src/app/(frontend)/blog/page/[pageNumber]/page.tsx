@@ -1,13 +1,15 @@
 import type { Metadata } from "next/types"
 
-import { CollectionArchive } from "@/payload/components/collection-archive"
-import { PageRange } from "@/payload/components/page-range"
-import { Pagination } from "@/payload/components/pagination"
+import { CollectionArchive } from "@/payload/components/frontend/collection-archive"
+import { PageRange } from "@/payload/components/frontend/page-range"
+import { Pagination } from "@/payload/components/frontend/pagination"
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
 import React from "react"
 import { notFound } from "next/navigation"
 import { getSettings } from "@/lib/queries/globals"
+import { getCurrentUser } from "@/lib/queries/user"
+import { cn } from "@/utilities/ui"
 
 export const revalidate = 600
 
@@ -20,6 +22,7 @@ type Args = {
 export default async function Page({ params: paramsPromise }: Args) {
   const { pageNumber } = await paramsPromise
   const payload = await getPayload({ config: configPromise })
+  const user = await getCurrentUser()
 
   const sanitizedPageNumber = Number(pageNumber)
 
@@ -34,7 +37,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   })
 
   return (
-    <div className="pt-24 pb-24">
+    <main className={cn(user ? "relative !mt-[32px]" : "")}>
       <div className="container mb-16">
         <div className="prose dark:prose-invert max-w-none">
           <h1>Posts</h1>
@@ -57,7 +60,7 @@ export default async function Page({ params: paramsPromise }: Args) {
           <Pagination page={posts.page} totalPages={posts.totalPages} />
         )}
       </div>
-    </div>
+    </main>
   )
 }
 

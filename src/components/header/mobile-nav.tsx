@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { CMSLink } from "@/payload/components/cms-link"
+import { CMSLink } from "@/payload/components/frontend/cms-link"
 import type { Header as HeaderType } from "@/payload/payload-types"
 import {
   FacebookIcon,

@@ -1,5 +1,5 @@
-import { Card } from "@/payload/components/card"
-import RichText from "@/payload/components/rich-text"
+import { Card } from "@/payload/components/frontend/card"
+import RichText from "@/payload/components/frontend/rich-text"
 import type { Post } from "@/payload/payload-types"
 import { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical"
 import clsx from "clsx"

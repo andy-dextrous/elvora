@@ -28,7 +28,7 @@ const admin = {
   livePreview: {
     collections: ["pages", "posts", "services"],
     globals: ["header", "footer"],
-    url: "http://localhost:3000",
+    url: process.env.NEXT_PUBLIC_URL || "http://localhost:3000",
     breakpoints: [
       {
         label: "Mobile",
@@ -50,11 +50,8 @@ const admin = {
       },
     ],
   },
-  // avatar: {
-  //   Component: "@/payload/components/avatar#Avatar",
-  // },
   avatar: {
-    Component: "@/payload/components/avatar#Avatar",
+    Component: "@/payload/components/backend/avatar#Avatar",
   },
 }
 
