@@ -1,5 +1,5 @@
 ---
-description: When you are asked to convert a static page to be Payload-CMS enabled.
+description: When you are asked to convert a static page get data from Payload
 globs:
 alwaysApply: false
 ---
@@ -21,6 +21,14 @@ When you are asked to take a static section and integrate it with Payload CMS, t
 - Sometimes you will see that schemas and defaults are stored in their own fields for quick reuse. Prefer these if the right one is available.
 - Do your best to integrate the Payload CMS fields with the design to achieve the intended functionality.
 - Use the cn function from @/utilities/ui in order to create conditional layouts.
+- You'll want to add dummy content to the fields that you create so that they don't break for pages already built. If valid content has been added to the section already (not lorem ipsum), then make this content the default. You can find examples of field defaults inside payload/fields/defaults.
+- Keep your fields nicely organised using rows, groups and collapsibles. Use rows when you have several small fields that belong together. Primarily, use collapsibles when you want to group fields together by role/component.
+
+## Payload Component Conversions
+
+- When converting static sections to Payload-powered ones, there are several components inside src/payload/components/frontend that map directly to certain fields.
+- The CMS Link pairs with the link or link group field. You can convert static Buttons or Next Links to CMS Links to handle CMS-provided URLs. Keep all props and displays the same.
+- The Payload Media pairs with images or video fields.
 
 ## Payload Types
 

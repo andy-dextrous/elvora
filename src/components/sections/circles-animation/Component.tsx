@@ -4,12 +4,16 @@ import React, { useRef } from "react"
 import { useGSAP, gsap, ScrollTrigger, GSDevTools } from "@/providers/gsap"
 import { SplitText } from "gsap/SplitText"
 import type { CirclesAnimationBlock } from "@/payload/payload-types"
+import parse from "html-react-parser"
+import RichText from "@/payload/components/frontend/rich-text"
 
 /*************************************************************************/
 /*  CIRCLES ANIMATION COMPONENT
 /*************************************************************************/
 
 const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
+  const { title, description, leftCircleWords, rightCircleWords, bottomText } = props
+
   const sectionRef = useRef<HTMLDivElement>(null)
   const svgContainerRef = useRef<HTMLDivElement>(null)
   const textLeftRef = useRef<HTMLDivElement>(null)
@@ -17,6 +21,17 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
   const textBottomRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const paragraphRef = useRef<HTMLParagraphElement>(null)
+
+  // Parse title and convert span tags to gradient elements
+  const parsedTitle = title
+    ? parse(title, {
+        replace: (domNode: any) => {
+          if (domNode.name === "span") {
+            return <span className="text-gradient">{domNode.children[0]?.data}</span>
+          }
+        },
+      })
+    : null
 
   useGSAP(() => {
     /*********************************************************
@@ -423,15 +438,15 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
       <div className="container-md flex h-full items-center">
         <div className="flex flex-5 flex-col gap-10">
           <h2 ref={titleRef} className="text-white">
-            Bridging Vision & <span className="text-gradient">Execution</span>
+            {parsedTitle}
           </h2>
-          <p ref={paragraphRef} className="max-w-[460px] text-white">
-            Many organisations invest in digital tools yet still leak profit because
-            strategy, finance and tech aren't aligned. Elvora builds the bridge between
-            these worlds, embedding data-driven automation that converts process waste
-            into measurable revenue and margin gains — delivering transformation, not just
-            plans.
-          </p>
+          <div ref={paragraphRef} className="max-w-[460px]">
+            <RichText
+              data={description}
+              enableGutter={false}
+              className="[&>p]:text-white"
+            />
+          </div>
         </div>
         <div className="flex-7">
           <div
@@ -446,22 +461,26 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
                     ref={textLeftRef}
                     className="gap-content col-span-3 col-start-2 row-span-6 row-start-4 flex flex-col items-center justify-center"
                   >
-                    <p className="text-white">Revenue</p>
-                    <p className="text-white">Margin</p>
-                    <p className="text-white">Efficiency</p>
+                    {leftCircleWords?.map((wordObj, index) => (
+                      <p key={index} className="text-white">
+                        {wordObj.word}
+                      </p>
+                    ))}
                   </div>
                   <div
                     ref={textRightRef}
                     className="gap-content col-span-3 col-start-9 row-span-6 row-start-4 flex flex-col items-center justify-center"
                   >
-                    <p className="text-white">Automation</p>
-                    <p className="text-white">Intelligence</p>
-                    <p className="text-white">Integration</p>
+                    {rightCircleWords?.map((wordObj, index) => (
+                      <p key={index} className="text-white">
+                        {wordObj.word}
+                      </p>
+                    ))}
                   </div>
                 </div>
               </div>
               <div ref={textBottomRef} className="flex w-full justify-center">
-                <p className="text-white">Transformation Delivered</p>
+                <p className="text-white">{bottomText}</p>
               </div>
             </div>
           </div>

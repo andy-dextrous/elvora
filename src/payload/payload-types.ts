@@ -747,6 +747,43 @@ export interface TextImageBlock {
  * via the `definition` "CirclesAnimationBlock".
  */
 export interface CirclesAnimationBlock {
+  /**
+   * Use <span> tags to designate text that should have the purple gradient effect. Example: 'Bridging Vision & <span>Execution</span>'
+   */
+  title: string;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Exactly three words for the left circle
+   */
+  leftCircleWords: {
+    word: string;
+    id?: string | null;
+  }[];
+  /**
+   * Exactly three words for the right circle
+   */
+  rightCircleWords: {
+    word: string;
+    id?: string | null;
+  }[];
+  /**
+   * Text that appears at the bottom of the infographic
+   */
+  bottomText: string;
   id?: string | null;
   blockName?: string | null;
   blockType: 'circles-animation';
@@ -1224,6 +1261,21 @@ export interface TextImageBlockSelect<T extends boolean = true> {
  * via the `definition` "CirclesAnimationBlock_select".
  */
 export interface CirclesAnimationBlockSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  leftCircleWords?:
+    | T
+    | {
+        word?: T;
+        id?: T;
+      };
+  rightCircleWords?:
+    | T
+    | {
+        word?: T;
+        id?: T;
+      };
+  bottomText?: T;
   id?: T;
   blockName?: T;
 }

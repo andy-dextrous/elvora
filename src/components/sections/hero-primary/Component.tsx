@@ -6,52 +6,42 @@ import Envelope from "@/components/icons/envelope"
 import SpeechBubble from "@/components/icons/speech-bubble"
 import { Grid, GridLines } from "@/components/layout/grid"
 import { Button } from "@/components/ui/button"
-import type { HeroPrimaryBlock as HeroProps, Media } from "@/payload/payload-types"
-import { useGSAP, gsap } from "@/providers/gsap"
-import { cn } from "@/utilities/ui"
+import { CMSLink } from "@/payload/components/frontend/cms-link"
 import { Media as PayloadMedia } from "@/payload/components/frontend/media"
-import Link from "next/link"
+import type { HeroPrimaryBlock as HeroProps, Media } from "@/payload/payload-types"
+import { gsap, useGSAP } from "@/providers/gsap"
+import { cn } from "@/utilities/ui"
 import React, { Fragment, useRef } from "react"
 
 /****************************************************
  * Hero Content Component
  ****************************************************/
 
-const HeroContent: React.FC<{ variant?: "default" | "outlineGradient" }> = ({
-  variant = "default",
-}) => {
+const HeroContent: React.FC<{
+  variant?: "default" | "outlineGradient"
+  content?: string
+  buttons?: HeroProps["buttons"]
+}> = ({ variant = "default", content, buttons }) => {
   return (
     <Fragment>
-      <p className="font-light text-white">
-        We fuse commercial insight with digital capability to unlock rapid, scalable
-        growth.
-      </p>
+      {content && <p className="font-light text-white">{content}</p>}
 
-      <div className="space-y-4">
-        <Button
-          variant={variant === "outlineGradient" ? "outlineGradient" : undefined}
-          size="lg"
-          asChild
-          className="w-full"
-        >
-          <Link href="/contact">
-            Discovery Call
-            <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-          </Link>
-        </Button>
-
-        <Button
-          variant={variant === "outlineGradient" ? "outlineGradient" : undefined}
-          size="lg"
-          className="w-full"
-          asChild
-        >
-          <Link href="/contact">
-            See What We Do
-            <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-          </Link>
-        </Button>
-      </div>
+      {buttons && buttons.length > 0 && (
+        <div className="space-y-4">
+          {buttons.map((buttonItem, index) => (
+            <CMSLink
+              key={index}
+              {...buttonItem.button.link}
+              appearance={variant === "outlineGradient" ? "outlineGradient" : "default"}
+              size="lg"
+              className="w-full"
+            >
+              {buttonItem.button.link.label}
+              <ArrowRightIcon className="!h-[14px] !w-[24px]" />
+            </CMSLink>
+          ))}
+        </div>
+      )}
     </Fragment>
   )
 }
@@ -109,7 +99,6 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
   const scrollTextRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const backgroundContainerRef = useRef<HTMLDivElement>(null)
-  const backgroundImageRef = useRef<HTMLImageElement>(null)
   const uspRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
@@ -273,7 +262,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
             )}
           >
             <h1 ref={titleRef} className="title-hidden max-w-[10ch] text-white">
-              Strategy Powered by Technology
+              {heading || "Strategy Powered by Technology"}
             </h1>
             <div
               className={cn(
@@ -283,7 +272,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
                 "xl:hidden"
               )}
             >
-              <HeroContent />
+              <HeroContent content={content} buttons={buttons} />
             </div>
           </div>
 
@@ -301,7 +290,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
               "xl:col-start-5 xl:flex"
             )}
           >
-            <HeroContent variant="outlineGradient" />
+            <HeroContent variant="outlineGradient" content={content} buttons={buttons} />
           </div>
 
           {/* Timestamp */}
@@ -367,7 +356,6 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
       <Background
         backgroundImage={backgroundImage as Media}
         containerRef={backgroundContainerRef}
-        imageRef={backgroundImageRef}
       />
     </section>
   )
@@ -376,11 +364,9 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
 const Background = ({
   backgroundImage,
   containerRef,
-  imageRef,
 }: {
   backgroundImage: Media | null
   containerRef: React.RefObject<HTMLDivElement | null>
-  imageRef: React.RefObject<HTMLImageElement | null>
 }) => {
   return (
     <Fragment>
