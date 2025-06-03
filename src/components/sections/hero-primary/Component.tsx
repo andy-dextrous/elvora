@@ -56,24 +56,6 @@ const HeroContent: React.FC<{ variant?: "default" | "outlineGradient" }> = ({
 }
 
 /****************************************************
- * Hero Timestamp Component
- ****************************************************/
-
-const HeroTimestamp: React.FC = () => {
-  const dateRef = useRef<HTMLDivElement>(null)
-  const timeRef = useRef<HTMLDivElement>(null)
-
-  return (
-    <div className="z-10 col-span-1 col-start-1 row-span-2 row-start-10 hidden items-end xl:flex">
-      <div className="text-sm text-white">
-        <div ref={dateRef}>Mon, 16th May 2025</div>
-        <div ref={timeRef}>02:00 AM (GMT+4)</div>
-      </div>
-    </div>
-  )
-}
-
-/****************************************************
  * Hero Scroll Indicator Component
  ****************************************************/
 
@@ -120,6 +102,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
   const titleRef = useRef<HTMLHeadingElement>(null)
   const backgroundContainerRef = useRef<HTMLDivElement>(null)
   const backgroundImageRef = useRef<HTMLImageElement>(null)
+  const uspRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
     let isUAE = true
@@ -216,8 +199,19 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
 
     // Title reveal animation
     gsap.effects.titleReveal(titleRef.current, {
-      duration: 2,
+      duration: 1.3,
       stagger: 0.3,
+      revertOnComplete: true,
+    })
+
+    // Usp reveal animation
+    gsap.effects.titleReveal(uspRef.current, {
+      trigger: {
+        trigger: uspRef.current,
+        start: "top 90%",
+        end: "bottom 70%",
+        scrub: false,
+      },
       revertOnComplete: true,
     })
 
@@ -228,7 +222,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
         duration: 16,
         repeat: -1,
         yoyo: true,
-        ease: "power1.inOut",
+        ease: "linear",
         force3D: true,
       })
     }
@@ -283,7 +277,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
       </div>
       <Grid className="h-auto grid-rows-[1fr_auto_auto] py-8">
         <div className="mb-section-y col-span-7 col-start-1 mt-40 flex items-center border-l-1 border-white lg:col-span-1 lg:col-start-4 lg:mt-0">
-          <p className="pr-10 pl-12 text-white/90">
+          <p ref={uspRef} className="pr-10 pl-12 text-white/90">
             Elvora bridges the gap between strategic intent and operational delivery,
             integrating commercial planning, finance, lean processes and technology to
             drive measurable growth and sustained profitability.

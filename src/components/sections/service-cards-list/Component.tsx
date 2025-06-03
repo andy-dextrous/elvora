@@ -1,6 +1,11 @@
 "use client"
 
-import * as Accordion from "@radix-ui/react-accordion"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import PlusIcon from "@/components/icons/plus"
 import MinusIcon from "@/components/icons/minus"
 import { Button } from "@/components/ui/button"
@@ -8,8 +13,9 @@ import type { ServiceCardsListBlock } from "@/payload/payload-types"
 import { cn } from "@/utilities/ui"
 import Link from "next/link"
 import ArrowRightIcon from "@/components/icons/arrow-right"
-import { useGSAP, gsap } from "@/providers/gsap"
+import { useGSAP, gsap, ScrollTrigger } from "@/providers/gsap"
 import { useRef } from "react"
+import Image from "next/image"
 
 /*************************************************************************/
 /*  SERVICE CARDS LIST COMPONENT
@@ -151,45 +157,58 @@ export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props 
 /*************************************************************************/
 
 const CustomAccordion = ({ cards }: { cards: any }) => {
+  const handleValueChange = (value: string) => {
+    ScrollTrigger.refresh()
+  }
+
   return (
-    <Accordion.Root type="single" defaultValue="item-0" collapsible>
+    <Accordion
+      type="single"
+      defaultValue="item-0"
+      collapsible
+      className="w-full"
+      onValueChange={handleValueChange}
+    >
       {cards.map((card: any, index: any) => (
-        <Accordion.Item
+        <AccordionItem
           key={index}
           value={`item-${index}`}
-          className="border-dark-border hover:bg-neutral !hover:cursor-pointer w-full border-b"
+          className="border-dark-border w-full border-b last:border-b"
         >
-          <div className="flex w-full flex-col lg:flex-row">
-            {/* Accordion Content */}
-            <div className="flex w-full flex-col items-start lg:w-1/2">
-              <Accordion.Header className="w-full">
-                <Accordion.Trigger className="group gap-content pl-section-x lg:pl-container-md-offset flex w-full items-center py-6 hover:cursor-pointer data-[state=open]:pt-12 lg:py-8 lg:data-[state=open]:pt-20">
-                  <span className="group-data-[state=open]:hidden">
-                    <PlusIcon />
-                  </span>
-                  <span className="group-data-[state=closed]:hidden">
-                    <MinusIcon />
-                  </span>
-                  <h4>{card.accordionTitle}</h4>
-                </Accordion.Trigger>
-              </Accordion.Header>
+          {/* Accordion Trigger */}
+          <AccordionTrigger className="group gap-content pl-section-x lg:pl-container-md-offset hover:bg-neutral flex w-full items-center justify-start py-6 text-left hover:cursor-pointer hover:no-underline focus-visible:ring-0 lg:py-8 [&>svg]:hidden">
+            <span className="center size-8 group-data-[state=open]:hidden">
+              <PlusIcon />
+            </span>
+            <span className="center size-8 group-data-[state=closed]:hidden">
+              <MinusIcon />
+            </span>
+            <h4 className="text-left">{card.accordionTitle}</h4>
+          </AccordionTrigger>
 
-              <Accordion.Content className="gap-content pb-section-xs pl-section-x pr-section-x lg:pb-section-x lg:pl-container-md-offset lg:pr-section-x flex flex-col data-[state=closed]:hidden">
+          {/* Single Accordion Content containing both text and image */}
+          <AccordionContent className="p-0">
+            <div className="relative flex w-full flex-col lg:flex-row">
+              {/* Text Content */}
+              <div className="gap-content lg:pl-container-md-offset lg:pr-section-x pl-section-x pr-section-x pb-section-xs lg:pb-section-x flex w-full flex-col py-20 lg:w-1/2">
                 <h3>{card.accordionContent[0].title}</h3>
                 <p>{card.accordionContent[0].description}</p>
                 <Button className="self-start">Discover {card.accordionTitle}</Button>
-              </Accordion.Content>
-            </div>
+              </div>
 
-            <Accordion.Content className="h-64 w-full data-[state=closed]:hidden md:h-80 lg:h-auto lg:w-1/2">
-              <div
-                className="h-full w-full bg-cover bg-center"
-                style={{ backgroundImage: `url(${card.accordionContent[0].image})` }}
-              />
-            </Accordion.Content>
-          </div>
-        </Accordion.Item>
+              {/* Image Content */}
+              <div className="absolute top-0 right-0 bottom-0 h-full w-full lg:w-1/2">
+                <Image
+                  src={card.accordionContent[0].image}
+                  alt={card.accordionContent[0].title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
       ))}
-    </Accordion.Root>
+    </Accordion>
   )
 }
