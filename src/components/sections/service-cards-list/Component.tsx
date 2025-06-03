@@ -12,9 +12,9 @@ import {
 import { Button } from "@/components/ui/button"
 import type { ServiceCardsListBlock } from "@/payload/payload-types"
 import { gsap, useGSAP, useSmoothContext, ScrollTrigger } from "@/providers/gsap"
-import Image from "next/image"
 import Link from "next/link"
 import { useRef } from "react"
+import Image from "next/image"
 
 /*************************************************************************/
 /*  SERVICE CARDS LIST COMPONENT

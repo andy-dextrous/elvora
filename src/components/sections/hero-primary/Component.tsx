@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import type { HeroPrimaryBlock as HeroProps, Media } from "@/payload/payload-types"
 import { useGSAP, gsap } from "@/providers/gsap"
 import { cn } from "@/utilities/ui"
-import Image from "next/image"
+import { Media as PayloadMedia } from "@/payload/components/frontend/media"
 import Link from "next/link"
 import React, { Fragment, useRef } from "react"
 
@@ -224,10 +224,11 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
     })
 
     // Gentle continuous zoom on background image
-    if (backgroundImageRef.current) {
-      gsap.to(backgroundImageRef.current, {
-        scale: 1.1,
-        duration: 16,
+    const heroImage = document.querySelector('[data-id="hero-background-image"]')
+    if (heroImage) {
+      gsap.to(heroImage, {
+        scale: 1.2,
+        duration: 20,
         repeat: -1,
         yoyo: true,
         ease: "linear",
@@ -401,12 +402,16 @@ const Background = ({
           />
 
           {/* Background Image */}
-          <div className="absolute inset-x-0 bottom-0 size-full">
-            <Image
-              ref={imageRef}
-              src={(backgroundImage as Media).url || "https://picsum.photos/1728/1260"}
-              alt={"Hero Background"}
-              className={cn(
+          <div
+            className="absolute inset-x-0 bottom-0 size-full"
+            data-id="hero-background-image"
+          >
+            <PayloadMedia
+              resource={backgroundImage}
+              alt="Hero Background"
+              fill
+              priority
+              imgClassName={cn(
                 // Base styles
                 "absolute inset-0 h-full w-full object-cover",
                 // Mobile
@@ -414,12 +419,8 @@ const Background = ({
                 // Desktop
                 "lg:object-[80%_50%]"
               )}
-              fill
-              priority
-              quality={100}
-              sizes="100vw"
+              size="100vw"
               loading="eager"
-              data-speed="0.8"
             />
           </div>
 

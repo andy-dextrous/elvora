@@ -1,7 +1,7 @@
 import RichText from "@/payload/components/frontend/rich-text"
 import { cn } from "@/utilities/ui"
 import { CMSLink } from "@/payload/components/frontend/cms-link"
-import Image from "next/image"
+import { Media as PayloadMedia } from "@/payload/components/frontend/media"
 import { Button } from "@/components/ui/button"
 import type {
   Media,
@@ -11,8 +11,6 @@ import type {
 export const TextImageComponent: React.FC<TextImageBlockProps> = props => {
   const { heading, content, image: imageProp, imagePosition, buttons } = props
   const image = imageProp as Media
-
-  const imageUrl = image?.url || "https://picsum.photos/700/400"
 
   return (
     <section>
@@ -46,8 +44,12 @@ export const TextImageComponent: React.FC<TextImageBlockProps> = props => {
         </div>
         <div className="flex flex-1 flex-col items-start gap-4">
           <div className="relative h-full max-h-[400px] min-h-[400px] w-full">
-            {/* <Media resource={image} /> */}
-            <Image src={imageUrl} alt={image?.alt || ""} fill className="object-cover" />
+            <PayloadMedia
+              resource={image}
+              alt={image?.alt || ""}
+              fill
+              imgClassName="object-cover"
+            />
           </div>
         </div>
       </div>
