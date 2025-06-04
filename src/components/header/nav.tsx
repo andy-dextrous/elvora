@@ -32,7 +32,7 @@ export const HeaderNavigation: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
 
   return (
-    <NavigationMenu className="hidden md:flex" orientation="vertical">
+    <NavigationMenu className="hidden lg:flex" orientation="vertical">
       <NavigationMenuList>
         {navItems.map(({ item }, i: number) => {
           if (item?.hasDropdown && item?.subItems && item?.subItems?.length > 0) {

@@ -19,5 +19,5 @@
     ["([\"'`][^\"'`]*.*?[\"'`])", "[\"'`]([^\"'`]*).*?[\"'`]"]
   ],
   "fluid-fonts.maxViewport": 1528,
-  "fluid-fonts.units": "px"
+  "fluid-fonts.units": "rem"
 }

@@ -71,7 +71,11 @@ const HeroScrollIndicator: React.FC<{
         // Base styles
         "flex flex-col items-center justify-end space-y-4 text-white",
         // Grid positioning
-        "col-span-1 col-start-4 row-span-1 row-start-11"
+        "col-start-1 col-end-8 row-span-1 row-start-11",
+        // Mobile
+        "md:col-span-1 md:col-start-4 md:row-span-1 md:row-start-11",
+        // Desktop
+        "lg:col-span-1 lg:col-start-4 lg:row-span-1 lg:row-start-11"
       )}
     >
       <div ref={textRef} className="text-xs font-light tracking-[0.4em] uppercase">
@@ -248,6 +252,9 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
     >
       <div className="relative h-screen w-full">
         <Grid className="h-full grid-rows-10 pb-8">
+          {/*************************************************************************/}
+          {/*  MAIN HERO CONTENT - TITLE AND CTA BUTTONS                           */}
+          {/*************************************************************************/}
           <div
             className={cn(
               // Base styles
@@ -277,6 +284,9 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
             </div>
           </div>
 
+          {/*************************************************************************/}
+          {/*  SECONDARY CONTENT AREA - DESKTOP LAYOUT                             */}
+          {/*************************************************************************/}
           <div
             className={cn(
               // Base styles
@@ -298,7 +308,9 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
             />
           </div>
 
-          {/* Timestamp */}
+          {/*************************************************************************/}
+          {/*  TIMESTAMP DISPLAY - DYNAMIC TIME ZONES                              */}
+          {/*************************************************************************/}
           <div
             className={cn(
               // Base styles
@@ -315,10 +327,14 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
             </div>
           </div>
 
-          {/* Scroll Indicator */}
+          {/*************************************************************************/}
+          {/*  SCROLL INDICATOR WITH ANIMATION                                      */}
+          {/*************************************************************************/}
           <HeroScrollIndicator textRef={scrollTextRef} />
 
-          {/* Bottom Right - Contact Icons */}
+          {/*************************************************************************/}
+          {/*  CONTACT ACTION BUTTONS                                               */}
+          {/*************************************************************************/}
           <div
             className={cn(
               // Base styles
@@ -338,13 +354,21 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
           </div>
         </Grid>
       </div>
+
+      {/*************************************************************************/}
+      {/*  USP SECTION - UNIQUE SELLING PROPOSITION                             */}
+      {/*************************************************************************/}
       <Grid className="h-auto grid-rows-[1fr_auto_auto] py-8">
         <div
           className={cn(
             // Base styles
             "mb-section-y flex items-center border-l-1 border-white",
             // Mobile
-            "col-span-7 col-start-1 mt-40",
+            "col-span-7 col-start-1 mt-20",
+            // Tablet
+            "md:col-span-5 md:col-start-2 md:mt-0",
+            // Small Laptops
+            "lg:col-span-2 lg:col-start-6 lg:mt-0",
             // Desktop
             "lg:col-span-1 lg:col-start-4 lg:mt-0"
           )}
@@ -355,7 +379,9 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
         </div>
       </Grid>
 
-      {/* Background */}
+      {/*************************************************************************/}
+      {/*  BACKGROUND IMAGE AND EFFECTS                                          */}
+      {/*************************************************************************/}
       <Background
         backgroundImage={backgroundImage as Media}
         containerRef={backgroundContainerRef}

@@ -5,7 +5,7 @@ import Link from "next/link"
 
 import type { Config } from "payload"
 import LogoPrimaryLight from "../logos/logo-light"
-import { MobileNav } from "./mobile-nav"
+import { MobileNavUpdated } from "./mobile-nav"
 import { getCurrentUser } from "@/lib/queries/user"
 import { cn } from "@/utilities/ui"
 
@@ -33,7 +33,7 @@ export async function Header() {
             <LogoPrimaryLight width={208} height={54} />
           </Link>
           <HeaderNavigation data={headerData} />
-          <MobileNav data={headerData} />
+          <MobileNavUpdated data={headerData} />
         </div>
       </div>
     </header>

@@ -32,8 +32,6 @@ export default async function Page({ params: paramsPromise }: Args) {
     draft,
   })
 
-  console.log(page)
-
   if (!page) {
     return <PayloadRedirects url={url} />
   }
@@ -45,7 +43,7 @@ export default async function Page({ params: paramsPromise }: Args) {
       data-collection="pages"
       data-single-type="page"
       data-id={page.id}
-      className={cn(user ? "relative !mt-[32px]" : "")}
+      // className={cn(user ? "relative !mt-[32px]" : "")}
     >
       {/* Only use PayloadRedirects for non-home pages to prevent infinite loops */}
       {slug !== "home" && <PayloadRedirects disableNotFound url={url} />}

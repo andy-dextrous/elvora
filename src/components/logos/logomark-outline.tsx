@@ -11,11 +11,11 @@ const SVGComponent = (props: React.SVGProps<SVGSVGElement>) => (
     <defs>
       <style>
         {
-          ".cls-1{fill:none;stroke:url(#linear-gradient);stroke-miterlimit:10;stroke-width:2px;}"
+          ".logomark-outline-cls-1{fill:none;stroke:url(#logomark-outline-linear-gradient);stroke-miterlimit:10;stroke-width:1px;}"
         }
       </style>
       <linearGradient
-        id="linear-gradient"
+        id="logomark-outline-linear-gradient"
         x1={0}
         y1={312.74}
         x2={399.01}
@@ -28,7 +28,7 @@ const SVGComponent = (props: React.SVGProps<SVGSVGElement>) => (
     </defs>
     <g id="Layer_1-2">
       <path
-        className="cls-1"
+        className="logomark-outline-cls-1"
         d="M170.52,388.18l224.43,234.5L2.6,457.47l167.92-69.29ZM170.97,387.99l163.2-67.34-6.09-315.8-157.11,383.14Z"
       />
     </g>
