@@ -1,5 +1,7 @@
 import { CollectionConfig } from "payload"
 import { createRevalidationHooks } from "@/payload/hooks/revalidateCollection"
+import { anyone } from "@/payload/access/anyone"
+import { canEditContent } from "@/payload/access/editor"
 
 const { afterChange, afterDelete } = createRevalidationHooks({
   collectionSlug: "testimonials",
@@ -8,7 +10,10 @@ const { afterChange, afterDelete } = createRevalidationHooks({
 export const Testimonials: CollectionConfig = {
   slug: "testimonials",
   access: {
-    read: () => true,
+    create: canEditContent,
+    delete: canEditContent,
+    read: anyone,
+    update: canEditContent,
   },
   labels: {
     singular: "Testimonial",

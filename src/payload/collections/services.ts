@@ -8,6 +8,8 @@ import {
 import { slugField } from "../fields/slug"
 import { CollectionConfig } from "payload"
 import { createRevalidationHooks } from "@/payload/hooks/revalidateCollection"
+import { anyone } from "@/payload/access/anyone"
+import { canEditContent } from "@/payload/access/editor"
 
 const { afterChange, afterDelete } = createRevalidationHooks({
   collectionSlug: "services",
@@ -15,6 +17,12 @@ const { afterChange, afterDelete } = createRevalidationHooks({
 
 export const Services: CollectionConfig = {
   slug: "services",
+  access: {
+    create: canEditContent,
+    delete: canEditContent,
+    read: anyone,
+    update: canEditContent,
+  },
   admin: {
     description:
       "Services represent the core business offerings of the company that should have a page dedicated to them for converting specific leads and customers. They are a great addition for SEO and marketing.",
