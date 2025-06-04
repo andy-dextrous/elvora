@@ -4,6 +4,7 @@ import ArrowRightIcon from "@/components/icons/arrow-right"
 import MinusIcon from "@/components/icons/minus"
 import PlusIcon from "@/components/icons/plus"
 import { SectionIntro } from "@/components/layout/section-intro"
+import { SectionCta } from "@/components/layout/section-cta"
 import {
   Accordion,
   AccordionContent,
@@ -109,7 +110,7 @@ const cards = [
 ] as any
 
 export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props => {
-  const { heading, description } = props
+  const { heading, description, text, link } = props
 
   return (
     <section className="side-border-dark pt-section-xl">
@@ -117,16 +118,8 @@ export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props 
       <div className="border-dark-border w-full border-t">
         <CustomAccordion cards={cards} />
       </div>
-      <div className="container-sm mt-section-x">
-        <div className="flex items-center justify-between">
-          <p>Didn't find what you're looking for? Explore our full capabilities</p>
-          <Button asChild>
-            <Link href="/services">
-              View All Services
-              <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-            </Link>
-          </Button>
-        </div>
+      <div className="mt-section-x">
+        <SectionCta text={text} link={link} />
       </div>
     </section>
   )

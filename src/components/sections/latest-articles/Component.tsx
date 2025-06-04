@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import ArrowRightIcon from "@/components/icons/arrow-right"
 import Image from "next/image"
+import { SectionCta } from "@/components/layout/section-cta"
 
 /*************************************************************************/
 /*  STATIC DATA FOR LATEST ARTICLES
@@ -43,6 +44,8 @@ const articles = [
 /*************************************************************************/
 
 export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
+  const { text, link } = props
+
   return (
     <section className="bg-dark side-border-light flicker-mask">
       <div className="container-sm gap-content-lg mb-section-x flex flex-col items-start">
@@ -93,19 +96,8 @@ export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
           </div>
         </div>
       </div>
-      <div className="mt-section-x container-sm">
-        <div className="gap-content flex flex-col items-start space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-          <p className="text-white">
-            Stay ahead of the curve: tap into Elvora's ongoing research and field
-            experience to navigate rapid technological change with confidence.
-          </p>
-          <Button asChild className="md:shrink-0">
-            <Link href="/blog">
-              View All Insights
-              <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-            </Link>
-          </Button>
-        </div>
+      <div className="mt-section-x">
+        <SectionCta text={text} link={link} containerClassName="text-white" />
       </div>
     </section>
   )

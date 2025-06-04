@@ -1,4 +1,5 @@
 import type { Block } from "payload"
+import { sectionCta } from "@/payload/fields/section-cta"
 
 export const LatestArticles: Block = {
   slug: "latest-articles",
@@ -7,12 +8,10 @@ export const LatestArticles: Block = {
   },
   interfaceName: "LatestArticlesBlock",
   fields: [
-    {
-      name: "placeholder",
-      type: "text",
-      admin: {
-        description: "Placeholder field - to be replaced with actual fields",
-      },
-    },
+    sectionCta({
+      collapsibleLabel: "Section CTA",
+      textDescription: "Text that appears before the call-to-action button",
+      linkDescription: "Button that links to view all articles or related content",
+    }),
   ],
 }

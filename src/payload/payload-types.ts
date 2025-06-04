@@ -815,6 +815,32 @@ export interface ServiceCardsListBlock {
     };
     [k: string]: unknown;
   };
+  /**
+   * Text that appears before the call-to-action button
+   */
+  text: string;
+  /**
+   * Button that links to more services or related content
+   */
+  link: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null)
+      | ({
+          relationTo: 'services';
+          value: string | Service;
+        } | null);
+    url?: string | null;
+    label: string;
+  };
   id?: string | null;
   blockName?: string | null;
   blockType: 'service-cards-list';
@@ -865,9 +891,31 @@ export interface InfoGridBlock {
  */
 export interface LatestArticlesBlock {
   /**
-   * Placeholder field - to be replaced with actual fields
+   * Text that appears before the call-to-action button
    */
-  placeholder?: string | null;
+  text: string;
+  /**
+   * Button that links to view all articles or related content
+   */
+  link: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null)
+      | ({
+          relationTo: 'services';
+          value: string | Service;
+        } | null);
+    url?: string | null;
+    label: string;
+  };
   id?: string | null;
   blockName?: string | null;
   blockType: 'latest-articles';
@@ -1310,6 +1358,16 @@ export interface CirclesAnimationBlockSelect<T extends boolean = true> {
 export interface ServiceCardsListBlockSelect<T extends boolean = true> {
   heading?: T;
   description?: T;
+  text?: T;
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
   id?: T;
   blockName?: T;
 }
@@ -1336,7 +1394,16 @@ export interface InfoGridBlockSelect<T extends boolean = true> {
  * via the `definition` "LatestArticlesBlock_select".
  */
 export interface LatestArticlesBlockSelect<T extends boolean = true> {
-  placeholder?: T;
+  text?: T;
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
   id?: T;
   blockName?: T;
 }

@@ -1,24 +1,20 @@
 "use client"
 
-import RichText from "@/payload/components/frontend/rich-text"
-import type { TestimonialsBlock } from "@/payload/payload-types"
-import { Swiper, SwiperSlide } from "swiper/react"
-import { Navigation, Autoplay } from "swiper/modules"
-import "swiper/css/navigation"
-import "swiper/css/autoplay"
-import "swiper/css"
-import { Button } from "@/components/ui/button"
 import ArrowRightIcon from "@/components/icons/arrow-right"
-import Image from "next/image"
 import {
+  LogoipGohissum,
   LogoipLorum,
   LogoipSpanum,
-  LogoipGohissum,
 } from "@/components/icons/partner-logos"
 import Quotation from "@/components/icons/quotation"
-import { useGSAP, gsap } from "@/providers/gsap"
-import { useRef } from "react"
 import { SectionIntro } from "@/components/layout/section-intro"
+import { Button } from "@/components/ui/button"
+import type { TestimonialsBlock } from "@/payload/payload-types"
+import "swiper/css"
+import "swiper/css/autoplay"
+import "swiper/css/navigation"
+import { Autoplay, Navigation } from "swiper/modules"
+import { Swiper, SwiperSlide } from "swiper/react"
 
 export const TestimonialsComponent: React.FC<TestimonialsBlock> = props => {
   const { heading, description } = props
