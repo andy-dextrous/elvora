@@ -3,6 +3,7 @@
 import ArrowRightIcon from "@/components/icons/arrow-right"
 import MinusIcon from "@/components/icons/minus"
 import PlusIcon from "@/components/icons/plus"
+import { SectionIntro } from "@/components/layout/section-intro"
 import {
   Accordion,
   AccordionContent,
@@ -108,31 +109,11 @@ const cards = [
 ] as any
 
 export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props => {
-  const titleRef = useRef<HTMLHeadingElement>(null)
-
-  useGSAP(() => {
-    gsap.effects.titleReveal(titleRef.current, {
-      trigger: {
-        trigger: titleRef.current,
-        start: "top 90%",
-        end: "bottom 40%",
-      },
-    })
-  })
+  const { heading, description } = props
 
   return (
     <section className="side-border-dark pt-section-xl">
-      <div className="container-sm gap-content-lg mb-section-x flex flex-col items-center">
-        <h2 ref={titleRef} className="title-hidden">
-          Commercial, Operational{" "}
-          <span className="text-gradient">& Technology Services</span>
-        </h2>
-        <p>
-          We combine business insight with technical excellence to help leaders accelerate
-          transformation. From strategy creation to full-stack implementation, Elvora
-          delivers integrated services that unlock growth, margin, and momentum.
-        </p>
-      </div>
+      <SectionIntro heading={heading} description={description} align="center" />
       <div className="border-dark-border w-full border-t">
         <CustomAccordion cards={cards} />
       </div>

@@ -1,10 +1,5 @@
 import type { Block } from "payload"
-
-import {
-  FixedToolbarFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from "@payloadcms/richtext-lexical"
+import { sectionIntro } from "@/payload/fields/section-intro"
 
 export const Testimonials: Block = {
   slug: "testimonials",
@@ -13,22 +8,12 @@ export const Testimonials: Block = {
     group: "Content Sections",
   },
   fields: [
-    {
-      name: "heading",
-      type: "text",
-      required: true,
-      defaultValue: "Testimonials",
-    },
-    {
-      name: "content",
-      type: "richText",
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
-        },
-      }),
-      label: false,
-      required: false,
-    },
+    sectionIntro({
+      collapsibleLabel: "Content",
+      headingDescription:
+        "Main heading for testimonials. Use <span> tags for gradient text: 'Trusted By <span>Forward-Thinkers</span>'",
+      descriptionDescription:
+        "Brief description about your testimonials and client success stories",
+    }),
   ],
 }

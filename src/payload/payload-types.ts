@@ -794,20 +794,13 @@ export interface CirclesAnimationBlock {
  */
 export interface ServiceCardsListBlock {
   /**
-   * Placeholder field - to be replaced with actual fields
+   * Main heading for the services section. Use <span> tags for gradient text: 'Commercial, Operational <span>& Technology Services</span>'
    */
-  placeholder?: string | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'service-cards-list';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TestimonialsBlock".
- */
-export interface TestimonialsBlock {
   heading: string;
-  content?: {
+  /**
+   * Brief description of your services and value proposition
+   */
+  description: {
     root: {
       type: string;
       children: {
@@ -821,7 +814,38 @@ export interface TestimonialsBlock {
       version: number;
     };
     [k: string]: unknown;
-  } | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'service-cards-list';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TestimonialsBlock".
+ */
+export interface TestimonialsBlock {
+  /**
+   * Main heading for testimonials. Use <span> tags for gradient text: 'Trusted By <span>Forward-Thinkers</span>'
+   */
+  heading: string;
+  /**
+   * Brief description about your testimonials and client success stories
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   id?: string | null;
   blockName?: string | null;
   blockType: 'testimonials';
@@ -1284,7 +1308,8 @@ export interface CirclesAnimationBlockSelect<T extends boolean = true> {
  * via the `definition` "ServiceCardsListBlock_select".
  */
 export interface ServiceCardsListBlockSelect<T extends boolean = true> {
-  placeholder?: T;
+  heading?: T;
+  description?: T;
   id?: T;
   blockName?: T;
 }
@@ -1294,7 +1319,7 @@ export interface ServiceCardsListBlockSelect<T extends boolean = true> {
  */
 export interface TestimonialsBlockSelect<T extends boolean = true> {
   heading?: T;
-  content?: T;
+  description?: T;
   id?: T;
   blockName?: T;
 }

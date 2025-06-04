@@ -48,21 +48,45 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
 type Props = {
   data: DefaultTypedEditorState
   enableGutter?: boolean
-  enableProse?: boolean
+  variant?: "default" | "prose"
+  textColor?: "inherit" | "dark" | "white" | "muted" | "primary" | "secondary"
 } & React.HTMLAttributes<HTMLDivElement>
 
 export default function RichText(props: Props) {
-  const { className, enableProse = true, enableGutter = true, ...rest } = props
+  const {
+    className,
+    enableGutter = true,
+    variant = "default", // Default inherits from typography.css
+    textColor = "inherit",
+    ...rest
+  } = props
+
+  // Color classes mapping
+  const colorClasses = {
+    inherit: "[&>*]:text-inherit",
+    dark: "[&>*]:text-dark",
+    white: "[&>*]:text-white",
+    muted: "[&>*]:text-gray-600 dark:[&>*]:text-gray-400",
+    primary: "[&>*]:text-primary",
+    secondary: "[&>*]:text-secondary",
+  }
+
   return (
     <ConvertRichText
       converters={jsxConverters}
       className={cn(
-        "payload-richtext !prose",
+        "payload-richtext",
         {
+          // Default: No special classes - inherits from typography.css
+          // Prose: Use Tailwind prose for blog content
+          "prose prose-lg max-w-none": variant === "prose",
+
+          // Gutter controls
           "payload-richtext--container": enableGutter,
           "payload-richtext--full-width": !enableGutter,
-          "payload-richtext--prose": enableProse,
         },
+        // Color classes
+        colorClasses[textColor],
         className
       )}
       {...rest}

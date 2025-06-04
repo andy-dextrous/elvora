@@ -18,33 +18,14 @@ import {
 import Quotation from "@/components/icons/quotation"
 import { useGSAP, gsap } from "@/providers/gsap"
 import { useRef } from "react"
+import { SectionIntro } from "@/components/layout/section-intro"
 
 export const TestimonialsComponent: React.FC<TestimonialsBlock> = props => {
-  const { heading, content } = props
-  const titleRef = useRef<HTMLHeadingElement>(null)
-
-  useGSAP(() => {
-    gsap.effects.titleReveal(titleRef.current, {
-      trigger: {
-        trigger: titleRef.current,
-        start: "top 90%",
-        end: "bottom 40%",
-      },
-    })
-  })
+  const { heading, description } = props
 
   return (
     <section className="bg-dark-50 side-border-dark">
-      <div className="container-sm gap-content-lg mb-section-x flex flex-col items-start">
-        <h2 ref={titleRef} className="title-hidden">
-          Trusted By <br />
-          <span className="text-gradient">Forward-Thinkers</span>
-        </h2>
-        <p className="max-w-3xl">
-          From strategy to execution, our work delivers real-world results—at scale, with
-          impact. These are their stories of transformation, growth, and success.
-        </p>
-      </div>
+      <SectionIntro heading={heading} description={description} align="start" />
       <div className="border-dark-border relative w-full border-t">
         <div className="absolute -top-16 right-0 flex h-16 items-center justify-between">
           <div className="flex items-center">
