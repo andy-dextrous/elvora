@@ -260,9 +260,9 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
               // Base styles
               "gap-content flex h-full flex-col justify-center",
               // Mobile
-              "col-span-full row-span-12 row-start-1",
+              "col-span-full row-span-12 row-start-1 pr-6 pl-6",
               // Tablet
-              "md:col-span-5 md:col-start-2",
+              "md:col-span-5 md:col-start-2 md:pr-0 md:pl-0",
               // Desktop
               "lg:col-span-5 lg:col-start-2 lg:row-span-10",
               // XL
@@ -373,7 +373,7 @@ export const HeroPrimaryComponent: React.FC<HeroProps> = ({
             "lg:col-span-1 lg:col-start-4 lg:mt-0"
           )}
         >
-          <p ref={uspRef} className="pr-10 pl-12 text-white/90">
+          <p ref={uspRef} className="pr-10 pl-6 text-white/90 lg:pl-12">
             {usp}
           </p>
         </div>

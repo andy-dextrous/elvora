@@ -1,8 +1,8 @@
 /* Spacing - applies to padding, margin, width & height */
 
 @theme {
-  --spacing-section-x: clamp(3.125rem, 2.2972rem + 4.1391vw, 6.25rem);
-  --spacing-section-y: clamp(1rem, 6.954vw + -0.391rem, 6.25rem);
+  --spacing-section-x: clamp(1rem, -0.3907rem + 6.9536vw, 6.25rem);
+  --spacing-section-y: clamp(3rem, 2.1391rem + 4.3046vw, 6.25rem);
   --spacing-section-xs: clamp(1.6875rem, 1.243vw + 1.439rem, 2.5rem);
   --spacing-section-sm: clamp(2.25rem, 2.294vw + 1.791rem, 3.75rem);
   --spacing-section-md: clamp(3rem, 4.015vw + 2.197rem, 5.625rem);

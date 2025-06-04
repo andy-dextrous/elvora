@@ -163,21 +163,31 @@ const CustomAccordion = ({ cards }: { cards: any }) => {
             <span className="center size-8 group-data-[state=closed]:hidden">
               <MinusIcon />
             </span>
-            <h4 className="text-left">{card.accordionTitle}</h4>
+            <h4 className="text-h6 lg:text-h4 text-left">{card.accordionTitle}</h4>
           </AccordionTrigger>
 
           {/* Single Accordion Content containing both text and image */}
           <AccordionContent className="p-0">
             <div className="relative flex w-full flex-col lg:flex-row">
+              {/* Mobile Image - smaller and above text */}
+              <div className="relative h-48 w-full lg:hidden">
+                <Image
+                  src={card.accordionContent[0].image}
+                  alt={card.accordionContent[0].title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
               {/* Text Content */}
-              <div className="gap-content lg:pl-container-md-offset lg:pr-section-x pl-section-x pr-section-x pb-section-xs lg:pb-section-x flex w-full flex-col py-20 lg:w-1/2">
+              <div className="gap-content px-section-xs py-section-xs lg:pl-container-md-offset lg:pr-section-x lg:pb-section-x pl-section-x pr-section-x pb-section-xs flex w-full flex-col lg:w-1/2 lg:py-20">
                 <h3>{card.accordionContent[0].title}</h3>
                 <p>{card.accordionContent[0].description}</p>
                 <Button className="self-start">Discover {card.accordionTitle}</Button>
               </div>
 
-              {/* Image Content */}
-              <div className="absolute top-0 right-0 bottom-0 h-full w-full lg:w-1/2">
+              {/* Desktop Image - side by side */}
+              <div className="absolute top-0 right-0 bottom-0 hidden h-full w-1/2 lg:block">
                 <Image
                   src={card.accordionContent[0].image}
                   alt={card.accordionContent[0].title}

@@ -38,11 +38,16 @@ const gridVariants = tv({
 })
 
 const cardVariants = tv({
-  base: "p-section-sm lg:p-section-md relative flex min-h-[400px] flex-col justify-between border-y border-r last:border-r-0 sm:min-h-[350px] lg:min-h-[400px]",
+  base: "p-section-sm lg:p-section-md relative flex flex-col justify-between",
   variants: {
     backgroundColorScheme: {
       dark: "border-light-border",
       light: "border-dark-border",
+    },
+    position: {
+      first: "border-b sm:min-h-[350px] sm:border-y sm:border-r lg:min-h-[400px]",
+      middle: "border-b sm:min-h-[350px] sm:border-y sm:border-r lg:min-h-[400px]",
+      last: "border-b sm:min-h-[350px] sm:border-y lg:min-h-[400px]",
     },
   },
 })
@@ -83,7 +88,18 @@ export const InfoGridComponent: React.FC<InfoGridBlock> = ({
       <div className={borderVariants({ backgroundColorScheme })}>
         <div className={gridVariants({ gridColumns })}>
           {processSteps?.map((step, index) => (
-            <div key={index} className={cardVariants({ backgroundColorScheme })}>
+            <div
+              key={index}
+              className={cardVariants({
+                backgroundColorScheme,
+                position:
+                  index === 0
+                    ? "first"
+                    : index === processSteps.length - 1
+                      ? "last"
+                      : "middle",
+              })}
+            >
               <p className="text-gradient text-h1 absolute top-0 right-0 z-10 px-8 font-light opacity-20">
                 {index + 1}
               </p>

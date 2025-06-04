@@ -18,8 +18,26 @@ export const TestimonialsComponent: React.FC<TestimonialsBlock> = props => {
   return (
     <section className="bg-dark-50 side-border-dark">
       <SectionIntro heading={heading} description={description} align="start" />
+
+      {/* Mobile Navigation - Left aligned, in normal flow */}
+      <div className="flex justify-start px-4 py-4 md:hidden">
+        <div className="flex items-center gap-2">
+          <Button className="testimonials-previous hover:cursor-pointer" icon={true}>
+            <ArrowRightIcon className="!h-4 !w-4 rotate-180" />
+          </Button>
+          <Button
+            className="testimonials-next hover:cursor-pointer"
+            variant="outlineDark"
+            icon={true}
+          >
+            <ArrowRightIcon className="!h-4 !w-4" />
+          </Button>
+        </div>
+      </div>
+
       <div className="border-dark-border relative w-full border-t">
-        <div className="absolute -top-16 right-0 flex h-16 items-center justify-between">
+        {/* Desktop Navigation - Absolute positioned */}
+        <div className="absolute -top-16 right-0 hidden h-16 items-center justify-between md:flex">
           <div className="flex items-center">
             <Button className="testimonials-previous hover:cursor-pointer" icon={true}>
               <ArrowRightIcon className="!h-4 !w-4 rotate-180 md:!h-6 md:!w-6" />
@@ -50,14 +68,14 @@ const TestimonialSlider = ({
 }) => {
   if (!testimonials || testimonials.length === 0) {
     return (
-      <div className="flex h-[300px] items-center justify-center text-gray-500">
+      <div className="flex min-h-[200px] items-center justify-center text-gray-500">
         No testimonials selected
       </div>
     )
   }
 
   return (
-    <div className="relative h-[300px] w-full md:h-[350px] lg:h-[400px]">
+    <div className="relative w-full">
       <Swiper
         spaceBetween={0}
         slidesPerView={1.2}
@@ -102,20 +120,20 @@ const TestimonialSlider = ({
 
           return (
             <SwiperSlide key={testimonialData.id || index}>
-              <article className="border-dark-border flex h-[300px] flex-col justify-between border-r border-b p-4 md:h-[350px] md:p-6 lg:h-[400px] lg:p-8">
+              <article className="border-dark-border flex min-h-[250px] flex-col justify-between border-r border-b p-4 md:min-h-[300px] md:p-6 lg:min-h-[350px] lg:p-8">
                 <div className="mb-4 md:mb-6 lg:mb-8">
-                  <Quotation className="text-primary mb-4 h-12 w-12" />
-                  <blockquote className="text-h4 font-light">
+                  <Quotation className="text-primary mb-4 h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12" />
+                  <blockquote className="text-base leading-relaxed font-light md:text-lg lg:text-xl">
                     {testimonialData.quote}
                   </blockquote>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
-                    <div className="truncate font-semibold text-gray-900">
+                    <div className="truncate text-sm font-semibold text-gray-900 md:text-base">
                       {testimonialData.name}
                     </div>
-                    <div className="text-primary truncate text-xs font-light">
+                    <div className="text-primary truncate text-xs font-light md:text-sm">
                       {testimonialData.title}, {testimonialData.company}
                     </div>
                   </div>
