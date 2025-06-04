@@ -822,7 +822,7 @@ export interface ServiceCardsListBlock {
    */
   text: string;
   /**
-   * Button configuration including style, size, and link destination
+   * Button that links to more services or related content
    */
   button: {
     /**

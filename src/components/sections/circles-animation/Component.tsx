@@ -47,11 +47,11 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     const CIRCLE_MOVEMENT_DURATION = DRAWSVG_DURATION // circles take same time as drawing to return
     const TEXT_APPEAR_TIME = TOTAL_DURATION * 0.3
     const TEXT_FADE_DURATION = TOTAL_DURATION * 0.2
-    const TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.5
+    const TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.48
     const TEXT_END_STAGGER = 0.5 // Delay between each p element finishing
     const BOTTOM_TEXT_APPEAR_TIME = TOTAL_DURATION * 0.5 // Bottom text appears later
-    const BOTTOM_TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.3 // Bottom text scramble duration
-    const INSIDE_FADE_DURATION = TOTAL_DURATION * 0.1
+    const BOTTOM_TEXT_SCRAMBLE_DURATION = TOTAL_DURATION * 0.4 // Bottom text scramble duration
+    const INSIDE_FADE_DURATION = TOTAL_DURATION * 0.4
     const END_DELAY = 0.5 // Fixed delay after inside animation
     const INSIDE_APPEAR_TIME = TOTAL_DURATION - INSIDE_FADE_DURATION - END_DELAY
     const TRAIL_FADE_DURATION = TOTAL_DURATION * 0.2
