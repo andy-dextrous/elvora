@@ -1,44 +1,75 @@
-import type { FullwidthCtaBlock } from "@/payload/payload-types"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import type { FullwidthCtaBlock, Media } from "@/payload/payload-types"
+import { CMSLink } from "@/payload/components/frontend/cms-link"
 import ArrowRightIcon from "@/components/icons/arrow-right"
 import Image from "next/image"
 import { Grid, GridLines } from "@/components/layout/grid"
 import { Fragment } from "react"
+import { cn } from "@/utilities/ui"
+import parse from "html-react-parser"
 
 /*************************************************************************/
 /*  FULLWIDTH CTA COMPONENT
 /*************************************************************************/
 
 export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
+  const { heading, description, textAlignment, backgroundImage, button } = props
+
+  // Parse heading and convert span tags to gradient elements if needed
+  const parsedHeading = heading
+    ? parse(heading, {
+        replace: (domNode: any) => {
+          if (domNode.name === "span") {
+            return <span className="text-gradient">{domNode.children[0]?.data}</span>
+          }
+        },
+      })
+    : null
+
   return (
     <section className="relative flex h-screen w-full flex-col justify-center overflow-hidden py-0">
       <div className="relative h-full w-full">
         <Grid className="h-full grid-rows-10">
-          <div className="col-span-full row-span-6 row-start-3 flex flex-col justify-center md:col-span-5 md:col-start-2 lg:col-span-5 lg:col-start-2 xl:col-span-3 xl:col-start-2">
-            <div className="flex max-w-[500px] flex-col">
-              <h2 className="title-hidden text-white">
-                See the Difference
-                <br />
-                in Minutes
-              </h2>
-              <p className="mb-8 font-light text-white">
-                Watch a fast demo and see how intelligent automation transforms your
-                workflow: less effort, more results.
-              </p>
-              <Button variant="white" size="lg" asChild className="self-start">
-                <Link href="/demo">
-                  Watch Demo
+          <div
+            className={cn(
+              "col-span-full row-span-6 row-start-3 flex flex-col justify-center",
+              {
+                "items-center": textAlignment === "center",
+                "items-end text-right md:col-span-5 md:col-start-7 lg:col-span-5 lg:col-start-7 xl:col-span-3 xl:col-start-9":
+                  textAlignment === "right",
+                "md:col-span-5 md:col-start-2 lg:col-span-5 lg:col-start-2 xl:col-span-3 xl:col-start-2":
+                  textAlignment === "left",
+              }
+            )}
+          >
+            <div
+              className={cn("flex max-w-[500px] flex-col", {
+                "items-center text-center": textAlignment === "center",
+                "items-end": textAlignment === "right",
+              })}
+            >
+              <h2 className="title-hidden text-white">{parsedHeading}</h2>
+              <p className="mb-8 font-light text-white">{description}</p>
+              {button && (
+                <CMSLink
+                  {...button.link}
+                  appearance={button.variant || "white"}
+                  size={button.size || "lg"}
+                  className={cn({
+                    "self-center": textAlignment === "center",
+                    "self-start": textAlignment !== "center",
+                  })}
+                >
+                  {button.link?.label}
                   <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-                </Link>
-              </Button>
+                </CMSLink>
+              )}
             </div>
           </div>
         </Grid>
       </div>
 
       {/* Background */}
-      <Background />
+      <Background backgroundImage={backgroundImage} />
     </section>
   )
 }
@@ -47,7 +78,15 @@ export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
 /*  BACKGROUND COMPONENT
 /*************************************************************************/
 
-const Background = () => {
+const Background = ({ backgroundImage }: { backgroundImage: string | Media }) => {
+  // Get image URL from Media object or use string directly
+  const imageUrl =
+    typeof backgroundImage === "object" && backgroundImage?.url
+      ? backgroundImage.url
+      : typeof backgroundImage === "string"
+        ? backgroundImage
+        : "https://res.cloudinary.com/wild-creative/image/upload/v1748834621/meeting_3_hbtmkr.jpg"
+
   return (
     <Fragment>
       <div className="inset-x-section-x absolute top-0 bottom-0">
@@ -58,8 +97,8 @@ const Background = () => {
           {/* Background Image */}
           <div className="absolute inset-0 size-full">
             <Image
-              src="https://res.cloudinary.com/wild-creative/image/upload/v1748834621/meeting_3_hbtmkr.jpg"
-              alt="Escalator Background"
+              src={imageUrl}
+              alt="Background Image"
               className="absolute inset-[-10%] h-[110%] w-[110%] object-cover"
               fill
               priority

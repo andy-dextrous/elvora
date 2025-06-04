@@ -1,14 +1,10 @@
 "use client"
 
 import ArrowRightIcon from "@/components/icons/arrow-right"
-import {
-  LogoipGohissum,
-  LogoipLorum,
-  LogoipSpanum,
-} from "@/components/icons/partner-logos"
 import Quotation from "@/components/icons/quotation"
 import { SectionIntro } from "@/components/layout/section-intro"
 import { Button } from "@/components/ui/button"
+import { Media } from "@/payload/components/frontend/media"
 import type { TestimonialsBlock } from "@/payload/payload-types"
 import "swiper/css"
 import "swiper/css/autoplay"
@@ -17,7 +13,7 @@ import { Autoplay, Navigation } from "swiper/modules"
 import { Swiper, SwiperSlide } from "swiper/react"
 
 export const TestimonialsComponent: React.FC<TestimonialsBlock> = props => {
-  const { heading, description } = props
+  const { heading, description, testimonials } = props
 
   return (
     <section className="bg-dark-50 side-border-dark">
@@ -37,78 +33,29 @@ export const TestimonialsComponent: React.FC<TestimonialsBlock> = props => {
             </Button>
           </div>
         </div>
-        <TestimonialSlider />
+        <TestimonialSlider testimonials={testimonials} />
       </div>
     </section>
   )
 }
 
 /*******************************************************/
-/*  Static Testimonials Data
-/*******************************************************/
-
-const testimonials = [
-  {
-    id: 1,
-    quote:
-      "Sensys didn't just deliver a solution — they helped reshape our entire digital strategy. The clarity and speed were unmatched.",
-    name: "Justin Kenter",
-    title: "Head of Digital Transformation",
-    company: "LumenX",
-    LogoComponent: LogoipLorum,
-  },
-  {
-    id: 2,
-    quote:
-      "From our first workshop to the final rollout, the Sensys team felt like an extension of our own. Reliable, sharp, and truly collaborative.",
-    name: "Daniel Ross",
-    title: "CTO",
-    company: "Vireon Systems",
-    LogoComponent: LogoipSpanum,
-  },
-  {
-    id: 3,
-    quote:
-      "What impressed us most was their ability to simplify complex processes while delivering with confidence.",
-    name: "Sarah Chen",
-    title: "COO",
-    company: "Noventa",
-    LogoComponent: LogoipGohissum,
-  },
-  {
-    id: 4,
-    quote:
-      "Sensys didn't just deliver a solution — they helped reshape our entire digital strategy. The clarity and speed were unmatched.",
-    name: "Justin Kenter",
-    title: "Head of Digital Transformation",
-    company: "LumenX",
-    LogoComponent: LogoipLorum,
-  },
-  {
-    id: 5,
-    quote:
-      "From our first workshop to the final rollout, the Sensys team felt like an extension of our own. Reliable, sharp, and truly collaborative.",
-    name: "Daniel Ross",
-    title: "CTO",
-    company: "Vireon Systems",
-    LogoComponent: LogoipSpanum,
-  },
-  {
-    id: 6,
-    quote:
-      "What impressed us most was their ability to simplify complex processes while delivering with confidence.",
-    name: "Sarah Chen",
-    title: "COO",
-    company: "Noventa",
-    LogoComponent: LogoipGohissum,
-  },
-]
-
-/*******************************************************/
 /*  Testimonial Slider Component
 /*******************************************************/
 
-const TestimonialSlider = () => {
+const TestimonialSlider = ({
+  testimonials,
+}: {
+  testimonials: TestimonialsBlock["testimonials"]
+}) => {
+  if (!testimonials || testimonials.length === 0) {
+    return (
+      <div className="flex h-[300px] items-center justify-center text-gray-500">
+        No testimonials selected
+      </div>
+    )
+  }
+
   return (
     <div className="relative h-[300px] w-full md:h-[350px] lg:h-[400px]">
       <Swiper
@@ -147,32 +94,44 @@ const TestimonialSlider = () => {
           prevEl: ".testimonials-previous",
         }}
       >
-        {testimonials.map(testimonial => (
-          <SwiperSlide key={testimonial.id}>
-            <article className="border-dark-border flex h-[300px] flex-col justify-between border-r border-b p-4 md:h-[350px] md:p-6 lg:h-[400px] lg:p-8">
-              <div className="mb-4 md:mb-6 lg:mb-8">
-                <Quotation className="text-primary mb-4 h-12 w-12" />
-                <blockquote className="text-h4 font-light">
-                  {testimonial.quote}
-                </blockquote>
-              </div>
+        {testimonials.map((testimonial, index) => {
+          // Handle both string IDs and populated testimonial objects
+          const testimonialData = typeof testimonial === "string" ? null : testimonial
 
-              <div className="flex items-center justify-between">
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-semibold text-gray-900">
-                    {testimonial.name}
+          if (!testimonialData) return null
+
+          return (
+            <SwiperSlide key={testimonialData.id || index}>
+              <article className="border-dark-border flex h-[300px] flex-col justify-between border-r border-b p-4 md:h-[350px] md:p-6 lg:h-[400px] lg:p-8">
+                <div className="mb-4 md:mb-6 lg:mb-8">
+                  <Quotation className="text-primary mb-4 h-12 w-12" />
+                  <blockquote className="text-h4 font-light">
+                    {testimonialData.quote}
+                  </blockquote>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-semibold text-gray-900">
+                      {testimonialData.name}
+                    </div>
+                    <div className="text-primary truncate text-xs font-light">
+                      {testimonialData.title}, {testimonialData.company}
+                    </div>
                   </div>
-                  <div className="text-primary truncate text-xs font-light">
-                    {testimonial.title}, {testimonial.company}
+                  <div className="ml-3 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 md:h-10 md:w-10 lg:h-12 lg:w-12">
+                    {testimonialData.companyLogo && (
+                      <Media
+                        resource={testimonialData.companyLogo}
+                        className="h-4 w-4 md:h-6 md:w-6 lg:h-8 lg:w-8"
+                      />
+                    )}
                   </div>
                 </div>
-                <div className="ml-3 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 md:h-10 md:w-10 lg:h-12 lg:w-12">
-                  <testimonial.LogoComponent className="h-4 w-4 md:h-6 md:w-6 lg:h-8 lg:w-8" />
-                </div>
-              </div>
-            </article>
-          </SwiperSlide>
-        ))}
+              </article>
+            </SwiperSlide>
+          )
+        })}
       </Swiper>
     </div>
   )

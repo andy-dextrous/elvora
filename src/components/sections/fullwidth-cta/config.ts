@@ -1,15 +1,91 @@
 import type { Block } from "payload"
+import { button } from "@/payload/fields/buttons"
+import { fullwidthCtaDefault } from "@/payload/fields/default-values/fullwidth-cta"
 
 export const FullwidthCta: Block = {
   slug: "fullwidth-cta",
   interfaceName: "FullwidthCtaBlock",
+  admin: {
+    group: "Content Sections",
+  },
   fields: [
     {
-      name: "placeholder",
-      type: "text",
+      type: "row",
+      fields: [
+        {
+          name: "heading",
+          type: "text",
+          required: true,
+          defaultValue: fullwidthCtaDefault.heading,
+          admin: {
+            description: "Main heading text. You can use HTML tags for styling.",
+            width: "70%",
+          },
+        },
+        {
+          name: "textAlignment",
+          type: "select",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+          defaultValue: fullwidthCtaDefault.textAlignment,
+          required: true,
+          admin: {
+            description: "Choose text alignment",
+            width: "30%",
+          },
+        },
+      ],
+    },
+    {
+      name: "description",
+      type: "textarea",
+      required: true,
+      defaultValue: fullwidthCtaDefault.description,
       admin: {
-        description: "Placeholder field - to be replaced with actual fields",
+        description: "Supporting description text",
+        rows: 4,
       },
+    },
+    {
+      type: "collapsible",
+      label: "Background Image",
+      admin: {
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          name: "backgroundImage",
+          type: "upload",
+          relationTo: "media",
+          required: true,
+          admin: {
+            description: "Background image for the CTA section",
+          },
+          filterOptions: {
+            mimeType: { contains: "image" },
+          },
+        },
+      ],
+    },
+    {
+      type: "collapsible",
+      label: "Call to Action Button",
+      admin: {
+        initCollapsed: false,
+      },
+      fields: [
+        button({
+          name: "button",
+          required: true,
+          defaultValue: fullwidthCtaDefault.button,
+          admin: {
+            description: "Configure the CTA button",
+          },
+        }),
+      ],
     },
   ],
 }

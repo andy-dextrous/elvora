@@ -894,9 +894,48 @@ export interface TestimonialsBlock {
     };
     [k: string]: unknown;
   };
+  /**
+   * Select the testimonials to display in this section. They will appear in the order selected.
+   */
+  testimonials: (string | Testimonial)[];
   id?: string | null;
   blockName?: string | null;
   blockType: 'testimonials';
+}
+/**
+ * Client testimonials displayed on the website. Each testimonial includes a quote, client information, and company logo.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: string;
+  /**
+   * The testimonial quote from the client
+   */
+  quote: string;
+  /**
+   * Full name of the person giving the testimonial
+   */
+  name: string;
+  /**
+   * Job title of the person (e.g., 'Head of Digital Transformation')
+   */
+  title: string;
+  /**
+   * Company name
+   */
+  company: string;
+  /**
+   * Company logo image - will be displayed as a small icon in the testimonial
+   */
+  companyLogo: string | Media;
+  /**
+   * Mark as featured to prioritize in displays
+   */
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -968,9 +1007,63 @@ export interface LatestArticlesBlock {
  */
 export interface FullwidthCtaBlock {
   /**
-   * Placeholder field - to be replaced with actual fields
+   * Main heading text. You can use HTML tags for styling.
    */
-  placeholder?: string | null;
+  heading: string;
+  /**
+   * Choose text alignment
+   */
+  textAlignment: 'left' | 'center' | 'right';
+  /**
+   * Supporting description text
+   */
+  description: string;
+  /**
+   * Background image for the CTA section
+   */
+  backgroundImage: string | Media;
+  /**
+   * Configure the CTA button
+   */
+  button: {
+    /**
+     * Select the button variant
+     */
+    variant?:
+      | ('default' | 'outline' | 'outlineDark' | 'outlineGradient' | 'secondary' | 'white' | 'dark' | 'ghost' | 'link')
+      | null;
+    /**
+     * Select the button size
+     */
+    size?: ('default' | 'sm' | 'md' | 'lg') | null;
+    /**
+     * Select the button layout
+     */
+    layout?: ('default' | 'centered') | null;
+    /**
+     * Make this an icon-only button
+     */
+    icon?: boolean | null;
+    link: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null)
+        | ({
+            relationTo: 'services';
+            value: string | Service;
+          } | null);
+      url?: string | null;
+      label: string;
+    };
+  };
   id?: string | null;
   blockName?: string | null;
   blockType: 'fullwidth-cta';
@@ -1000,41 +1093,6 @@ export interface Team {
         id?: string | null;
       }[]
     | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Client testimonials displayed on the website. Each testimonial includes a quote, client information, and company logo.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "testimonials".
- */
-export interface Testimonial {
-  id: string;
-  /**
-   * The testimonial quote from the client
-   */
-  quote: string;
-  /**
-   * Full name of the person giving the testimonial
-   */
-  name: string;
-  /**
-   * Job title of the person (e.g., 'Head of Digital Transformation')
-   */
-  title: string;
-  /**
-   * Company name
-   */
-  company: string;
-  /**
-   * Company logo image - will be displayed as a small icon in the testimonial
-   */
-  companyLogo: string | Media;
-  /**
-   * Mark as featured to prioritize in displays
-   */
-  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1467,6 +1525,7 @@ export interface ServiceCardsListBlockSelect<T extends boolean = true> {
 export interface TestimonialsBlockSelect<T extends boolean = true> {
   heading?: T;
   description?: T;
+  testimonials?: T;
   id?: T;
   blockName?: T;
 }
@@ -1509,7 +1568,27 @@ export interface LatestArticlesBlockSelect<T extends boolean = true> {
  * via the `definition` "FullwidthCtaBlock_select".
  */
 export interface FullwidthCtaBlockSelect<T extends boolean = true> {
-  placeholder?: T;
+  heading?: T;
+  textAlignment?: T;
+  description?: T;
+  backgroundImage?: T;
+  button?:
+    | T
+    | {
+        variant?: T;
+        size?: T;
+        layout?: T;
+        icon?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+      };
   id?: T;
   blockName?: T;
 }

@@ -15,5 +15,16 @@ export const Testimonials: Block = {
       descriptionDescription:
         "Brief description about your testimonials and client success stories",
     }),
+    {
+      name: "testimonials",
+      type: "relationship",
+      relationTo: "testimonials",
+      hasMany: true,
+      required: true,
+      admin: {
+        description:
+          "Select the testimonials to display in this section. They will appear in the order selected.",
+      },
+    },
   ],
 }
