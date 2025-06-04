@@ -435,12 +435,12 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
       className="bg-dark side-border-light flicker-mask flex min-h-screen items-center"
       ref={sectionRef}
     >
-      <div className="container-md flex h-full items-center">
-        <div className="flex flex-5 flex-col gap-10">
+      <div className="container-md flex h-full w-full flex-col items-center lg:flex-row lg:items-center">
+        <div className="order-2 flex w-full flex-col gap-1 px-4 text-center lg:order-1 lg:flex-5 lg:gap-10 lg:px-0 lg:text-left">
           <h2 ref={titleRef} className="text-white">
             {parsedTitle}
           </h2>
-          <div ref={paragraphRef} className="max-w-[460px]">
+          <div ref={paragraphRef} className="mx-auto max-w-[460px] lg:mx-0">
             <RichText
               data={description}
               enableGutter={false}
@@ -448,12 +448,12 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
             />
           </div>
         </div>
-        <div className="flex-7">
+        <div className="order-1 w-full lg:order-2 lg:flex-7">
           <div
             ref={svgContainerRef}
-            className="relative flex h-full w-full items-center justify-center opacity-0"
+            className="mt-nav relative flex w-full flex-1 items-center justify-center px-8 pt-8 pb-8 opacity-0 lg:mt-0 lg:h-full lg:px-0 lg:pt-0 lg:pb-0"
           >
-            <div className="flex h-full w-full flex-col gap-10">
+            <div className="flex h-full w-full flex-col gap-6 lg:gap-10">
               <div className="relative">
                 <SVGComponent />
                 <div className="absolute inset-0 grid h-full w-full grid-cols-12 grid-rows-12">
