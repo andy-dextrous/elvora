@@ -7,6 +7,11 @@ import {
 } from "@payloadcms/richtext-lexical"
 import { slugField } from "../fields/slug"
 import { CollectionConfig } from "payload"
+import { createRevalidationHooks } from "@/payload/hooks/revalidateCollection"
+
+const { afterChange, afterDelete } = createRevalidationHooks({
+  collectionSlug: "services",
+})
 
 export const Services: CollectionConfig = {
   slug: "services",
@@ -44,4 +49,8 @@ export const Services: CollectionConfig = {
     },
     ...slugField(),
   ],
+  hooks: {
+    afterChange: [afterChange],
+    afterDelete: [afterDelete],
+  },
 }

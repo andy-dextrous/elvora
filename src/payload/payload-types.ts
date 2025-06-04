@@ -75,6 +75,7 @@ export interface Config {
     posts: Post;
     team: Team;
     services: Service;
+    testimonials: Testimonial;
     media: Media;
     categories: Category;
     users: User;
@@ -97,6 +98,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     team: TeamSelect<false> | TeamSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
+    testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -1002,6 +1004,41 @@ export interface Team {
   createdAt: string;
 }
 /**
+ * Client testimonials displayed on the website. Each testimonial includes a quote, client information, and company logo.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials".
+ */
+export interface Testimonial {
+  id: string;
+  /**
+   * The testimonial quote from the client
+   */
+  quote: string;
+  /**
+   * Full name of the person giving the testimonial
+   */
+  name: string;
+  /**
+   * Job title of the person (e.g., 'Head of Digital Transformation')
+   */
+  title: string;
+  /**
+   * Company name
+   */
+  company: string;
+  /**
+   * Company logo image - will be displayed as a small icon in the testimonial
+   */
+  companyLogo: string | Media;
+  /**
+   * Mark as featured to prioritize in displays
+   */
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
@@ -1193,6 +1230,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'services';
         value: string | Service;
+      } | null)
+    | ({
+        relationTo: 'testimonials';
+        value: string | Testimonial;
       } | null)
     | ({
         relationTo: 'media';
@@ -1533,6 +1574,20 @@ export interface ServicesSelect<T extends boolean = true> {
   heroImage?: T;
   slug?: T;
   slugLock?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonials_select".
+ */
+export interface TestimonialsSelect<T extends boolean = true> {
+  quote?: T;
+  name?: T;
+  title?: T;
+  company?: T;
+  companyLogo?: T;
+  featured?: T;
   updatedAt?: T;
   createdAt?: T;
 }

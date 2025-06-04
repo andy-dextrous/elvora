@@ -3,9 +3,9 @@ import { Media } from "@/payload/collections/media"
 import { Pages } from "@/payload/collections/pages"
 import { Posts } from "@/payload/collections/posts"
 import { Categories } from "@/payload/collections/categories"
-import { Menus } from "@/payload/collections/menus"
 import { Team } from "@/payload/collections/team"
 import { Services } from "@/payload/collections/services"
+import { Testimonials } from "@/payload/collections/testimonials"
 import { CollectionConfig } from "payload"
 
 const collections: CollectionConfig[] = [
@@ -13,6 +13,7 @@ const collections: CollectionConfig[] = [
   Posts,
   Team,
   Services,
+  Testimonials,
   Media,
   Categories,
   Users,

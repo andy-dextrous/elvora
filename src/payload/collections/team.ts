@@ -1,4 +1,9 @@
 import { CollectionConfig } from "payload"
+import { createRevalidationHooks } from "@/payload/hooks/revalidateCollection"
+
+const { afterChange, afterDelete } = createRevalidationHooks({
+  collectionSlug: "team",
+})
 
 export const Team: CollectionConfig = {
   slug: "team",
@@ -74,4 +79,8 @@ export const Team: CollectionConfig = {
       ],
     },
   ],
+  hooks: {
+    afterChange: [afterChange],
+    afterDelete: [afterDelete],
+  },
 }
