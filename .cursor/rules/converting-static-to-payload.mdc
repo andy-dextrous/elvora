@@ -1,9 +1,9 @@
 ---
-description: When you are asked to convert a static page get data from Payload
+description: When you are asked to convert any component to integrate/source data with Payload CMS
 globs:
 alwaysApply: false
 ---
-When you are asked to take a static section and integrate it with Payload CMS, this guide tells you exactly how to do this the right way.
+When you are asked to convert any component to integrate its data with Payload CMS, this guide tells you exactly how to do this the right way.
 
 ## Before Building
 

@@ -15,8 +15,6 @@ import { Swiper, SwiperSlide } from "swiper/react"
 export const TestimonialsComponent: React.FC<TestimonialsBlock> = props => {
   const { heading, description, testimonials } = props
 
-  console.log(testimonials)
-
   return (
     <section className="bg-dark-50 side-border-dark">
       <SectionIntro heading={heading} description={description} align="start" />

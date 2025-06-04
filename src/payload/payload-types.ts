@@ -942,6 +942,44 @@ export interface Testimonial {
  * via the `definition` "InfoGridBlock".
  */
 export interface InfoGridBlock {
+  /**
+   * Main heading for the info grid section. Use <span> tags for gradient text: 'How We Turn <span>Strategy Into Results</span>'
+   */
+  heading: string;
+  /**
+   * Brief description of your process and approach that appears below the heading
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Choose background color scheme for the section
+   */
+  backgroundColorScheme: 'dark' | 'light';
+  /**
+   * Number of columns for the process steps grid
+   */
+  gridColumns: '2' | '3' | '4';
+  /**
+   * Add process steps for your methodology. Steps will be automatically numbered based on their order.
+   */
+  processSteps: {
+    title: string;
+    description: string;
+    id?: string | null;
+  }[];
   id?: string | null;
   blockName?: string | null;
   blockType: 'info-grid';
@@ -1538,6 +1576,17 @@ export interface TestimonialsBlockSelect<T extends boolean = true> {
  * via the `definition` "InfoGridBlock_select".
  */
 export interface InfoGridBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  backgroundColorScheme?: T;
+  gridColumns?: T;
+  processSteps?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }

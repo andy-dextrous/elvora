@@ -1,68 +1,104 @@
 import type { InfoGridBlock } from "@/payload/payload-types"
+import { SectionIntro } from "@/components/layout/section-intro"
+import { tv } from "tailwind-variants"
 
 /*************************************************************************/
-/*  STATIC DATA FOR INFO GRID CARDS
+/*  COMPONENT VARIANTS
 /*************************************************************************/
 
-const processSteps = [
-  {
-    number: "1",
-    title: "Discover",
-    description:
-      "We begin with deep listening and immersion into your business to understand your goals, challenges, and potential.",
+const sectionVariants = tv({
+  base: "",
+  variants: {
+    backgroundColorScheme: {
+      dark: "bg-dark side-border-light",
+      light: "bg-light side-border-dark",
+    },
   },
-  {
-    number: "2",
-    title: "Strategize",
-    description:
-      "Together, we frame outcomes and align priorities, designing a roadmap that balances ambition with precision.",
+})
+
+const borderVariants = tv({
+  base: "border-dark-border w-full border-t",
+  variants: {
+    backgroundColorScheme: {
+      dark: "border-light-border",
+      light: "border-dark-border",
+    },
   },
-  {
-    number: "3",
-    title: "Build",
-    description:
-      "Through our hybrid teams, we execute solutions that fuse strategy with smart technology.",
+})
+
+const gridVariants = tv({
+  base: "grid",
+  variants: {
+    gridColumns: {
+      "2": "grid-cols-1 sm:grid-cols-2",
+      "3": "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+      "4": "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
+    },
   },
-  {
-    number: "4",
-    title: "Elevate",
-    description:
-      "We continuously optimize and adapt, ensuring every solution evolves with your business and delivers sustained value.",
+})
+
+const cardVariants = tv({
+  base: "p-section-sm lg:p-section-md relative flex min-h-[400px] flex-col justify-between border-y border-r last:border-r-0 sm:min-h-[350px] lg:min-h-[400px]",
+  variants: {
+    backgroundColorScheme: {
+      dark: "border-light-border",
+      light: "border-dark-border",
+    },
   },
-]
+})
+
+const textVariants = tv({
+  base: "",
+  variants: {
+    backgroundColorScheme: {
+      dark: "text-white",
+      light: "text-dark",
+    },
+  },
+})
 
 /*************************************************************************/
 /*  INFO GRID COMPONENT
 /*************************************************************************/
 
-export const InfoGridComponent: React.FC<InfoGridBlock> = props => {
+export const InfoGridComponent: React.FC<InfoGridBlock> = ({
+  heading,
+  description,
+  backgroundColorScheme = "dark",
+  gridColumns = "4",
+  processSteps,
+}) => {
+  const textColor = backgroundColorScheme === "dark" ? "text-white" : "text-dark"
+
   return (
-    <section className="bg-dark side-border-light">
-      <div className="container-sm gap-content-lg mb-section-x flex flex-col items-start">
-        <h2 className="title-hidden text-white">
-          How We Turn
-          <br />
-          <span className="text-gradient">Strategy Into Results</span>
-        </h2>
-        <p className="font-light text-white">
-          Our five-step model helps you move from insight to execution with clarity and
-          confidence. Whether it's AI, operations, or cloud, we tailor solutions that
-          scale and evolve with your business.
-        </p>
-      </div>
-      <div className="border-dark-border w-full border-t">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {processSteps.map((step, index) => (
-            <div
-              key={index}
-              className="border-light-border p-section-sm lg:p-section-md relative flex min-h-[400px] flex-col justify-between border-y border-r last:border-r-0 sm:min-h-[350px] lg:min-h-[400px]"
-            >
+    <section className={sectionVariants({ backgroundColorScheme })}>
+      <SectionIntro
+        heading={heading}
+        description={description}
+        align="start"
+        headingClassName={textColor}
+        descriptionClassName={textColor}
+      />
+
+      <div className={borderVariants({ backgroundColorScheme })}>
+        <div className={gridVariants({ gridColumns })}>
+          {processSteps?.map((step, index) => (
+            <div key={index} className={cardVariants({ backgroundColorScheme })}>
               <p className="text-gradient text-h1 absolute top-0 right-0 z-10 px-8 font-light opacity-20">
-                {step.number}
+                {index + 1}
               </p>
 
-              <h3 className="mb-content-sm text-white">{step.title}</h3>
-              <p className="font-light text-white">{step.description}</p>
+              <h3
+                className={textVariants({
+                  backgroundColorScheme,
+                  class: "mb-content-sm",
+                })}
+              >
+                {step.title}
+              </h3>
+              <p className={textVariants({ backgroundColorScheme, class: "font-light" })}>
+                {step.description}
+              </p>
             </div>
           ))}
         </div>
