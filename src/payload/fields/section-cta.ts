@@ -1,5 +1,5 @@
 import type { Field } from "payload"
-import { link } from "./link"
+import { button } from "./buttons"
 import { sectionCtaDefault } from "./default-values"
 
 /*************************************************************************/
@@ -9,18 +9,18 @@ import { sectionCtaDefault } from "./default-values"
 export const sectionCta = (
   options: {
     textRequired?: boolean
-    linkRequired?: boolean
+    buttonRequired?: boolean
     textDescription?: string
-    linkDescription?: string
+    buttonDescription?: string
     collapsibleLabel?: string
     initCollapsed?: boolean
   } = {}
 ): Field => {
   const {
     textRequired = true,
-    linkRequired = true,
+    buttonRequired = true,
     textDescription = "Call-to-action text that appears on the left side",
-    linkDescription = "Button link that appears on the right side",
+    buttonDescription = "Button configuration including style, size, and link destination",
     collapsibleLabel = "Section CTA",
     initCollapsed = false,
   } = options
@@ -41,14 +41,13 @@ export const sectionCta = (
           description: textDescription,
         },
       },
-      link({
-        overrides: {
-          name: "link",
-          label: "CTA Link",
-          defaultValue: sectionCtaDefault.link,
-          admin: {
-            description: linkDescription,
-          },
+      button({
+        name: "button",
+        label: "CTA Button",
+        required: buttonRequired,
+        defaultValue: sectionCtaDefault.button,
+        admin: {
+          description: buttonDescription,
         },
       }),
     ],

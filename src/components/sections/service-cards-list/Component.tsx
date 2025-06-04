@@ -110,7 +110,7 @@ const cards = [
 ] as any
 
 export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props => {
-  const { heading, description, text, link } = props
+  const { heading, description, text, button } = props
 
   return (
     <section className="side-border-dark pt-section-xl">
@@ -119,7 +119,7 @@ export const ServiceCardsListComponent: React.FC<ServiceCardsListBlock> = props 
         <CustomAccordion cards={cards} />
       </div>
       <div className="mt-section-x">
-        <SectionCta text={text} link={link} />
+        <SectionCta text={text} button={button} />
       </div>
     </section>
   )

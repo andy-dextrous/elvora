@@ -1,5 +1,5 @@
 import { CMSLink } from "@/payload/components/frontend/cms-link"
-import { Button } from "@/components/ui/button"
+import { Button, type ButtonProps } from "@/components/ui/button"
 import { cn } from "@/utilities/ui"
 import ArrowRightIcon from "@/components/icons/arrow-right"
 
@@ -9,22 +9,28 @@ import ArrowRightIcon from "@/components/icons/arrow-right"
 
 interface SectionCtaProps {
   text?: string
-  link?: {
-    type?: ("reference" | "custom") | null
-    newTab?: boolean | null
-    reference?: any | null
-    url?: string | null
-    label: string
+  button?: {
+    variant?: ButtonProps["variant"] | null
+    size?: ButtonProps["size"] | null
+    layout?: ButtonProps["layout"] | null
+    icon?: boolean | null
+    link?: {
+      type?: ("reference" | "custom") | null
+      newTab?: boolean | null
+      reference?: any | null
+      url?: string | null
+      label: string
+    } | null
   } | null
   containerClassName?: string
 }
 
 export const SectionCta: React.FC<SectionCtaProps> = ({
   text,
-  link,
+  button,
   containerClassName,
 }) => {
-  if (!text && !link) return null
+  if (!text && !button) return null
 
   return (
     <div
@@ -35,12 +41,15 @@ export const SectionCta: React.FC<SectionCtaProps> = ({
     >
       {text && <p className="text-current">{text}</p>}
 
-      {link && (
-        <CMSLink {...link} className="md:shrink-0">
-          <Button>
-            {link.label}
-            <ArrowRightIcon className="!h-[14px] !w-[24px]" />
-          </Button>
+      {button?.link && (
+        <CMSLink
+          {...button.link}
+          appearance={button.variant || "default"}
+          size={button.size || "lg"}
+          className="md:shrink-0"
+        >
+          {button.link.label}
+          {!button.icon && <ArrowRightIcon className="!h-[14px] !w-[24px]" />}
         </CMSLink>
       )}
     </div>

@@ -44,7 +44,7 @@ const articles = [
 /*************************************************************************/
 
 export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
-  const { text, link } = props
+  const { text, button } = props
 
   return (
     <section className="bg-dark side-border-light flicker-mask">
@@ -97,7 +97,7 @@ export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = props => {
         </div>
       </div>
       <div className="mt-section-x">
-        <SectionCta text={text} link={link} containerClassName="text-white" />
+        <SectionCta text={text} button={button} containerClassName="text-white" />
       </div>
     </section>
   )

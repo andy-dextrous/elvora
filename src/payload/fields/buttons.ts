@@ -1,6 +1,17 @@
 import deepMerge from "@/utilities/deepMerge"
 import { link } from "@/payload/fields/link"
 import type { Field } from "payload"
+import { getButtonVariantOptions, createDefaultButton } from "@/utilities/button-variants"
+
+/*************************************************************************/
+/*  GET BUTTON VARIANT OPTIONS
+/*************************************************************************/
+
+const { variantOptions, layoutOptions, sizeOptions } = getButtonVariantOptions()
+
+/*************************************************************************/
+/*  BUTTONS GROUP FIELD
+/*************************************************************************/
 
 export const buttonsGroup = (overrides: Partial<Field> = {}): Field => {
   return deepMerge(
@@ -16,70 +27,50 @@ export const buttonsGroup = (overrides: Partial<Field> = {}): Field => {
               type: "row",
               fields: [
                 {
-                  name: "buttonType",
+                  name: "variant",
                   type: "select",
-                  label: "Button type",
-                  defaultValue: "primary",
-                  options: [
-                    {
-                      label: "Primary",
-                      value: "primary",
-                    },
-                    {
-                      label: "Secondary",
-                      value: "secondary",
-                    },
-                    {
-                      label: "Neutral",
-                      value: "neutral",
-                    },
-                    {
-                      label: "Dark",
-                      value: "dark",
-                    },
-                    {
-                      label: "Light",
-                      value: "light",
-                    },
-                    {
-                      label: "Outline Dark",
-                      value: "outlineDark",
-                    },
-                    {
-                      label: "Outline Light",
-                      value: "outlineLight",
-                    },
-                  ],
+                  label: "Button variant",
+                  defaultValue: "default",
+                  options: variantOptions,
                   admin: {
-                    description: "Select the button type",
-                    width: "50%",
+                    description: "Select the button variant",
+                    width: "33%",
                   },
                 },
                 {
-                  name: "buttonSize",
+                  name: "size",
                   type: "select",
                   label: "Button size",
                   defaultValue: "lg",
-                  options: [
-                    {
-                      label: "Small",
-                      value: "sm",
-                    },
-                    {
-                      label: "Medium",
-                      value: "md",
-                    },
-                    {
-                      label: "Large",
-                      value: "lg",
-                    },
-                    {
-                      label: "Icon",
-                      value: "icon",
-                    },
-                  ],
+                  options: sizeOptions,
                   admin: {
                     description: "Select the button size",
+                    width: "33%",
+                  },
+                },
+                {
+                  name: "layout",
+                  type: "select",
+                  label: "Button layout",
+                  defaultValue: "default",
+                  options: layoutOptions,
+                  admin: {
+                    description: "Select the button layout",
+                    width: "34%",
+                  },
+                },
+              ],
+            },
+            {
+              type: "row",
+              fields: [
+                {
+                  name: "icon",
+                  type: "checkbox",
+                  label: "Icon button",
+                  defaultValue: false,
+                  admin: {
+                    description: "Make this an icon-only button",
                     width: "50%",
                   },
                 },
@@ -89,26 +80,26 @@ export const buttonsGroup = (overrides: Partial<Field> = {}): Field => {
           ],
           defaultValue: [
             {
-              button: {
-                buttonType: "primary",
+              button: createDefaultButton({
+                variant: "default",
                 link: {
                   type: "custom",
                   newTab: true,
                   url: "google.com",
                   label: "Button 1",
                 },
-              },
+              }),
             },
             {
-              button: {
-                buttonType: "dark",
+              button: createDefaultButton({
+                variant: "dark",
                 link: {
                   type: "custom",
                   newTab: true,
                   url: "google.com",
                   label: "Button 2",
                 },
-              },
+              }),
             },
           ],
         },
@@ -118,6 +109,10 @@ export const buttonsGroup = (overrides: Partial<Field> = {}): Field => {
   )
 }
 
+/*************************************************************************/
+/*  SINGLE BUTTON FIELD
+/*************************************************************************/
+
 export const button = (overrides: Partial<Field> = {}): Field => {
   return deepMerge(
     {
@@ -125,44 +120,57 @@ export const button = (overrides: Partial<Field> = {}): Field => {
       type: "group",
       fields: [
         {
-          name: "buttonType",
-          type: "select",
-          label: "Button type",
-          defaultValue: "primary",
-          options: [
+          type: "row",
+          fields: [
             {
-              label: "Primary",
-              value: "primary",
+              name: "variant",
+              type: "select",
+              label: "Button variant",
+              defaultValue: "default",
+              options: variantOptions,
+              admin: {
+                description: "Select the button variant",
+                width: "33%",
+              },
             },
             {
-              label: "Secondary",
-              value: "secondary",
+              name: "size",
+              type: "select",
+              label: "Button size",
+              defaultValue: "lg",
+              options: sizeOptions,
+              admin: {
+                description: "Select the button size",
+                width: "33%",
+              },
             },
             {
-              label: "Neutral",
-              value: "neutral",
-            },
-            {
-              label: "Dark",
-              value: "dark",
-            },
-            {
-              label: "Light",
-              value: "light",
-            },
-            {
-              label: "Outline Dark",
-              value: "outlineDark",
-            },
-            {
-              label: "Outline Light",
-              value: "outlineLight",
+              name: "layout",
+              type: "select",
+              label: "Button layout",
+              defaultValue: "default",
+              options: layoutOptions,
+              admin: {
+                description: "Select the button layout",
+                width: "34%",
+              },
             },
           ],
-          admin: {
-            description: "Select the button type",
-            width: "50%",
-          },
+        },
+        {
+          type: "row",
+          fields: [
+            {
+              name: "icon",
+              type: "checkbox",
+              label: "Icon button",
+              defaultValue: false,
+              admin: {
+                description: "Make this an icon-only button",
+                width: "50%",
+              },
+            },
+          ],
         },
         link(),
       ],

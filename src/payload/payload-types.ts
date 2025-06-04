@@ -820,26 +820,46 @@ export interface ServiceCardsListBlock {
    */
   text: string;
   /**
-   * Button that links to more services or related content
+   * Button configuration including style, size, and link destination
    */
-  link: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null)
-      | ({
-          relationTo: 'services';
-          value: string | Service;
-        } | null);
-    url?: string | null;
-    label: string;
+  button: {
+    /**
+     * Select the button variant
+     */
+    variant?:
+      | ('default' | 'outline' | 'outlineDark' | 'outlineGradient' | 'secondary' | 'white' | 'dark' | 'ghost' | 'link')
+      | null;
+    /**
+     * Select the button size
+     */
+    size?: ('default' | 'sm' | 'md' | 'lg') | null;
+    /**
+     * Select the button layout
+     */
+    layout?: ('default' | 'centered') | null;
+    /**
+     * Make this an icon-only button
+     */
+    icon?: boolean | null;
+    link: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null)
+        | ({
+            relationTo: 'services';
+            value: string | Service;
+          } | null);
+      url?: string | null;
+      label: string;
+    };
   };
   id?: string | null;
   blockName?: string | null;
@@ -895,26 +915,46 @@ export interface LatestArticlesBlock {
    */
   text: string;
   /**
-   * Button that links to view all articles or related content
+   * Button configuration including style, size, and link destination
    */
-  link: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null)
-      | ({
-          relationTo: 'services';
-          value: string | Service;
-        } | null);
-    url?: string | null;
-    label: string;
+  button: {
+    /**
+     * Select the button variant
+     */
+    variant?:
+      | ('default' | 'outline' | 'outlineDark' | 'outlineGradient' | 'secondary' | 'white' | 'dark' | 'ghost' | 'link')
+      | null;
+    /**
+     * Select the button size
+     */
+    size?: ('default' | 'sm' | 'md' | 'lg') | null;
+    /**
+     * Select the button layout
+     */
+    layout?: ('default' | 'centered') | null;
+    /**
+     * Make this an icon-only button
+     */
+    icon?: boolean | null;
+    link: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: string | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: string | Post;
+          } | null)
+        | ({
+            relationTo: 'services';
+            value: string | Service;
+          } | null);
+      url?: string | null;
+      label: string;
+    };
   };
   id?: string | null;
   blockName?: string | null;
@@ -1359,14 +1399,22 @@ export interface ServiceCardsListBlockSelect<T extends boolean = true> {
   heading?: T;
   description?: T;
   text?: T;
-  link?:
+  button?:
     | T
     | {
-        type?: T;
-        newTab?: T;
-        reference?: T;
-        url?: T;
-        label?: T;
+        variant?: T;
+        size?: T;
+        layout?: T;
+        icon?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
       };
   id?: T;
   blockName?: T;
@@ -1395,14 +1443,22 @@ export interface InfoGridBlockSelect<T extends boolean = true> {
  */
 export interface LatestArticlesBlockSelect<T extends boolean = true> {
   text?: T;
-  link?:
+  button?:
     | T
     | {
-        type?: T;
-        newTab?: T;
-        reference?: T;
-        url?: T;
-        label?: T;
+        variant?: T;
+        size?: T;
+        layout?: T;
+        icon?: T;
+        link?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
       };
   id?: T;
   blockName?: T;
