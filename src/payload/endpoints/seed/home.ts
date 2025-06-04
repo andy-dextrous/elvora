@@ -15,14 +15,7 @@ export const home = ({
     title: "Home",
     slug: "home",
     _status: "published",
-    sections: [
-      {
-        blockType: "hero-primary",
-        heading: "Payload Website Template",
-        content:
-          "Visit the admin dashboard to make your account and seed content for your website.",
-      },
-    ],
+    sections: [],
     meta: {
       title: "Home",
       description: "Welcome to our website",

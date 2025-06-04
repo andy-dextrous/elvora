@@ -18,7 +18,7 @@ export const ServiceCardsList: Block = {
     sectionCta({
       collapsibleLabel: "Section CTA",
       textDescription: "Text that appears before the call-to-action button",
-      linkDescription: "Button that links to more services or related content",
+      buttonDescription: "Button that links to more services or related content",
     }),
   ],
 }

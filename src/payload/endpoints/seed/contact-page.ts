@@ -13,13 +13,7 @@ export const contact = ({
     title: "Contact",
     slug: "contact",
     _status: "published",
-    sections: [
-      {
-        blockType: "hero-primary",
-        heading: "Contact Us",
-        content: "Contact Us",
-      },
-    ],
+    sections: [],
     meta: {
       title: "Contact Us",
       description: "Get in touch with our team",
