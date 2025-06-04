@@ -990,11 +990,33 @@ export interface InfoGridBlock {
  */
 export interface LatestArticlesBlock {
   /**
+   * Main heading for the latest articles section. Use <span> tags for gradient text: 'Expert <span>Insights</span>'
+   */
+  heading: string;
+  /**
+   * Brief description about your thought leadership and expertise that appears below the heading
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
    * Text that appears before the call-to-action button
    */
   text: string;
   /**
-   * Button configuration including style, size, and link destination
+   * Button that links to view all articles or related content
    */
   button: {
     /**
@@ -1595,6 +1617,8 @@ export interface InfoGridBlockSelect<T extends boolean = true> {
  * via the `definition` "LatestArticlesBlock_select".
  */
 export interface LatestArticlesBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
   text?: T;
   button?:
     | T
