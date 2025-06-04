@@ -11,7 +11,7 @@ import { cn } from "@/utilities/ui"
 
 export async function Header() {
   const [headerData, user] = await Promise.all([
-    getCachedGlobal("header" as keyof Config["globals"], 1)(),
+    getCachedGlobal("header" as keyof Config["globals"], 1),
     getCurrentUser(),
   ])
 

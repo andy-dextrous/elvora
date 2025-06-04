@@ -1,37 +1,44 @@
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
-import { cache } from "react"
+import { unstable_cache } from "next/cache"
 
 /*******************************************************/
 /* Get Page By Slug
 /*******************************************************/
 
-export const getPageBySlug = cache(
-  async ({ slug, draft }: { slug: string; draft: boolean }) => {
-    const payload = await getPayload({ config: configPromise })
+async function getPageBySlugInternal({ slug, draft }: { slug: string; draft: boolean }) {
+  const payload = await getPayload({ config: configPromise })
 
-    const result = await payload.find({
-      collection: "pages",
-      draft,
-      limit: 1,
-      pagination: false,
-      overrideAccess: draft,
-      where: {
-        slug: {
-          equals: slug,
-        },
+  const result = await payload.find({
+    collection: "pages",
+    draft,
+    limit: 1,
+    pagination: false,
+    overrideAccess: draft,
+    where: {
+      slug: {
+        equals: slug,
       },
-    })
+    },
+  })
 
-    return result.docs?.[0] || null
-  }
-)
+  return result.docs?.[0] || null
+}
+
+export const getPageBySlug = ({ slug, draft }: { slug: string; draft: boolean }) =>
+  unstable_cache(
+    async () => getPageBySlugInternal({ slug, draft }),
+    ["page", slug, draft ? "draft" : "published"],
+    {
+      tags: ["pages", `page_${slug}`],
+    }
+  )()
 
 /*******************************************************/
 /* Get All Pages
 /*******************************************************/
 
-export const getAllPages = cache(async () => {
+async function getAllPagesInternal() {
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
@@ -46,4 +53,9 @@ export const getAllPages = cache(async () => {
   })
 
   return result.docs || []
-})
+}
+
+export const getAllPages = () =>
+  unstable_cache(async () => getAllPagesInternal(), ["all-pages"], {
+    tags: ["pages"],
+  })()

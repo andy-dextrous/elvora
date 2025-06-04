@@ -1,5 +1,5 @@
 import { getPayload } from "payload"
-import { cache } from "react"
+import { unstable_cache } from "next/cache"
 import configPromise from "@payload-config"
 import { Post } from "@/payload/payload-types"
 import { draftMode } from "next/headers"
@@ -8,7 +8,7 @@ import { draftMode } from "next/headers"
 /* Get Post By Slug
 /*******************************************************/
 
-export const getPostBySlug = cache(async ({ slug }: { slug: string }) => {
+async function getPostBySlugInternal({ slug }: { slug: string }) {
   const { isEnabled: draft } = await draftMode()
 
   const payload = await getPayload({ config: configPromise })
@@ -27,13 +27,18 @@ export const getPostBySlug = cache(async ({ slug }: { slug: string }) => {
   })
 
   return result.docs?.[0] || null
-})
+}
+
+export const getPostBySlug = ({ slug }: { slug: string }) =>
+  unstable_cache(async () => getPostBySlugInternal({ slug }), ["post", slug], {
+    tags: ["posts", `post_${slug}`],
+  })()
 
 /*******************************************************/
 /* Get All Posts
 /*******************************************************/
 
-export const getPosts = cache(async () => {
+async function getPostsInternal() {
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
@@ -48,4 +53,9 @@ export const getPosts = cache(async () => {
   })
 
   return result.docs || ([] as Post[])
-})
+}
+
+export const getPosts = () =>
+  unstable_cache(async () => getPostsInternal(), ["all-posts"], {
+    tags: ["posts"],
+  })()

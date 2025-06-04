@@ -1,8 +1,7 @@
 import { getPayload } from "payload"
-import { cache } from "react"
+import { unstable_cache } from "next/cache"
 import configPromise from "@payload-config"
 import { Testimonial } from "@/payload/payload-types"
-import { unstable_cache } from "next/cache"
 
 /*******************************************************/
 /* Get All Testimonials
@@ -25,13 +24,13 @@ async function getTestimonialsInternal() {
 export const getTestimonials = () =>
   unstable_cache(async () => getTestimonialsInternal(), ["testimonials"], {
     tags: ["testimonials"],
-  })
+  })()
 
 /*******************************************************/
 /* Get Featured Testimonials
 /*******************************************************/
 
-export const getFeaturedTestimonials = cache(async () => {
+async function getFeaturedTestimonialsInternal() {
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
@@ -48,4 +47,13 @@ export const getFeaturedTestimonials = cache(async () => {
   })
 
   return result.docs || ([] as Testimonial[])
-})
+}
+
+export const getFeaturedTestimonials = () =>
+  unstable_cache(
+    async () => getFeaturedTestimonialsInternal(),
+    ["featured-testimonials"],
+    {
+      tags: ["testimonials"],
+    }
+  )()
