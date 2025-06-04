@@ -7,6 +7,9 @@ const { afterChange, afterDelete } = createRevalidationHooks({
 
 export const Testimonials: CollectionConfig = {
   slug: "testimonials",
+  access: {
+    read: () => true,
+  },
   labels: {
     singular: "Testimonial",
     plural: "Testimonials",

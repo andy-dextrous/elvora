@@ -19,7 +19,7 @@ export const FullwidthCta: Block = {
           defaultValue: fullwidthCtaDefault.heading,
           admin: {
             description: "Main heading text. You can use HTML tags for styling.",
-            width: "70%",
+            width: "50%",
           },
         },
         {
@@ -34,7 +34,21 @@ export const FullwidthCta: Block = {
           required: true,
           admin: {
             description: "Choose text alignment",
-            width: "30%",
+            width: "25%",
+          },
+        },
+        {
+          name: "colorScheme",
+          type: "select",
+          options: [
+            { label: "Gradient", value: "gradient" },
+            { label: "Dark", value: "dark" },
+          ],
+          defaultValue: fullwidthCtaDefault.colorScheme,
+          required: true,
+          admin: {
+            description: "Choose overlay color scheme",
+            width: "25%",
           },
         },
       ],

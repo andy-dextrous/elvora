@@ -1015,6 +1015,10 @@ export interface FullwidthCtaBlock {
    */
   textAlignment: 'left' | 'center' | 'right';
   /**
+   * Choose overlay color scheme
+   */
+  colorScheme: 'gradient' | 'dark';
+  /**
    * Supporting description text
    */
   description: string;
@@ -1570,6 +1574,7 @@ export interface LatestArticlesBlockSelect<T extends boolean = true> {
 export interface FullwidthCtaBlockSelect<T extends boolean = true> {
   heading?: T;
   textAlignment?: T;
+  colorScheme?: T;
   description?: T;
   backgroundImage?: T;
   button?:

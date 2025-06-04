@@ -12,10 +12,10 @@ async function getPageBySlugInternal({ slug, draft }: { slug: string; draft: boo
   const result = await payload.find({
     collection: "pages",
     draft,
-    depth: 2,
+    depth: 5,
     limit: 1,
     pagination: false,
-    overrideAccess: draft,
+    overrideAccess: true,
     where: {
       slug: {
         equals: slug,
@@ -45,7 +45,7 @@ async function getAllPagesInternal() {
   const result = await payload.find({
     collection: "pages",
     draft: false,
-    depth: 2,
+    depth: 5,
     limit: 1000,
     overrideAccess: false,
     pagination: false,

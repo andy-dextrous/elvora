@@ -12,7 +12,8 @@ import parse from "html-react-parser"
 /*************************************************************************/
 
 export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
-  const { heading, description, textAlignment, backgroundImage, button } = props
+  const { heading, description, textAlignment, colorScheme, backgroundImage, button } =
+    props
 
   // Parse heading and convert span tags to gradient elements if needed
   const parsedHeading = heading
@@ -69,7 +70,7 @@ export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
       </div>
 
       {/* Background */}
-      <Background backgroundImage={backgroundImage} />
+      <Background backgroundImage={backgroundImage} colorScheme={colorScheme} />
     </section>
   )
 }
@@ -78,7 +79,13 @@ export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
 /*  BACKGROUND COMPONENT
 /*************************************************************************/
 
-const Background = ({ backgroundImage }: { backgroundImage: string | Media }) => {
+const Background = ({
+  backgroundImage,
+  colorScheme,
+}: {
+  backgroundImage: string | Media
+  colorScheme?: string
+}) => {
   // Get image URL from Media object or use string directly
   const imageUrl =
     typeof backgroundImage === "object" && backgroundImage?.url
@@ -108,9 +115,18 @@ const Background = ({ backgroundImage }: { backgroundImage: string | Media }) =>
             />
           </div>
 
-          <div className="bg-primary/70 absolute inset-0 z-5" />
-          <div className="from-secondary-600/80 to-primary-600/60 absolute inset-0 z-5 bg-linear-to-r opacity-80 mix-blend-hard-light" />
-          <div className="cta-overlay-depth absolute inset-0 z-6 mix-blend-plus-darker" />
+          {/* Conditional Overlays based on Color Scheme */}
+          {colorScheme === "dark" ? (
+            // Dark overlay (70% opacity)
+            <div className="bg-dark/70 absolute inset-0 z-5" />
+          ) : (
+            // Gradient overlay (default)
+            <Fragment>
+              <div className="bg-primary/70 absolute inset-0 z-5" />
+              <div className="from-secondary-600/80 to-primary-600/60 absolute inset-0 z-5 bg-linear-to-r opacity-80 mix-blend-hard-light" />
+              <div className="cta-overlay-depth absolute inset-0 z-6 mix-blend-plus-darker" />
+            </Fragment>
+          )}
         </div>
       </div>
     </Fragment>
