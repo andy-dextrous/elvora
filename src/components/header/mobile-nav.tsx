@@ -8,8 +8,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { CMSLink } from "@/payload/components/frontend/cms-link"
-import type { Header as HeaderType } from "@/payload/payload-types"
-import { FaFacebook, FaLinkedin, FaTwitter } from "react-icons/fa"
+import { SocialLinks } from "@/payload/components/frontend/social-links"
+import type { Header as HeaderType, Setting } from "@/payload/payload-types"
 import Link from "next/link"
 import * as React from "react"
 import { Hamburger } from "./hamburger"
@@ -20,7 +20,10 @@ import LogomarkOutline from "../logos/logomark-outline"
 /*  MOBILE NAVIGATION WITH SHEET AND CUSTOM HAMBURGER
 /*************************************************************************/
 
-export const MobileNavUpdated: React.FC<{ data: HeaderType }> = ({ data }) => {
+export const MobileNavUpdated: React.FC<{ data: HeaderType; settings?: Setting }> = ({
+  data,
+  settings,
+}) => {
   const [open, setOpen] = React.useState(false)
   const navItems = data?.navItems || []
 
@@ -117,32 +120,11 @@ export const MobileNavUpdated: React.FC<{ data: HeaderType }> = ({ data }) => {
               <SheetDescription className="text-center text-sm text-white/60">
                 © {new Date().getFullYear()} Elvora. All rights reserved.
               </SheetDescription>
-              <div className="flex justify-center gap-4">
-                <a
-                  href="https://linkedin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-transform hover:scale-110"
-                >
-                  <FaLinkedin className="from-secondary-600 to-primary-500 h-4 w-4 bg-gradient-to-r bg-clip-text text-transparent transition-all" />
-                </a>
-                <a
-                  href="https://twitter.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-transform hover:scale-110"
-                >
-                  <FaTwitter className="from-secondary-600 to-primary-500 h-4 w-4 bg-gradient-to-r bg-clip-text text-transparent transition-all" />
-                </a>
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-transform hover:scale-110"
-                >
-                  <FaFacebook className="from-secondary-600 to-primary-500 h-4 w-4 bg-gradient-to-r bg-clip-text text-transparent transition-all" />
-                </a>
-              </div>
+              <SocialLinks
+                socialLinks={settings?.social?.socialLinks || []}
+                variant="icon"
+                className="[&>a]:from-secondary-600 [&>a]:to-primary-500 justify-center [&>a]:bg-gradient-to-r [&>a]:bg-clip-text [&>a]:text-transparent [&>a]:transition-all [&>a]:hover:scale-110"
+              />
             </div>
           </div>
         </div>

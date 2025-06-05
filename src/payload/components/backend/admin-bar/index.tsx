@@ -174,7 +174,9 @@ async function SystemDropdown({ settings }: { settings?: any }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="admin-bar__dropdown-trigger">
-        <span>{siteName}</span>
+        <span className="admin-bar__site-name" title={siteName}>
+          {siteName}
+        </span>
         <ChevronDown className="admin-bar__chevron-icon" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="admin-bar__dropdown-content">

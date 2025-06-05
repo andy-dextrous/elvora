@@ -32,6 +32,7 @@ import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloa
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { RowLabel as RowLabel_ac590f04e7b67b0cd330fd91c828079e } from '@/payload/globals/header/row-label'
 import { RowLabel as RowLabel_d4fd277a286d50f536848872bd9d5784 } from '@/payload/globals/footer/RowLabel'
+import { SocialLinksRowLabel as SocialLinksRowLabel_387b56607e83cdf3c58cb58eba96b79a } from '@/payload/fields/social-links-row-label'
 import { Avatar as Avatar_1846a465315586e38caf5c11952a6ef0 } from '@/payload/components/backend/avatar'
 import { default as default_0aa20e033b47825da0f34df6e2689062 } from '@/payload/components/backend/nav'
 import { Icon as Icon_b3ad8f927b79b366aab6de43edcf542a } from '@/payload/components/backend/logo'
@@ -76,6 +77,7 @@ export const importMap = {
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "@/payload/globals/header/row-label#RowLabel": RowLabel_ac590f04e7b67b0cd330fd91c828079e,
   "@/payload/globals/footer/RowLabel#RowLabel": RowLabel_d4fd277a286d50f536848872bd9d5784,
+  "@/payload/fields/social-links-row-label#SocialLinksRowLabel": SocialLinksRowLabel_387b56607e83cdf3c58cb58eba96b79a,
   "@/payload/components/backend/avatar#Avatar": Avatar_1846a465315586e38caf5c11952a6ef0,
   "@/payload/components/backend/nav#default": default_0aa20e033b47825da0f34df6e2689062,
   "@/payload/components/backend/logo#Icon": Icon_b3ad8f927b79b366aab6de43edcf542a,

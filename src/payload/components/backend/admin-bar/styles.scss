@@ -17,6 +17,14 @@
   color: white;
   isolation: isolate;
 
+  &__site-name {
+    max-width: 20ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
   &__left-menu {
     display: flex;
     align-items: center;

@@ -74,6 +74,9 @@ export const socialLinks = (overrides: Partial<Field> = {}): Field => {
       admin: {
         description: "Add social media links",
         initCollapsed: true,
+        components: {
+          RowLabel: "@/payload/fields/social-links-row-label#SocialLinksRowLabel",
+        },
       },
       defaultValue: socialLinksDefault,
     },

@@ -1,6 +1,7 @@
 import { HeaderNavigation } from "@/components/header/nav"
 import { getCachedGlobal } from "@/lib/queries/globals"
-import type { Header } from "@/payload/payload-types"
+import { getSettings } from "@/lib/queries/globals"
+import type { Header, Setting } from "@/payload/payload-types"
 import Link from "next/link"
 
 import type { Config } from "payload"
@@ -10,10 +11,13 @@ import { getCurrentUser } from "@/lib/queries/user"
 import { cn } from "@/utilities/ui"
 
 export async function Header() {
-  const [headerData, user] = await Promise.all([
+  const [headerData, settingsData, user] = await Promise.all([
     getCachedGlobal("header" as keyof Config["globals"], 1),
+    getSettings(),
     getCurrentUser(),
   ])
+
+  const settings = settingsData as Setting
 
   return (
     <header
@@ -33,7 +37,7 @@ export async function Header() {
             <LogoPrimaryLight width={208} height={54} />
           </Link>
           <HeaderNavigation data={headerData} />
-          <MobileNavUpdated data={headerData} />
+          <MobileNavUpdated data={headerData} settings={settings} />
         </div>
       </div>
     </header>
