@@ -1,12 +1,9 @@
-import { getCachedGlobal } from "@/lib/queries/globals"
-import { getSettings } from "@/lib/queries/globals"
+import LogoPrimaryLight from "@/components/logos/logo-light"
+import { getCachedGlobal, getSettings } from "@/lib/queries/globals"
 import { CMSLink } from "@/payload/components/frontend/cms-link"
 import { SocialLinks } from "@/payload/components/frontend/social-links"
-import LogoPrimaryLight from "@/components/logos/logo-light"
-import LogomarkWhite from "@/components/logos/logomark-white"
 import type { Footer as FooterType, Setting } from "@/payload/payload-types"
 import Link from "next/link"
-import type { Config } from "payload"
 import LogomarkOutline from "../logos/logomark-outline"
 
 /*************************************************************************/

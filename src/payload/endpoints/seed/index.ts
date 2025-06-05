@@ -350,28 +350,66 @@ export const seed = async ({
     payload.updateGlobal({
       slug: "footer",
       data: {
-        navItems: [
+        menus: [
+          {
+            title: "Company",
+            menuItems: [
+              {
+                link: {
+                  type: "custom",
+                  label: "About",
+                  url: "/about",
+                },
+              },
+              {
+                link: {
+                  type: "custom",
+                  label: "Services",
+                  url: "/services",
+                },
+              },
+              {
+                link: {
+                  type: "custom",
+                  label: "Contact",
+                  url: "/contact",
+                },
+              },
+            ],
+          },
+          {
+            title: "Resources",
+            menuItems: [
+              {
+                link: {
+                  type: "custom",
+                  label: "Blog",
+                  url: "/blog",
+                },
+              },
+              {
+                link: {
+                  type: "custom",
+                  label: "Documentation",
+                  url: "/docs",
+                },
+              },
+            ],
+          },
+        ],
+        legals: [
           {
             link: {
               type: "custom",
-              label: "Admin",
-              url: "/admin",
+              label: "Privacy Policy",
+              url: "/privacy",
             },
           },
           {
             link: {
               type: "custom",
-              label: "Source Code",
-              newTab: true,
-              url: "https://github.com/payloadcms/payload/tree/main/templates/website",
-            },
-          },
-          {
-            link: {
-              type: "custom",
-              label: "Payload",
-              newTab: true,
-              url: "https://payloadcms.com/",
+              label: "Terms of Service",
+              url: "/terms",
             },
           },
         ],
