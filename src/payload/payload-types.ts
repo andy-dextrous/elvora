@@ -2238,7 +2238,37 @@ export interface Header {
  */
 export interface Footer {
   id: string;
-  navItems?:
+  menus?:
+    | {
+        title: string;
+        menuItems?:
+          | {
+              link: {
+                type?: ('reference' | 'custom') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: string | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: string | Post;
+                    } | null)
+                  | ({
+                      relationTo: 'services';
+                      value: string | Service;
+                    } | null);
+                url?: string | null;
+                label: string;
+              };
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  legals?:
     | {
         link: {
           type?: ('reference' | 'custom') | null;
@@ -2276,11 +2306,37 @@ export interface Setting {
     siteDescription?: string | null;
   };
   social?: {
-    facebook?: string | null;
-    instagram?: string | null;
-    twitter?: string | null;
-    linkedin?: string | null;
-    youtube?: string | null;
+    /**
+     * Add social media links
+     */
+    socialLinks?:
+      | {
+          platform:
+            | 'facebook'
+            | 'instagram'
+            | 'linkedin'
+            | 'youtube'
+            | 'twitter'
+            | 'tiktok'
+            | 'pinterest'
+            | 'snapchat'
+            | 'whatsapp'
+            | 'telegram'
+            | 'discord'
+            | 'twitch'
+            | 'reddit'
+            | 'github'
+            | 'email'
+            | 'phone'
+            | 'website';
+          url: string;
+          /**
+           * Override default platform name
+           */
+          label?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   locations?: {
     locations?:
@@ -2370,7 +2426,27 @@ export interface HeaderSelect<T extends boolean = true> {
  * via the `definition` "footer_select".
  */
 export interface FooterSelect<T extends boolean = true> {
-  navItems?:
+  menus?:
+    | T
+    | {
+        title?: T;
+        menuItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  legals?:
     | T
     | {
         link?:
@@ -2402,11 +2478,14 @@ export interface SettingsSelect<T extends boolean = true> {
   social?:
     | T
     | {
-        facebook?: T;
-        instagram?: T;
-        twitter?: T;
-        linkedin?: T;
-        youtube?: T;
+        socialLinks?:
+          | T
+          | {
+              platform?: T;
+              url?: T;
+              label?: T;
+              id?: T;
+            };
       };
   locations?:
     | T

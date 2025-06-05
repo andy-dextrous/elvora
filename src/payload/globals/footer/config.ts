@@ -13,15 +13,42 @@ export const Footer: GlobalConfig = {
   },
   fields: [
     {
-      name: "navItems",
+      name: "menus",
+      label: "Footer Menus",
       type: "array",
-      fields: [link()],
-      maxRows: 6,
+      fields: [
+        {
+          name: "title",
+          type: "text",
+          label: "Menu Title",
+          required: true,
+        },
+        {
+          name: "menuItems",
+          label: "Menu Items",
+          type: "array",
+          fields: [link()],
+          admin: {
+            initCollapsed: true,
+          },
+        },
+      ],
+      maxRows: 10,
       admin: {
         initCollapsed: true,
         components: {
           RowLabel: "@/payload/globals/footer/RowLabel#RowLabel",
         },
+      },
+    },
+    {
+      name: "legals",
+      label: "Legal Links",
+      type: "array",
+      fields: [link()],
+      maxRows: 10,
+      admin: {
+        initCollapsed: true,
       },
     },
   ],

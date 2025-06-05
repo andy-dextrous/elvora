@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload"
+import { socialLinks } from "@/payload/fields/social-links"
 import { revalidateSettings } from "./hooks/revalidateSettings"
 
 export const Settings: GlobalConfig = {
@@ -31,39 +32,8 @@ export const Settings: GlobalConfig = {
         },
         {
           name: "social",
-          label: "Socials",
-          fields: [
-            {
-              type: "row",
-              fields: [
-                {
-                  name: "facebook",
-                  label: "Facebook",
-                  type: "text",
-                },
-                {
-                  name: "instagram",
-                  label: "Instagram",
-                  type: "text",
-                },
-                {
-                  name: "twitter",
-                  label: "X (Twitter)",
-                  type: "text",
-                },
-                {
-                  name: "linkedin",
-                  label: "LinkedIn",
-                  type: "text",
-                },
-                {
-                  name: "youtube",
-                  label: "YouTube",
-                  type: "text",
-                },
-              ],
-            },
-          ],
+          label: "Social Media",
+          fields: [socialLinks()],
         },
         {
           name: "locations",
