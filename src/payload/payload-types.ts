@@ -2347,6 +2347,10 @@ export interface Setting {
           country?: string | null;
           phone?: string | null;
           email?: string | null;
+          /**
+           * Full Google Maps URL for this location
+           */
+          googleMapsLink?: string | null;
           id?: string | null;
         }[]
       | null;
@@ -2499,6 +2503,7 @@ export interface SettingsSelect<T extends boolean = true> {
               country?: T;
               phone?: T;
               email?: T;
+              googleMapsLink?: T;
               id?: T;
             };
       };

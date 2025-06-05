@@ -23,7 +23,14 @@ export async function Footer() {
   const settings = settingsData as Setting
 
   return (
-    <footer className="bg-dark side-border-light flicker-mask relative overflow-hidden">
+    <footer className="bg-dark side-border-light flicker-mask relative min-h-[60vh] overflow-hidden">
+      <div
+        className="absolute right-[-150px] bottom-[-100px] z-10 h-[80vh] w-auto"
+        data-speed="0.8"
+      >
+        <LogomarkOutline className="h-full w-full" />
+      </div>
+
       {/* Background Spotlights */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Spotlight 1 - Royal Purple Spotlight */}
@@ -39,7 +46,7 @@ export async function Footer() {
         {/* Logo Row - Larger and spans full width */}
         <div className="pb-16">
           <Link href="/" className="block">
-            <LogoPrimaryLight className="h-20 w-auto" />
+            <LogoPrimaryLight className="h-16 w-auto" />
           </Link>
         </div>
 
@@ -67,18 +74,56 @@ export async function Footer() {
             <div key={`location-${index}`}>
               <h3 className="mb-6 text-lg font-medium text-white">{location.country}</h3>
               <div className="space-y-2">
-                <p className="text-sm text-white/80">{location.street}</p>
-                {location.city && (
-                  <p className="text-sm text-white/80">
-                    {location.city}
-                    {location.zip && `, ${location.zip}`}
-                  </p>
+                {/* Address with Google Maps Link */}
+                {location.street && (
+                  <>
+                    {location.googleMapsLink ? (
+                      <a
+                        href={location.googleMapsLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-sm text-white/80 transition-colors hover:text-white"
+                      >
+                        <p>{location.street}</p>
+                        {location.city && (
+                          <p>
+                            {location.city}
+                            {location.zip && `, ${location.zip}`}
+                          </p>
+                        )}
+                      </a>
+                    ) : (
+                      <>
+                        <p className="text-sm text-white/80">{location.street}</p>
+                        {location.city && (
+                          <p className="text-sm text-white/80">
+                            {location.city}
+                            {location.zip && `, ${location.zip}`}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </>
                 )}
+
+                {/* Phone with tel link */}
                 {location.phone && (
-                  <p className="text-sm text-white/80">{location.phone}</p>
+                  <a
+                    href={`tel:${location.phone}`}
+                    className="block text-sm text-white/80 transition-colors hover:text-white"
+                  >
+                    {location.phone}
+                  </a>
                 )}
+
+                {/* Email with mailto link */}
                 {location.email && (
-                  <p className="text-sm text-white/80">{location.email}</p>
+                  <a
+                    href={`mailto:${location.email}`}
+                    className="block text-sm text-white/80 transition-colors hover:text-white"
+                  >
+                    {location.email}
+                  </a>
                 )}
               </div>
             </div>
@@ -86,11 +131,11 @@ export async function Footer() {
         </div>
 
         {/* Bottom Section */}
-        <div className="flex flex-col space-y-8 border-t border-white/10 pt-8 md:flex-row md:items-end md:justify-between md:space-y-0">
+        <div className="z-20 flex flex-col space-y-8 border-t border-white/10 pt-8 md:flex-row md:items-end md:justify-between md:space-y-0">
           {/* Left Side - Legal Links */}
           <div className="space-y-4">
             {footer?.legals && footer.legals.length > 0 && (
-              <div className="flex space-x-4 text-sm">
+              <div className="flex flex-wrap justify-center space-x-4 text-sm md:justify-start">
                 {footer.legals.map((legal, index) => (
                   <div key={index} className="flex items-center space-x-4">
                     <CMSLink {...legal.link} className="text-white/80 hover:text-white" />
@@ -106,7 +151,8 @@ export async function Footer() {
           {/* Center - Copyright */}
           <div className="text-center">
             <p className="text-sm text-white/60">
-              ©2024 {settings?.general?.siteName || "Elvora.info"} All Rights Reserved
+              © {new Date().getFullYear()} {settings?.general?.siteName || "Elvora.info"}{" "}
+              | All Rights Reserved
             </p>
           </div>
 
@@ -114,7 +160,7 @@ export async function Footer() {
           <SocialLinks
             socialLinks={settings?.social?.socialLinks || []}
             variant="icon-button"
-            className="md:justify-end"
+            className="justify-center md:justify-end"
           />
         </div>
       </div>

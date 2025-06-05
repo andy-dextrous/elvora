@@ -68,6 +68,14 @@ export const Settings: GlobalConfig = {
                   name: "email",
                   type: "text",
                 },
+                {
+                  name: "googleMapsLink",
+                  label: "Google Maps Link",
+                  type: "text",
+                  admin: {
+                    description: "Full Google Maps URL for this location",
+                  },
+                },
               ],
             },
           ],
