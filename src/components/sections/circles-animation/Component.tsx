@@ -38,11 +38,14 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
      * Constants
      ********************************************************/
 
-    const TOTAL_DURATION = 5
+    const TOTAL_DURATION = 5 // Can be any number, is used to make everything relative to it. Will be replaced by scrubbed duration
     const ROTATIONS_DURING_DRAW = 3 // Number of rotations while circles are being drawn
-    const PIN_DURATION = "300%" // How long to pin (400% = 4x viewport height of scrolling)
-    const DRAWSVG_START_TIME = 0.7
-    const DRAWSVG_DURATION = TOTAL_DURATION * 0.5 // when circles finish drawing
+    const ANIMATION_START_TIME = 0.7 // When to start the animation (when top of section is 70% from the top of the viewport)
+    const ANIMATION_DURATION = 3 // How long to pin (3 = 3x viewport height of scrolling)
+    const PIN_DURATION = 2.3 // How long to pin the sction. Needs to account for animation headstart
+
+    const DRAWSVG_START_TIME = 0 // Start revealing circles 14% into the animation
+    const DRAWSVG_DURATION = TOTAL_DURATION * 0.6 // when circles finish drawing
     const CIRCLES_SPLIT_START = TOTAL_DURATION * 0.15 // at this time, circles start to split
     const CIRCLE_MOVEMENT_DURATION = DRAWSVG_DURATION // circles take same time as drawing to return
     const TEXT_APPEAR_TIME = TOTAL_DURATION * 0.3
@@ -162,8 +165,8 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
       id: "circles-animation",
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: "top 70%",
-        end: `+=${PIN_DURATION}`,
+        start: `top ${ANIMATION_START_TIME * 100}%`,
+        end: `+=${ANIMATION_DURATION * 100}%`,
         scrub: 1,
       },
     })
@@ -178,7 +181,7 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
         trigger: sectionRef.current,
         pin: sectionRef.current,
         start: "top top",
-        end: `+=230%`,
+        end: `+=${PIN_DURATION * 100}%`,
         scrub: true,
         anticipatePin: 1,
       },
@@ -193,6 +196,12 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
       type: "lines",
       mask: "lines",
       linesClass: "title-line",
+    })
+
+    titleSplit.lines.forEach((line: Element, index: number) => {
+      tl.set(line, {
+        autoAlpha: 0,
+      })
     })
 
     // Make title element visible (parent needs to be visible for children to show)
