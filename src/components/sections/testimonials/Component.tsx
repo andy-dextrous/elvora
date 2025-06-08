@@ -6,11 +6,11 @@ import { SectionIntro } from "@/components/layout/section-intro"
 import { Button } from "@/components/ui/button"
 import { Media } from "@/payload/components/frontend/media"
 import type { TestimonialsBlock } from "@/payload/payload-types"
+import { Autoplay, Navigation } from "swiper/modules"
+import { Swiper, SwiperSlide } from "swiper/react"
 import "swiper/css"
 import "swiper/css/autoplay"
 import "swiper/css/navigation"
-import { Autoplay, Navigation } from "swiper/modules"
-import { Swiper, SwiperSlide } from "swiper/react"
 
 export const TestimonialsComponent: React.FC<TestimonialsBlock> = props => {
   const { heading, description, testimonials } = props
@@ -79,6 +79,7 @@ const TestimonialSlider = ({
       <Swiper
         spaceBetween={0}
         slidesPerView={1.2}
+        centeredSlides={false}
         autoplay={{
           delay: 5000,
           pauseOnMouseEnter: true,

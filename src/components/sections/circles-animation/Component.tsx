@@ -8,7 +8,7 @@ import parse from "html-react-parser"
 import React, { useRef } from "react"
 
 /*************************************************************************/
-/*  CIRCLES ANIMATION COMPONENT∏
+/*  CIRCLES ANIMATION COMPONENT
 /*************************************************************************/
 
 const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {

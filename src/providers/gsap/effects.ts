@@ -107,7 +107,7 @@ gsap.registerEffect({
       })
 
       // If revertOnComplete is true and not using scrollTrigger, revert SplitText after animation
-      if (settings.revertOnComplete && !isScroll) {
+      if (settings.revertOnComplete) {
         tl.call(() => {
           gsap.delayedCall(0.1, () => {
             split.revert()

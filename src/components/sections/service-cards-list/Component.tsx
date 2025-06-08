@@ -143,9 +143,8 @@ const CustomAccordion = ({ cards }: { cards: any }) => {
 
   return (
     <Accordion
-      type="single"
-      defaultValue="item-0"
-      collapsible
+      type="multiple"
+      defaultValue={["item-0"]}
       className="w-full"
       onValueChange={handleValueChange}
     >
