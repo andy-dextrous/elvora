@@ -160,13 +160,26 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
 
     const tl = gsap.timeline({
       id: "circles-animation",
-      duration: TOTAL_DURATION,
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top 70%",
+        end: `+=${PIN_DURATION}`,
+        scrub: 1,
+      },
+    })
+
+    /*********************************************************
+     *  Pin the section
+     ********************************************************/
+
+    gsap.timeline({
+      id: "circles-animation-pin",
       scrollTrigger: {
         trigger: sectionRef.current,
         pin: sectionRef.current,
         start: "top top",
-        end: `+=${PIN_DURATION}`,
-        scrub: 1,
+        end: `+=230%`,
+        scrub: true,
         anticipatePin: 1,
       },
     })
