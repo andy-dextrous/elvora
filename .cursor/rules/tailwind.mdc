@@ -17,4 +17,5 @@ alwaysApply: true
 - If you want to copy a screenshot or are asked to design a component or make a component responsive, NEVER apply your sizing directly to headings or paragraphs. This website has its typography defined by the style system inside app/(frontend)/css/... Never add styles for font weight, font size, line height, letter spacing to a component directly (unless they are specific overrides). Most designs should draw from the design system.
 - Only use new classes for color changes etc - things that are unique to the current section.
 - The tailwind-variants npm package is installed for complex components or things that need lots of variants/complex logic.
+- When copying CSS from somewhere else or an example, try not to use style tags EVER. Always try to write styles in tailwind 4 CSS utility classes. If a gradient or composite is too complex for tailwind, add a custom class to [components.css](mdc:src/app/(frontend)/css/components.css) and use that.
 
