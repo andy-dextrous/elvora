@@ -66,7 +66,7 @@ const CirclesAnimationComponent: React.FC<CirclesAnimationBlock> = props => {
     const PARAGRAPH_FADE_DURATION = TOTAL_DURATION * 0.4 // Paragraph fade duration
 
     // Ease constants
-    const DRAWSVG_EASE = "power2.inOut"
+    const DRAWSVG_EASE = "power1.inOut"
     const ROTATION_EASE = "none"
     const CIRCLE_MOVEMENT_EASE = "power3.inOut"
     const TEXT_FADE_EASE = "power1.out"
