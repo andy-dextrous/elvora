@@ -6,6 +6,7 @@ import { TestimonialsComponent } from "@/components/sections/testimonials/Compon
 import { InfoGridComponent } from "@/components/sections/info-grid/Component"
 import { LatestArticlesComponent } from "@/components/sections/latest-articles/Component"
 import { FullwidthCtaComponent } from "@/components/sections/fullwidth-cta/Component"
+import { GlobeLocationsComponent } from "@/components/sections/globe-locations/Component"
 import React, { Fragment } from "react"
 
 /*******************************************************/
@@ -21,6 +22,7 @@ const sectionsMap: Record<string, React.ComponentType<any>> = {
   "info-grid": InfoGridComponent,
   "latest-articles": LatestArticlesComponent,
   "fullwidth-cta": FullwidthCtaComponent,
+  "globe-locations": GlobeLocationsComponent,
 }
 
 /*******************************************************/

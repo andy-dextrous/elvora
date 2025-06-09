@@ -76,6 +76,14 @@ export const Settings: GlobalConfig = {
                     description: "Full Google Maps URL for this location",
                   },
                 },
+                {
+                  name: "latitude",
+                  type: "number",
+                },
+                {
+                  name: "longitude",
+                  type: "number",
+                },
               ],
             },
           ],

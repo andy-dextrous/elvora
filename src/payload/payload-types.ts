@@ -486,6 +486,7 @@ export interface Page {
     | InfoGridBlock
     | LatestArticlesBlock
     | FullwidthCtaBlock
+    | GlobeLocationsBlock
   )[];
   meta?: {
     title?: string | null;
@@ -1133,6 +1134,37 @@ export interface FullwidthCtaBlock {
   blockType: 'fullwidth-cta';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GlobeLocationsBlock".
+ */
+export interface GlobeLocationsBlock {
+  /**
+   * Main heading for the locations section. Use <span> tags for gradient text.
+   */
+  heading: string;
+  /**
+   * Brief description of your global presence and office locations
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'globe-locations';
+}
+/**
  * Team members are used to display the team on the website. They are different to users, which are used for the admin panel.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1450,6 +1482,7 @@ export interface PagesSelect<T extends boolean = true> {
         'info-grid'?: T | InfoGridBlockSelect<T>;
         'latest-articles'?: T | LatestArticlesBlockSelect<T>;
         'fullwidth-cta'?: T | FullwidthCtaBlockSelect<T>;
+        'globe-locations'?: T | GlobeLocationsBlockSelect<T>;
       };
   meta?:
     | T
@@ -1667,6 +1700,16 @@ export interface FullwidthCtaBlockSelect<T extends boolean = true> {
               label?: T;
             };
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GlobeLocationsBlock_select".
+ */
+export interface GlobeLocationsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
   id?: T;
   blockName?: T;
 }
@@ -2351,6 +2394,8 @@ export interface Setting {
            * Full Google Maps URL for this location
            */
           googleMapsLink?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           id?: string | null;
         }[]
       | null;
@@ -2504,6 +2549,8 @@ export interface SettingsSelect<T extends boolean = true> {
               phone?: T;
               email?: T;
               googleMapsLink?: T;
+              latitude?: T;
+              longitude?: T;
               id?: T;
             };
       };

@@ -6,6 +6,7 @@ import { Testimonials } from "@/components/sections/testimonials/config"
 import { InfoGrid } from "@/components/sections/info-grid/config"
 import { LatestArticles } from "@/components/sections/latest-articles/config"
 import { FullwidthCta } from "@/components/sections/fullwidth-cta/config"
+import { GlobeLocations } from "@/components/sections/globe-locations/config"
 
 export const sectionBlocks = [
   HeroPrimary,
@@ -16,4 +17,5 @@ export const sectionBlocks = [
   InfoGrid,
   LatestArticles,
   FullwidthCta,
+  GlobeLocations,
 ]
