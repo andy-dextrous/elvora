@@ -479,6 +479,7 @@ export interface Page {
   categories?: (string | Category)[] | null;
   sections: (
     | HeroPrimaryBlock
+    | HeroFullBlock
     | TextImageBlock
     | CirclesAnimationBlock
     | ServiceCardsListBlock
@@ -693,6 +694,47 @@ export interface Service {
   slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroFullBlock".
+ */
+export interface HeroFullBlock {
+  heading: string;
+  content: string;
+  /**
+   * Optional background image for the hero section
+   */
+  backgroundImage?: (string | null) | Media;
+  buttons?:
+    | {
+        button: {
+          link: {
+            type?: ('reference' | 'custom') | null;
+            newTab?: boolean | null;
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'posts';
+                  value: string | Post;
+                } | null)
+              | ({
+                  relationTo: 'services';
+                  value: string | Service;
+                } | null);
+            url?: string | null;
+            label: string;
+          };
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero-full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1475,6 +1517,7 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         'hero-primary'?: T | HeroPrimaryBlockSelect<T>;
+        'hero-full'?: T | HeroFullBlockSelect<T>;
         'text-image'?: T | TextImageBlockSelect<T>;
         'circles-animation'?: T | CirclesAnimationBlockSelect<T>;
         'service-cards-list'?: T | ServiceCardsListBlockSelect<T>;
@@ -1516,6 +1559,35 @@ export interface HeroPrimaryBlockSelect<T extends boolean = true> {
   heading?: T;
   content?: T;
   usp?: T;
+  backgroundImage?: T;
+  buttons?:
+    | T
+    | {
+        button?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+            };
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroFullBlock_select".
+ */
+export interface HeroFullBlockSelect<T extends boolean = true> {
+  heading?: T;
+  content?: T;
   backgroundImage?: T;
   buttons?:
     | T

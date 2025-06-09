@@ -1,4 +1,5 @@
 import { HeroPrimary } from "@/components/sections/hero-primary/config"
+import { HeroFull } from "@/components/sections/hero-full/config"
 import { TextImage } from "@/components/sections/text-image/config"
 import { CirclesAnimation } from "@/components/sections/circles-animation/config"
 import { ServiceCardsList } from "@/components/sections/service-cards-list/config"
@@ -10,6 +11,7 @@ import { GlobeLocations } from "@/components/sections/globe-locations/config"
 
 export const sectionBlocks = [
   HeroPrimary,
+  HeroFull,
   TextImage,
   CirclesAnimation,
   ServiceCardsList,
