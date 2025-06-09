@@ -420,6 +420,7 @@ const Background = ({
           <div
             className="absolute inset-x-0 bottom-0 size-full"
             data-id="hero-background-image"
+            data-speed="0.9"
           >
             <PayloadMedia
               resource={backgroundImage}
