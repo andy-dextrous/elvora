@@ -20,7 +20,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { SplitText } from "gsap/SplitText"
 import { TextPlugin } from "gsap/TextPlugin"
 import { usePathname } from "next/navigation"
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 
 // Import effects to register them
 import "./effects"
@@ -86,6 +86,20 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
           smoother?.kill()
           setSmootherInstance(null)
         }
+      }
+    },
+    {
+      dependencies: [pathname],
+      revertOnUpdate: true,
+    }
+  )
+
+  useGSAP(
+    () => {
+      ScrollTrigger.refresh()
+
+      if (smootherInstance) {
+        smootherInstance.refresh()
       }
     },
     {

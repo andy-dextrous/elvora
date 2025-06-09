@@ -1,21 +1,21 @@
 import { Button, type ButtonProps } from "@/components/ui/button"
+import { pathMapping } from "@/payload/path-mapping"
 import { cn } from "@/utilities/ui"
 import Link from "next/link"
 import React from "react"
 
 type CMSLinkType = {
-  appearance?: "inline" | ButtonProps["variant"]
-  children?: React.ReactNode
+  appearance?: "inline" | ButtonProps["variant"] // either render as a link or a button
+  children?: React.ReactNode // Pass in text and icons like usual
   className?: string
-  label?: string | null
   newTab?: boolean | null
   reference?: {
-    relationTo: string
-    value: any | string | number
+    relationTo: string // Type of collection the reference is to
+    value: any | string | number // The slug of the reference
   } | null
-  size?: ButtonProps["size"] | null
-  type?: "custom" | "reference" | null
-  url?: string | null
+  size?: ButtonProps["size"] | null // The size of the button
+  type?: "custom" | "reference" | null // Is this a custom link or a reference to a document in the CMS ?
+  url?: string | null // The external URL if type is "custom"
 } & Omit<React.ComponentProps<typeof Link>, "href" | "children" | "className" | "type">
 
 export const CMSLink: React.FC<CMSLinkType> = props => {
@@ -24,7 +24,6 @@ export const CMSLink: React.FC<CMSLinkType> = props => {
     appearance = "inline",
     children,
     className,
-    label,
     newTab,
     reference,
     size: sizeFromProps,
@@ -34,13 +33,7 @@ export const CMSLink: React.FC<CMSLinkType> = props => {
 
   // Collection-to-path mapping for custom routing
   const getCollectionPath = (relationTo: string): string => {
-    const pathMapping: Record<string, string> = {
-      pages: "",
-      posts: "blog",
-      // Add more custom mappings as needed
-    }
-
-    return pathMapping[relationTo] || relationTo
+    return pathMapping[relationTo] || "" // if no mapping is found, return an empty string which means no path is needed
   }
 
   const relationToPath = reference?.relationTo
@@ -51,7 +44,9 @@ export const CMSLink: React.FC<CMSLinkType> = props => {
     type === "reference" && typeof reference?.value === "object" && reference.value.slug
       ? reference.value.slug === "home"
         ? `${process.env.NEXT_PUBLIC_URL}/`
-        : `${process.env.NEXT_PUBLIC_URL}/${relationToPath}/${reference.value.slug}`
+        : relationToPath === ""
+          ? `${process.env.NEXT_PUBLIC_URL}/${reference.value.slug}`
+          : `${process.env.NEXT_PUBLIC_URL}/${relationToPath}/${reference.value.slug}`
       : url
 
   if (!href) return null
@@ -60,7 +55,7 @@ export const CMSLink: React.FC<CMSLinkType> = props => {
   const newTabProps = newTab ? { rel: "noopener noreferrer", target: "_blank" } : {}
 
   // Render children if provided, otherwise render label
-  const content = children || label
+  const content = children
 
   /* Ensure we don't break any styles set by richText */
   if (appearance === "inline") {

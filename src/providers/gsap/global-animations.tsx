@@ -1,6 +1,7 @@
 "use client"
 
 import { useGSAP, gsap } from "@/providers/gsap"
+import { usePathname } from "next/navigation"
 import { Fragment } from "react"
 
 /*************************************************************************/
@@ -12,6 +13,8 @@ interface GlobalAnimationsProps {
 }
 
 export const GlobalAnimations: React.FC<GlobalAnimationsProps> = ({ children }) => {
+  const pathname = usePathname()
+
   useGSAP(() => {
     const titleElements = document.querySelectorAll(".title-hidden")
 
@@ -24,7 +27,7 @@ export const GlobalAnimations: React.FC<GlobalAnimationsProps> = ({ children }) 
         },
       })
     })
-  })
+  }, [pathname])
 
   return <Fragment>{children}</Fragment>
 }

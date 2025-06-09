@@ -8,7 +8,50 @@ import { Media as PayloadMedia } from "@/payload/components/frontend/media"
 import type { HeroFullBlock as HeroProps, Media } from "@/payload/payload-types"
 import { gsap, useGSAP } from "@/providers/gsap"
 import { cn } from "@/utilities/ui"
+import { tv } from "tailwind-variants"
+import parse from "html-react-parser"
 import React, { Fragment, useRef } from "react"
+
+/****************************************************
+ * Hero Variants Configuration
+ ****************************************************/
+
+const heroVariants = tv({
+  base: "relative flex w-full flex-col justify-between overflow-hidden border-b pt-[calc(var(--spacing-section-y)+var(--spacing-nav))]",
+  variants: {
+    size: {
+      full: "min-h-screen",
+      md: "min-h-[65vh]",
+      sm: "min-h-[50vh]",
+    },
+    colorScheme: {
+      "background-image": "bg-dark border-light-border",
+      dark: "bg-dark border-light-border",
+      white: "border-dark-border bg-white",
+      primary: "bg-primary border-light-border",
+      secondary: "bg-secondary border-light-border",
+    },
+  },
+  defaultVariants: {
+    size: "full",
+    colorScheme: "background-image",
+  },
+})
+
+const textVariants = tv({
+  variants: {
+    colorScheme: {
+      "background-image": "text-white",
+      dark: "text-white",
+      white: "text-dark",
+      primary: "text-white",
+      secondary: "text-white",
+    },
+  },
+  defaultVariants: {
+    colorScheme: "background-image",
+  },
+})
 
 /****************************************************
  * Hero Content Component
@@ -18,10 +61,18 @@ const HeroContent: React.FC<{
   content?: string
   buttons?: HeroProps["buttons"]
   buttonAppearance?: "default" | "outlineGradient"
-}> = ({ content, buttons, buttonAppearance = "default" }) => {
+  colorScheme?: HeroProps["colorScheme"]
+}> = ({
+  content,
+  buttons,
+  buttonAppearance = "default",
+  colorScheme = "background-image",
+}) => {
   return (
     <Fragment>
-      {content && <p className="font-light text-white">{content}</p>}
+      {content && (
+        <p className={cn("font-light", textVariants({ colorScheme }))}>{content}</p>
+      )}
 
       {buttons && buttons.length > 0 && (
         <div className="space-y-4">
@@ -52,9 +103,22 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
   content,
   backgroundImage,
   buttons,
+  size = "full",
+  colorScheme = "background-image",
 }) => {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const backgroundContainerRef = useRef<HTMLDivElement>(null)
+
+  // Parse heading and convert span tags to gradient elements
+  const parsedHeading = heading
+    ? parse(heading, {
+        replace: (domNode: any) => {
+          if (domNode.name === "span") {
+            return <span className="text-gradient">{domNode.children[0]?.data}</span>
+          }
+        },
+      })
+    : null
 
   useGSAP(() => {
     // Title reveal animation
@@ -79,14 +143,7 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
   })
 
   return (
-    <section
-      className={cn(
-        // Base styles
-        "bg-dark relative flex w-full flex-col justify-between overflow-hidden py-0",
-        // Height
-        "h-screen"
-      )}
-    >
+    <section className={heroVariants({ size, colorScheme })}>
       <div className="relative h-full w-full">
         <Grid className="h-full grid-rows-10 pb-8">
           {/*************************************************************************/}
@@ -106,8 +163,11 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
               "xl:col-span-3 xl:col-start-2"
             )}
           >
-            <h1 ref={titleRef} className="title-hidden max-w-[10ch] text-white">
-              {heading || "Strategy Powered by Technology"}
+            <h1
+              ref={titleRef}
+              className={cn("title-hidden max-w-[10ch]", textVariants({ colorScheme }))}
+            >
+              {parsedHeading || heading || "Strategy Powered by Technology"}
             </h1>
             <div
               className={cn(
@@ -117,7 +177,11 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
                 "xl:hidden"
               )}
             >
-              <HeroContent content={content} buttons={buttons} />
+              <HeroContent
+                content={content}
+                buttons={buttons}
+                colorScheme={colorScheme}
+              />
             </div>
           </div>
 
@@ -142,23 +206,33 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
               content={content}
               buttons={buttons}
               buttonAppearance="outlineGradient"
+              colorScheme={colorScheme}
             />
           </div>
         </Grid>
       </div>
 
       {/*************************************************************************/}
+      {/*  GRID LINES - ALWAYS VISIBLE                                          */}
+      {/*************************************************************************/}
+      <div className="pt-nav top-nav inset-x-section-x pointer-events-none absolute bottom-0">
+        <GridLines />
+      </div>
+
+      {/*************************************************************************/}
       {/*  BACKGROUND IMAGE AND EFFECTS                                          */}
       {/*************************************************************************/}
-      <Background
-        backgroundImage={backgroundImage as Media}
-        containerRef={backgroundContainerRef}
-      />
+      {colorScheme === "background-image" && (
+        <ImageBackground
+          backgroundImage={backgroundImage as Media}
+          containerRef={backgroundContainerRef}
+        />
+      )}
     </section>
   )
 }
 
-const Background = ({
+const ImageBackground = ({
   backgroundImage,
   containerRef,
 }: {
@@ -166,78 +240,73 @@ const Background = ({
   containerRef: React.RefObject<HTMLDivElement | null>
 }) => {
   return (
-    <Fragment>
-      <div className="pt-nav top-nav inset-x-section-x pointer-events-none absolute bottom-0">
-        <GridLines />
-      </div>
-      <div
-        ref={containerRef}
-        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-      >
-        <div className="relative h-full w-full">
-          {/* Top Down Fade */}
-          <div
-            className={cn(
-              // Base styles
-              "absolute inset-0 z-10",
-              // Mobile
-              "from-dark-950 to-dark-950 via-dark/20 bg-gradient-to-b via-50% to-100%"
-            )}
-          />
+    <div
+      ref={containerRef}
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+    >
+      <div className="relative h-full w-full">
+        {/* Top Down Fade */}
+        <div
+          className={cn(
+            // Base styles
+            "absolute inset-0 z-10",
+            // Mobile
+            "from-dark-950 to-dark-950 via-dark/20 bg-gradient-to-b via-50% to-100%"
+          )}
+        />
 
-          {/* Background Image */}
-          <div
-            className="absolute inset-x-0 bottom-0 size-full"
-            data-id="hero-background-image"
-            data-speed="0.9"
-          >
-            <PayloadMedia
-              resource={backgroundImage}
-              alt="Hero Background"
-              fill
-              priority
-              imgClassName={cn(
-                // Base styles
-                "absolute inset-0 h-full w-full object-cover",
-                // Mobile
-                "object-[50%_50%]",
-                // Desktop
-                "lg:object-[80%_50%]"
-              )}
-              size="100vw"
-              loading="eager"
-            />
-          </div>
-
-          {/* Spotlight 1 - Royal Purple Spotlight */}
-          <div
-            className={cn(
+        {/* Background Image */}
+        <div
+          className="absolute inset-x-0 bottom-0 size-full"
+          data-id="hero-background-image"
+          data-speed="0.9"
+        >
+          <PayloadMedia
+            resource={backgroundImage}
+            alt="Hero Background"
+            fill
+            priority
+            imgClassName={cn(
               // Base styles
-              "absolute z-50 h-[700px] w-[700px] blur-[350px]",
-              "-bottom-[148px] -left-[370px]",
+              "absolute inset-0 h-full w-full object-cover",
               // Mobile
-              "bg-primary/30",
+              "object-[50%_50%]",
               // Desktop
-              "lg:bg-primary/40"
+              "lg:object-[80%_50%]"
             )}
-            data-speed="0.8"
-          />
-
-          {/* Spotlight 2 - Chrysler Blue Spotlight */}
-          <div
-            className={cn(
-              // Base styles
-              "absolute z-50 h-[1200px] w-[495.05px] -rotate-[15deg] blur-[350px]",
-              "-right-[80.43px] -bottom-[405.61px]",
-              // Mobile
-              "bg-secondary/30",
-              // Desktop
-              "lg:bg-secondary/40"
-            )}
-            data-speed="1.2"
+            size="100vw"
+            loading="eager"
           />
         </div>
+
+        {/* Spotlight 1 - Royal Purple Spotlight */}
+        <div
+          className={cn(
+            // Base styles
+            "absolute z-50 h-[700px] w-[700px] blur-[350px]",
+            "-bottom-[148px] -left-[370px]",
+            // Mobile
+            "bg-primary/30",
+            // Desktop
+            "lg:bg-primary/40"
+          )}
+          data-speed="0.8"
+        />
+
+        {/* Spotlight 2 - Chrysler Blue Spotlight */}
+        <div
+          className={cn(
+            // Base styles
+            "absolute z-50 h-[1200px] w-[495.05px] -rotate-[15deg] blur-[350px]",
+            "-right-[80.43px] -bottom-[405.61px]",
+            // Mobile
+            "bg-secondary/30",
+            // Desktop
+            "lg:bg-secondary/40"
+          )}
+          data-speed="1.2"
+        />
       </div>
-    </Fragment>
+    </div>
   )
 }

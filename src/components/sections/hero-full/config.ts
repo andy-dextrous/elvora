@@ -33,6 +33,63 @@ export const HeroFull: Block = {
     },
     {
       type: "collapsible",
+      label: "Layout Options",
+      admin: {
+        initCollapsed: true,
+      },
+      fields: [
+        {
+          name: "size",
+          type: "select",
+          options: [
+            {
+              label: "Full Height (100vh)",
+              value: "full",
+            },
+            {
+              label: "Medium Height (60vh)",
+              value: "md",
+            },
+            {
+              label: "Small Height (40vh)",
+              value: "sm",
+            },
+          ],
+          defaultValue: "full",
+          required: true,
+        },
+        {
+          name: "colorScheme",
+          type: "select",
+          options: [
+            {
+              label: "Background Image",
+              value: "background-image",
+            },
+            {
+              label: "Dark",
+              value: "dark",
+            },
+            {
+              label: "White",
+              value: "white",
+            },
+            {
+              label: "Primary",
+              value: "primary",
+            },
+            {
+              label: "Secondary",
+              value: "secondary",
+            },
+          ],
+          defaultValue: "background-image",
+          required: true,
+        },
+      ],
+    },
+    {
+      type: "collapsible",
       label: "Background Image",
       admin: {
         initCollapsed: true,

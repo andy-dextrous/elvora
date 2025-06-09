@@ -702,6 +702,8 @@ export interface Service {
 export interface HeroFullBlock {
   heading: string;
   content: string;
+  size: 'full' | 'md' | 'sm';
+  colorScheme: 'background-image' | 'dark' | 'white' | 'primary' | 'secondary';
   /**
    * Optional background image for the hero section
    */
@@ -1588,6 +1590,8 @@ export interface HeroPrimaryBlockSelect<T extends boolean = true> {
 export interface HeroFullBlockSelect<T extends boolean = true> {
   heading?: T;
   content?: T;
+  size?: T;
+  colorScheme?: T;
   backgroundImage?: T;
   buttons?:
     | T

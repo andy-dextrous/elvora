@@ -3,7 +3,7 @@ import React from "react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
-import { GlobalAnimations } from "@/components/layout/global-animations"
+import { GlobalAnimations } from "@/providers/gsap/global-animations"
 import { getSettings } from "@/lib/queries/globals"
 import { getCurrentUser } from "@/lib/queries/user"
 import { WildChildAdminBar } from "@/payload/components/backend/admin-bar"
