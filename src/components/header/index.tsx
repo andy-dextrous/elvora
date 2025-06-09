@@ -22,7 +22,7 @@ export async function Header() {
   return (
     <header
       className={cn(
-        "h-nav md:px-section-x bg-dark/40 border-light-border fixed inset-x-0 z-[1000] border-b px-0 backdrop-blur-lg",
+        "h-nav md:px-section-x bg-dark/80 border-light-border fixed inset-x-0 z-[1000] border-b px-0 backdrop-blur-lg",
         // If user is logged in, add 32px to the top of the header to accomodate the admin bar
         user ? "top-[32px]" : "top-0"
       )}

@@ -488,6 +488,7 @@ export interface Page {
     | LatestArticlesBlock
     | FullwidthCtaBlock
     | GlobeLocationsBlock
+    | ContactFormBlock
   )[];
   meta?: {
     title?: string | null;
@@ -1209,6 +1210,41 @@ export interface GlobeLocationsBlock {
   blockType: 'globe-locations';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactFormBlock".
+ */
+export interface ContactFormBlock {
+  /**
+   * Main heading for the form section. Use <span> tags for gradient text.
+   */
+  heading: string;
+  /**
+   * Brief description that appears above the form
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Select the form to display in this section
+   */
+  form: string | Form;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'contact-form';
+}
+/**
  * Team members are used to display the team on the website. They are different to users, which are used for the admin panel.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1528,6 +1564,7 @@ export interface PagesSelect<T extends boolean = true> {
         'latest-articles'?: T | LatestArticlesBlockSelect<T>;
         'fullwidth-cta'?: T | FullwidthCtaBlockSelect<T>;
         'globe-locations'?: T | GlobeLocationsBlockSelect<T>;
+        'contact-form'?: T | ContactFormBlockSelect<T>;
       };
   meta?:
     | T
@@ -1786,6 +1823,17 @@ export interface FullwidthCtaBlockSelect<T extends boolean = true> {
 export interface GlobeLocationsBlockSelect<T extends boolean = true> {
   heading?: T;
   description?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContactFormBlock_select".
+ */
+export interface ContactFormBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  form?: T;
   id?: T;
   blockName?: T;
 }
