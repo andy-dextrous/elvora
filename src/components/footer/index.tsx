@@ -8,6 +8,14 @@ import LogomarkOutline from "../logos/logomark-outline"
 
 /*************************************************************************/
 /*  FOOTER COMPONENT
+
+Animate the container
+
+Before
+- translate: none; rotate: none; scale: none; transform-origin: 50% 100%; opacity: 0; transform: translate(0%, -50%) rotateX(-5deg);
+
+After
+- translate: none; rotate: none; scale: none; transform-origin: 50% 100%; opacity: 1; transform: translate(0px, 0px);
 /*************************************************************************/
 
 export async function Footer() {

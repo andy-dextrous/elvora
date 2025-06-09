@@ -81,7 +81,7 @@ imitate where the edges of the containers would be. */
   --color-dark-600: oklch(33.41% 0.04 274.2);
   --color-dark-700: oklch(29.75% 0.033 274.52);
   --color-dark-800: oklch(25.96% 0.027 275.01);
-  --color-dark-900: oklch(22.1% 0.022 276.46);
+  --color-dark-900: oklch(22.097% 0.02176 276.465);
   --color-dark-950: oklch(14.557% 0.00884 273.86);
 }
 
