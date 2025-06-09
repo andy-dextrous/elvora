@@ -22,7 +22,7 @@ export async function Footer() {
   return (
     <footer className="bg-dark side-border-light flicker-mask relative min-h-[60vh] overflow-hidden">
       <div
-        className="absolute right-[-150px] bottom-[-100px] z-10 h-[80vh] w-auto"
+        className="absolute right-[-150px] bottom-[30%] z-10 h-[80vh] w-auto lg:bottom-[-100px]"
         data-speed="0.8"
       >
         <LogomarkOutline className="h-full w-full" />

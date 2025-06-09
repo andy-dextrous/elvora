@@ -26,7 +26,11 @@ export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = async prop
         <div className="py-section-md md:container-md">
           <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-8 lg:grid-cols-3">
             {posts.map(post => (
-              <PostCard key={post.id} post={post} />
+              <PostCard
+                key={post.id}
+                post={post}
+                className="border-x-none border-y md:border-x"
+              />
             ))}
           </div>
         </div>

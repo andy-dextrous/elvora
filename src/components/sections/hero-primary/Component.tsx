@@ -399,10 +399,13 @@ const Background = ({
 }) => {
   return (
     <Fragment>
-      <div className="pt-nav top-nav inset-x-section-x absolute bottom-0">
+      <div className="pt-nav top-nav inset-x-section-x pointer-events-none absolute bottom-0">
         <GridLines />
       </div>
-      <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden">
+      <div
+        ref={containerRef}
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      >
         <div className="relative h-full w-full">
           {/* Top Down Fade */}
           <div

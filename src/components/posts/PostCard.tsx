@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import ArrowRightIcon from "@/components/icons/arrow-right"
 import { Media as PayloadMedia } from "@/payload/components/frontend/media"
+import { cn } from "@/utilities/ui"
 
 /*************************************************************************/
 /*  POST CARD COMPONENT
@@ -10,11 +11,17 @@ import { Media as PayloadMedia } from "@/payload/components/frontend/media"
 
 interface PostCardProps {
   post: Post
+  className?: string
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, className }: PostCardProps) {
   return (
-    <article className="group border-light-border relative flex flex-col overflow-hidden border-1 transition-all duration-500 ease-in-out hover:translate-y-[-5px]">
+    <article
+      className={cn(
+        "group border-light-border relative flex flex-col overflow-hidden border-x border-y transition-all duration-500 ease-in-out hover:translate-y-[-5px]",
+        className
+      )}
+    >
       <div className="relative z-30 mb-4 aspect-[4/3] overflow-hidden md:mb-6">
         {post.heroImage && typeof post.heroImage === "object" && (
           <PayloadMedia
