@@ -1,7 +1,10 @@
 "use client"
 
 import ArrowRightIcon from "@/components/icons/arrow-right"
+import Envelope from "@/components/icons/envelope"
+import SpeechBubble from "@/components/icons/speech-bubble"
 import { Grid, GridLines } from "@/components/layout/grid"
+import { Button } from "@/components/ui/button"
 import { CMSLink } from "@/payload/components/frontend/cms-link"
 import { Media as PayloadMedia } from "@/payload/components/frontend/media"
 
@@ -17,10 +20,10 @@ import React, { Fragment, useRef } from "react"
  ****************************************************/
 
 const heroVariants = tv({
-  base: "relative flex w-full flex-col justify-between overflow-hidden border-b pt-[calc(var(--spacing-section-y)+var(--spacing-nav))]",
+  base: "pt-first-section-nav-offset relative flex w-full flex-col justify-between overflow-hidden border-b",
   variants: {
     size: {
-      full: "min-h-screen",
+      full: "h-screen",
       md: "min-h-[65vh]",
       sm: "min-h-[50vh]",
     },
@@ -49,6 +52,71 @@ const textVariants = tv({
     },
   },
   defaultVariants: {
+    colorScheme: "background-image",
+  },
+})
+
+const heroFullVariants = tv({
+  slots: {
+    titleContainer: "gap-content flex h-full flex-col justify-center",
+    title: "title-hidden",
+    content: "gap-content flex flex-col items-start justify-center xl:hidden",
+    secondaryContent:
+      "col-span-full row-span-4 row-start-1 hidden flex-col justify-center space-y-12 md:col-span-5 md:col-start-2 md:row-span-3 md:row-start-6 lg:col-span-2 lg:col-start-6 lg:row-span-6 lg:row-start-4 xl:col-start-5 xl:flex",
+    timestamp:
+      "z-10 col-span-1 col-start-1 row-span-2 row-start-9 hidden items-end xl:flex",
+    contactButtons:
+      "col-span-3 col-start-7 row-span-2 row-start-9 hidden items-end justify-end space-x-4 lg:flex",
+  },
+  variants: {
+    size: {
+      full: {
+        title: "text-h1",
+      },
+      md: {
+        title: "text-h2",
+      },
+      sm: {
+        title: "text-h2",
+      },
+    },
+    placement: {
+      left: {
+        titleContainer:
+          "col-span-full row-span-12 row-start-1 pr-6 pl-6 md:col-span-5 md:col-start-2 md:pr-0 md:pl-0 lg:col-span-5 lg:col-start-1 lg:row-span-5 lg:row-start-5 xl:col-span-4 xl:col-start-1",
+        title: "max-w-[10ch]",
+      },
+      center: {
+        titleContainer: "",
+        title: "",
+      },
+    },
+    colorScheme: {
+      "background-image": {
+        title: "text-white",
+        timestamp: "text-white",
+      },
+      dark: {
+        title: "text-white",
+        timestamp: "text-white",
+      },
+      white: {
+        title: "text-dark",
+        timestamp: "text-dark",
+      },
+      primary: {
+        title: "text-white",
+        timestamp: "text-white",
+      },
+      secondary: {
+        title: "text-white",
+        timestamp: "text-white",
+      },
+    },
+  },
+  defaultVariants: {
+    size: "full",
+    placement: "left",
     colorScheme: "background-image",
   },
 })
@@ -108,6 +176,18 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
 }) => {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const backgroundContainerRef = useRef<HTMLDivElement>(null)
+  const timestampDateRef = useRef<HTMLDivElement>(null)
+  const timestampTimeRef = useRef<HTMLDivElement>(null)
+
+  // Create slots from variants
+  const {
+    titleContainer,
+    title,
+    content: contentSlot,
+    secondaryContent,
+    timestamp,
+    contactButtons,
+  } = heroFullVariants({ size, colorScheme, placement: "left" })
 
   // Parse heading and convert span tags to gradient elements
   const parsedHeading = heading
@@ -121,6 +201,90 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
     : null
 
   useGSAP(() => {
+    let isUAE = true
+
+    function getCurrentTimes() {
+      const now = new Date()
+
+      // UAE Time (GMT+4)
+      const uaeDate = new Intl.DateTimeFormat("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Asia/Dubai",
+      }).format(now)
+
+      const uaeTime = new Intl.DateTimeFormat("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Dubai",
+      }).format(now)
+
+      // Ireland Time (GMT+0/+1)
+      const irelandDate = new Intl.DateTimeFormat("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "Europe/Dublin",
+      }).format(now)
+
+      const irelandTime = new Intl.DateTimeFormat("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Europe/Dublin",
+      }).format(now)
+
+      return {
+        uae: {
+          date: uaeDate,
+          time: `${uaeTime} (GMT+4)`,
+        },
+        ireland: {
+          date: irelandDate,
+          time: `${irelandTime} (GMT+0)`,
+        },
+      }
+    }
+
+    function animateTimestamp() {
+      const times = getCurrentTimes()
+      const current = isUAE ? times.uae : times.ireland
+
+      // Animate timestamp
+      gsap.to(timestampDateRef.current, {
+        duration: 2,
+        scrambleText: {
+          text: current.date,
+          chars: "lowerCase",
+          newClass: "text-sm text-white",
+        },
+      })
+
+      gsap.to(timestampTimeRef.current, {
+        duration: 2,
+        scrambleText: {
+          text: current.time,
+          chars: "lowerCase",
+          newClass: "text-sm text-white",
+        },
+      })
+
+      isUAE = !isUAE
+    }
+
+    // Set initial timestamp with small delay
+    gsap.delayedCall(0.1, () => {
+      const initialTimes = getCurrentTimes()
+      if (timestampDateRef.current && timestampTimeRef.current) {
+        timestampDateRef.current.textContent = initialTimes.uae.date
+        timestampTimeRef.current.textContent = initialTimes.uae.time
+      }
+    })
+
     // Title reveal animation
     gsap.effects.titleReveal(titleRef.current, {
       duration: 1.3,
@@ -140,43 +304,30 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
         force3D: true,
       })
     }
+
+    // Master timeline for timestamp animations - start after initial setup
+    gsap.delayedCall(3, () => {
+      const masterTimeline = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 8, // 10 seconds total (2 second animation + 8 second delay)
+      })
+
+      masterTimeline.call(animateTimestamp)
+    })
   })
 
   return (
     <section className={heroVariants({ size, colorScheme })}>
       <div className="relative h-full w-full">
-        <Grid className="h-full grid-rows-10 pb-8">
+        <Grid className="h-full grid-rows-10">
           {/*************************************************************************/}
           {/*  MAIN HERO CONTENT - TITLE AND CTA BUTTONS                           */}
           {/*************************************************************************/}
-          <div
-            className={cn(
-              // Base styles
-              "gap-content flex h-full flex-col justify-center",
-              // Mobile
-              "col-span-full row-span-12 row-start-1 pr-6 pl-6",
-              // Tablet
-              "md:col-span-5 md:col-start-2 md:pr-0 md:pl-0",
-              // Desktop
-              "lg:col-span-5 lg:col-start-2 lg:row-span-10",
-              // XL
-              "xl:col-span-3 xl:col-start-2"
-            )}
-          >
-            <h1
-              ref={titleRef}
-              className={cn("title-hidden max-w-[10ch]", textVariants({ colorScheme }))}
-            >
+          <div className={titleContainer()}>
+            <h1 ref={titleRef} className={title()}>
               {parsedHeading || heading || "Strategy Powered by Technology"}
             </h1>
-            <div
-              className={cn(
-                // Base styles
-                "gap-content flex flex-col items-start justify-center",
-                // XL
-                "xl:hidden"
-              )}
-            >
+            <div className={contentSlot()}>
               <HeroContent
                 content={content}
                 buttons={buttons}
@@ -188,26 +339,39 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
           {/*************************************************************************/}
           {/*  SECONDARY CONTENT AREA - DESKTOP LAYOUT                             */}
           {/*************************************************************************/}
-          <div
-            className={cn(
-              // Base styles
-              "hidden flex-col justify-center space-y-12",
-              // Mobile
-              "col-span-full row-span-4 row-start-1",
-              // Tablet
-              "md:col-span-5 md:col-start-2 md:row-span-3 md:row-start-6",
-              // Small Laptops
-              "lg:col-span-2 lg:col-start-6 lg:row-span-6 lg:row-start-4",
-              // Large Laptops +
-              "xl:col-start-5 xl:flex"
-            )}
-          >
+          <div className={secondaryContent()}>
             <HeroContent
               content={content}
               buttons={buttons}
               buttonAppearance="outlineGradient"
               colorScheme={colorScheme}
             />
+          </div>
+
+          {/*************************************************************************/}
+          {/*  TIMESTAMP DISPLAY - DYNAMIC TIME ZONES                              */}
+          {/*************************************************************************/}
+          <div className={timestamp()}>
+            <div>
+              <div ref={timestampDateRef} className="text-sm">
+                Mon, 16th May 2025
+              </div>
+              <div ref={timestampTimeRef} className="text-sm">
+                02:00 AM (GMT+4)
+              </div>
+            </div>
+          </div>
+
+          {/*************************************************************************/}
+          {/*  CONTACT ACTION BUTTONS                                               */}
+          {/*************************************************************************/}
+          <div className={contactButtons()}>
+            <Button icon variant="ghost">
+              <Envelope className="!h-6 !w-6" />
+            </Button>
+            <Button icon variant="ghost">
+              <SpeechBubble className="!h-6 !w-6" />
+            </Button>
           </div>
         </Grid>
       </div>

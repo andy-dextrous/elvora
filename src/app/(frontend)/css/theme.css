@@ -39,6 +39,8 @@ imitate where the edges of the containers would be. */
   --spacing-container-sm-offset: calc(
     (100vw - (var(--spacing-section-x) * 2) - var(--spacing-container-sm)) / 2
   );
+
+  --spacing-first-section-nav-offset: calc(var(--spacing-section-y) + var(--spacing-nav));
 }
 
 /* Grid Lines */
