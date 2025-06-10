@@ -14,7 +14,7 @@ export const Textarea: React.FC<
     register: UseFormRegister<FieldValues>
     rows?: number
   }
-> = ({ name, defaultValue, errors, label, register, required, rows = 3, width }) => {
+> = ({ name, defaultValue, errors, label, register, required, rows, width }) => {
   return (
     <Width width={width}>
       <Label htmlFor={name}>
@@ -30,7 +30,7 @@ export const Textarea: React.FC<
       <TextAreaComponent
         defaultValue={defaultValue}
         id={name}
-        rows={rows}
+        rows={rows || 10}
         {...register(name, { required: required })}
       />
 

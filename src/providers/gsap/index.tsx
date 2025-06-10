@@ -68,13 +68,15 @@ const GSAPContext = createContext<GSAPContextType>({
  * Smooth Scroll Provider
  ****************************************************/
 
+const omittedPaths = ["/contact"]
+
 const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname()
   const [smootherInstance, setSmootherInstance] = useState<ScrollSmoother | null>(null)
 
   useGSAP(
     () => {
-      if (wildChildConfig.smoothScroll) {
+      if (wildChildConfig.smoothScroll && !omittedPaths.includes(pathname)) {
         const smoother = ScrollSmoother.create({
           smooth: 1.8,
           effects: true,

@@ -104,7 +104,7 @@ const buttonVariants = tv({
         "lg:[&_svg:not([class*='size-'])]:size-6",
       ],
       phoneSelect: [
-        "h-10 gap-1 px-3 py-2 text-sm",
+        "h-9 gap-1 px-3 py-2 text-sm",
         "[&_svg:not([class*='size-'])]:size-4",
       ],
     },
