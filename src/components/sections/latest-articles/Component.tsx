@@ -2,7 +2,7 @@ import type { LatestArticlesBlock } from "@/payload/payload-types"
 import { SectionCta } from "@/components/layout/section-cta"
 import { SectionIntro } from "@/components/layout/section-intro"
 import { getRecentPosts } from "@/lib/queries/recent-posts"
-import { PostCard } from "@/components/posts/PostCard"
+import { PostCard } from "@/components/posts/post-card"
 
 /*************************************************************************/
 /*  LATEST ARTICLES COMPONENT

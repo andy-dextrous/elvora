@@ -2,7 +2,7 @@ import type { Metadata } from "next/types"
 
 import { SectionIntro } from "@/components/layout/section-intro"
 import { SectionCta } from "@/components/layout/section-cta"
-import { PostCard } from "@/components/posts/PostCard"
+import { PostCard } from "@/components/posts/post-card"
 import { PageRange } from "@/payload/components/frontend/page-range"
 import { Pagination } from "@/payload/components/frontend/pagination"
 import configPromise from "@payload-config"

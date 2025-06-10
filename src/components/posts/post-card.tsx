@@ -15,6 +15,8 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, className }: PostCardProps) {
+  console.log(post)
+
   return (
     <article
       className={cn(

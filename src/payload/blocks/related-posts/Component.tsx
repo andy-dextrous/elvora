@@ -1,4 +1,4 @@
-import { PostCard } from "@/components/posts/PostCard"
+import { PostCard } from "@/components/posts/post-card"
 import RichText from "@/payload/components/frontend/rich-text"
 import type { Post } from "@/payload/payload-types"
 import { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical"
