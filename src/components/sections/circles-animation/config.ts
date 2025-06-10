@@ -3,9 +3,10 @@ import { richContent } from "@/payload/fields/content"
 
 export const CirclesAnimation: Block = {
   slug: "circles-animation",
+  imageURL: "/api/media/file/circles animation-600x338.png",
   interfaceName: "CirclesAnimationBlock",
   admin: {
-    group: "Homepage",
+    group: "Dynamic & Interactive",
   },
   fields: [
     {

@@ -4,8 +4,9 @@ import { sectionCta } from "@/payload/fields/section-cta"
 
 export const ServiceCardsList: Block = {
   slug: "service-cards-list",
+  imageURL: "/api/media/file/service cards-600x490.png",
   admin: {
-    group: "Homepage",
+    group: "Business Sections",
   },
   interfaceName: "ServiceCardsListBlock",
   fields: [

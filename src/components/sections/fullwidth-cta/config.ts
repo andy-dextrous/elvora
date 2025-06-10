@@ -4,9 +4,10 @@ import { fullwidthCtaDefault } from "@/payload/fields/default-values/fullwidth-c
 
 export const FullwidthCta: Block = {
   slug: "fullwidth-cta",
+  imageURL: "/api/media/file/fullwidth cta-600x283.png",
   interfaceName: "FullwidthCtaBlock",
   admin: {
-    group: "Content Sections",
+    group: "Call-to-Actions",
   },
   fields: [
     {

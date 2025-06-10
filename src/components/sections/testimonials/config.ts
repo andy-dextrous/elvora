@@ -3,9 +3,10 @@ import { sectionIntro } from "@/payload/fields/section-intro"
 
 export const Testimonials: Block = {
   slug: "testimonials",
+  imageURL: "/api/media/file/testimonials-600x422.png",
   interfaceName: "TestimonialsBlock",
   admin: {
-    group: "Content Sections",
+    group: "Business Sections",
   },
   fields: [
     sectionIntro({

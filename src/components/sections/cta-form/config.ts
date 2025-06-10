@@ -4,8 +4,9 @@ import { formVariant } from "@/payload/fields/form"
 
 export const CtaForm: Block = {
   slug: "cta-form",
+  imageURL: "/api/media/file/form cta-1-600x333.png",
   admin: {
-    group: "Content Sections",
+    group: "Call-to-Actions",
   },
   interfaceName: "CtaFormBlock",
   fields: [

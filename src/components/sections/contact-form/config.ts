@@ -4,9 +4,10 @@ import { formVariant } from "@/payload/fields/form"
 
 export const ContactForm: Block = {
   slug: "contact-form",
+  imageURL: "/api/media/file/contact form-600x547.png",
   interfaceName: "ContactFormBlock",
   admin: {
-    group: "Content Sections",
+    group: "Call-to-Actions",
   },
   fields: [
     sectionIntro({

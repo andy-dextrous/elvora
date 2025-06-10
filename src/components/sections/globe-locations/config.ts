@@ -3,9 +3,10 @@ import { sectionIntro } from "@/payload/fields/section-intro"
 
 export const GlobeLocations: Block = {
   slug: "globe-locations",
+  imageURL: "/api/media/file/globe-600x327.png",
   interfaceName: "GlobeLocationsBlock",
   admin: {
-    group: "Content Sections",
+    group: "Business Sections",
   },
   fields: [
     sectionIntro({

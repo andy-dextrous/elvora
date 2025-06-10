@@ -4,8 +4,9 @@ import { sectionIntro } from "@/payload/fields/section-intro"
 
 export const LatestArticles: Block = {
   slug: "latest-articles",
+  imageURL: "/api/media/file/latest articles-600x515.png",
   admin: {
-    group: "Content Sections",
+    group: "Dynamic & Interactive",
   },
   interfaceName: "LatestArticlesBlock",
   fields: [

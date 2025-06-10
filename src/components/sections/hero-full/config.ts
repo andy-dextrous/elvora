@@ -4,8 +4,9 @@ import { link } from "@/payload/fields/link"
 
 export const HeroFull: Block = {
   slug: "hero-full",
+  imageURL: "/api/media/file/hero full-600x354.png",
   admin: {
-    group: "Hero Sections",
+    group: "Page Headers",
   },
   fields: [
     {

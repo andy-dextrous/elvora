@@ -4,8 +4,9 @@ import { infoGridDefault } from "@/payload/fields/default-values/info-grid"
 
 export const InfoGrid: Block = {
   slug: "info-grid",
+  imageURL: "/api/media/file/data grid-600x381.png",
   admin: {
-    group: "Content Sections",
+    group: "Content & Media",
   },
   interfaceName: "InfoGridBlock",
   fields: [

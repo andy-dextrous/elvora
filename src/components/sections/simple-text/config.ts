@@ -3,9 +3,10 @@ import { defaultLexical } from "@/payload/fields/default-lexical"
 
 export const SimpleText: Block = {
   slug: "simple-text",
+  imageURL: "/api/media/file/simple text-600x456.png",
   interfaceName: "SimpleTextBlock",
   admin: {
-    group: "Content Sections",
+    group: "Content & Media",
   },
   fields: [
     {
