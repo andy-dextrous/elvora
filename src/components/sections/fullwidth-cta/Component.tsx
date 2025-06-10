@@ -1,11 +1,14 @@
+"use client"
+
 import type { FullwidthCtaBlock, Media } from "@/payload/payload-types"
 import { CMSLink } from "@/payload/components/frontend/cms-link"
 import ArrowRightIcon from "@/components/icons/arrow-right"
 import Image from "next/image"
 import { Grid, GridLines } from "@/components/layout/grid"
-import { Fragment } from "react"
+import { Fragment, useRef } from "react"
 import { cn } from "@/utilities/ui"
 import parse from "html-react-parser"
+import { gsap, useGSAP } from "@/providers/gsap"
 
 /*************************************************************************/
 /*  FULLWIDTH CTA COMPONENT
@@ -14,6 +17,7 @@ import parse from "html-react-parser"
 export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
   const { heading, description, textAlignment, colorScheme, backgroundImage, button } =
     props
+  const titleRef = useRef<HTMLHeadingElement>(null)
 
   // Parse heading and convert span tags to gradient elements if needed
   const parsedHeading = heading
@@ -25,6 +29,22 @@ export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
         },
       })
     : null
+
+  /****************************************************
+   * GSAP Animation
+   ****************************************************/
+
+  useGSAP(() => {
+    if (titleRef.current) {
+      gsap.effects.titleReveal(titleRef.current, {
+        trigger: {
+          trigger: titleRef.current,
+          start: "top 90%",
+          end: "bottom 40%",
+        },
+      })
+    }
+  })
 
   return (
     <section className="relative flex h-screen w-full flex-col justify-center overflow-hidden py-0">
@@ -48,7 +68,9 @@ export const FullwidthCtaComponent: React.FC<FullwidthCtaBlock> = props => {
                 "items-end": textAlignment === "right",
               })}
             >
-              <h2 className="title-hidden text-white">{parsedHeading}</h2>
+              <h2 ref={titleRef} className="title-hidden text-white">
+                {parsedHeading}
+              </h2>
               <p className="mb-8 font-light text-white">{description}</p>
               {button && (
                 <CMSLink

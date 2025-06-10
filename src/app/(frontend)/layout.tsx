@@ -3,7 +3,6 @@ import React from "react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
-import { GlobalAnimations } from "@/providers/gsap/global-animations"
 import { getSettings } from "@/lib/queries/globals"
 import { getCurrentUser } from "@/lib/queries/user"
 import { WildChildAdminBar } from "@/payload/components/backend/admin-bar"
@@ -58,15 +57,13 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
         <Providers>
           <WildChildAdminBar preview={isEnabled} user={user} settings={settings} />
-          <GlobalAnimations>
-            <Header />
-            <div id="smooth-wrapper">
-              <div id="smooth-content">
-                {children}
-                <Footer />
-              </div>
+          <Header />
+          <div id="smooth-wrapper">
+            <div id="smooth-content">
+              {children}
+              <Footer />
             </div>
-          </GlobalAnimations>
+          </div>
           {bodyEnd && parse(bodyEnd)}
         </Providers>
       </body>

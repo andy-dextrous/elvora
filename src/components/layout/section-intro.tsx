@@ -1,6 +1,10 @@
+"use client"
+
 import RichText from "@/payload/components/frontend/rich-text"
 import { cn } from "@/utilities/ui"
 import parse from "html-react-parser"
+import { gsap, useGSAP } from "@/providers/gsap"
+import { useRef } from "react"
 
 /*************************************************************************/
 /*  SECTION INTRO COMPONENT
@@ -23,6 +27,8 @@ export const SectionIntro: React.FC<SectionIntroProps> = ({
   descriptionClassName,
   containerClassName,
 }) => {
+  const titleRef = useRef<HTMLHeadingElement>(null)
+
   // Parse heading and convert span tags to gradient elements
   const parsedHeading = heading
     ? parse(heading, {
@@ -33,6 +39,22 @@ export const SectionIntro: React.FC<SectionIntroProps> = ({
         },
       })
     : null
+
+  /****************************************************
+   * GSAP Animation
+   ****************************************************/
+
+  useGSAP(() => {
+    if (titleRef.current) {
+      gsap.effects.titleReveal(titleRef.current, {
+        trigger: {
+          trigger: titleRef.current,
+          start: "top 90%",
+          end: "bottom 40%",
+        },
+      })
+    }
+  })
 
   if (!heading && !description) return null
 
@@ -45,7 +67,9 @@ export const SectionIntro: React.FC<SectionIntroProps> = ({
       )}
     >
       {heading && (
-        <h2 className={cn("title-hidden", headingClassName)}>{parsedHeading}</h2>
+        <h2 ref={titleRef} className={cn("title-hidden", headingClassName)}>
+          {parsedHeading}
+        </h2>
       )}
 
       {description && (

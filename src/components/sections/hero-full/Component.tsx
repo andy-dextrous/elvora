@@ -3,6 +3,7 @@
 import { Grid, GridLines } from "@/components/layout/grid"
 import type { HeroFullBlock as HeroProps } from "@/payload/payload-types"
 import { gsap, useGSAP } from "@/providers/gsap"
+import { SplitText } from "gsap/SplitText"
 import parse from "html-react-parser"
 import React, { useRef } from "react"
 import { tv } from "tailwind-variants"
@@ -51,6 +52,7 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
   const backgroundContainerRef = useRef<HTMLDivElement>(null)
   const timestampDateRef = useRef<HTMLDivElement>(null)
   const timestampTimeRef = useRef<HTMLDivElement>(null)
+  const heroContainerRef = useRef<HTMLDivElement>(null)
 
   // Parse heading and convert span tags to gradient elements
   const parsedHeading = heading
@@ -67,30 +69,94 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
    * GSAP Animations
    ****************************************************/
 
-  useGSAP(() => {
-    // Title reveal animation
-    gsap.effects.titleReveal(titleRef.current, {
-      duration: 1.3,
-      stagger: 0.3,
-      revertOnComplete: true,
-    })
+  useGSAP(
+    () => {
+      // Custom title reveal animation - inlined for direct control
+      if (titleRef.current) {
+        // Create SplitText for title element
+        const split = SplitText.create(titleRef.current, {
+          type: "lines",
+          mask: "lines",
+          linesClass: "title-line",
+        })
 
-    // Gentle continuous zoom on background image
-    const heroImage = document.querySelector('[data-id="hero-background-image"]')
-    if (heroImage) {
-      gsap.to(heroImage, {
-        scale: 1.2,
-        duration: 20,
-        repeat: -1,
-        yoyo: true,
-        ease: "linear",
-        force3D: true,
-      })
+        // Set initial state for split lines
+        gsap.set(split.lines, {
+          xPercent: -100,
+          autoAlpha: 0,
+          onComplete: () => {
+            titleRef.current?.classList.remove("title-hidden")
+            gsap.set(titleRef.current, { autoAlpha: 1 })
+          },
+        })
+
+        // Create timeline for title animation
+        const titleTl = gsap.timeline()
+
+        titleTl.fromTo(
+          split.lines,
+          {
+            xPercent: -100,
+            autoAlpha: 0,
+          },
+          {
+            xPercent: 0,
+            autoAlpha: 1,
+            duration: 1.3,
+            ease: "power3.out",
+            immediateRender: false,
+            stagger: 0.3,
+            delay: 0.3,
+          }
+        )
+
+        // Revert SplitText after animation completes
+        titleTl.call(() => {
+          gsap.delayedCall(0.1, () => {
+            split.revert()
+          })
+        })
+      }
+
+      if (colorScheme === "background-image") {
+        gsap.fromTo(
+          backgroundContainerRef.current,
+          {
+            autoAlpha: 0,
+          },
+          {
+            autoAlpha: 1,
+            duration: 1,
+            ease: "power4.inOut",
+            delay: 0.4,
+          }
+        )
+      }
+
+      // Fade in and gentle continuous zoom on background image
+      const heroImage = document.querySelector('[data-id="hero-background-image"]')
+
+      if (heroImage) {
+        gsap.to(heroImage, {
+          scale: 1.2,
+          duration: 20,
+          repeat: -1,
+          yoyo: true,
+          ease: "linear",
+          force3D: true,
+        })
+      }
+    },
+    {
+      scope: heroContainerRef.current!,
     }
-  })
+  )
 
   return (
-    <section className={heroContainerVariants({ size, colorScheme })}>
+    <section
+      className={heroContainerVariants({ size, colorScheme })}
+      ref={heroContainerRef}
+    >
       <div className="relative h-full w-full">
         <Grid className="h-full grid-rows-10">
           <HeroLayout

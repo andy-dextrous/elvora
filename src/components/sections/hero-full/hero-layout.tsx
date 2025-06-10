@@ -6,6 +6,7 @@ import { tv } from "tailwind-variants"
 import React from "react"
 import { HeroContent } from "./hero-content"
 import { TimestampDisplay } from "./timestamp-display"
+import { cn } from "@/utilities/ui"
 
 /****************************************************
  * Hero Layout Variants Configuration
@@ -14,7 +15,7 @@ import { TimestampDisplay } from "./timestamp-display"
 const heroLayoutVariants = tv({
   slots: {
     titleContainer: "gap-content flex h-full flex-col justify-center",
-    title: "title-hidden",
+    title: "text-h1",
     content: "gap-content flex flex-col items-start justify-center xl:hidden",
     secondaryContent: "hidden flex-col justify-center space-y-12 xl:flex",
     timestamp:
@@ -25,13 +26,13 @@ const heroLayoutVariants = tv({
   variants: {
     size: {
       full: {
-        title: "text-h1",
+        title: "",
       },
       md: {
-        title: "text-h2",
+        title: "!text-h2",
       },
       sm: {
-        title: "text-h2",
+        title: "!text-h2",
       },
     },
     placement: {
@@ -118,7 +119,7 @@ export const HeroLayout: React.FC<{
       {/*  MAIN HERO CONTENT - TITLE AND CTA BUTTONS                           */}
       {/*************************************************************************/}
       <div className={titleContainer()}>
-        <h1 ref={titleRef} className={title()}>
+        <h1 ref={titleRef} className={cn("title-hidden", title())}>
           {parsedHeading || fallbackHeading || "Strategy Powered by Technology"}
         </h1>
         <div className={contentSlot()}>
