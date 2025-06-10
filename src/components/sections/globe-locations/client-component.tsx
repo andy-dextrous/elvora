@@ -256,7 +256,7 @@ export function GlobeLocationsClientComponent({
   }
 
   return (
-    <section className="bg-dark relative">
+    <section className="bg-dark side-border-light relative">
       <SectionIntro
         heading={heading}
         description={description}
