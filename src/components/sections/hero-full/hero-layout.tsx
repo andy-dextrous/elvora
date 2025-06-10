@@ -92,6 +92,10 @@ export const HeroLayout: React.FC<{
   buttons?: HeroProps["buttons"]
   timestampDateRef: React.RefObject<HTMLDivElement | null>
   timestampTimeRef: React.RefObject<HTMLDivElement | null>
+  contentRef: React.RefObject<HTMLDivElement | null>
+  secondaryContentRef: React.RefObject<HTMLDivElement | null>
+  timestampRef: React.RefObject<HTMLDivElement | null>
+  contactButtonsRef: React.RefObject<HTMLDivElement | null>
 }> = ({
   size,
   colorScheme,
@@ -102,6 +106,10 @@ export const HeroLayout: React.FC<{
   buttons,
   timestampDateRef,
   timestampTimeRef,
+  contentRef,
+  secondaryContentRef,
+  timestampRef,
+  contactButtonsRef,
 }) => {
   // Create slots from variants
   const {
@@ -122,7 +130,7 @@ export const HeroLayout: React.FC<{
         <h1 ref={titleRef} className={cn("title-hidden", title())}>
           {parsedHeading || fallbackHeading || "Strategy Powered by Technology"}
         </h1>
-        <div className={contentSlot()}>
+        <div ref={contentRef} className={cn("translate-y-5 opacity-0", contentSlot())}>
           <HeroContent content={content} buttons={buttons} colorScheme={colorScheme} />
         </div>
       </div>
@@ -130,7 +138,10 @@ export const HeroLayout: React.FC<{
       {/*************************************************************************/}
       {/*  SECONDARY CONTENT AREA - DESKTOP LAYOUT                             */}
       {/*************************************************************************/}
-      <div className={secondaryContent()}>
+      <div
+        ref={secondaryContentRef}
+        className={cn("translate-y-5 opacity-0", secondaryContent())}
+      >
         <HeroContent
           content={content}
           buttons={buttons}
@@ -142,7 +153,7 @@ export const HeroLayout: React.FC<{
       {/*************************************************************************/}
       {/*  TIMESTAMP DISPLAY - DYNAMIC TIME ZONES                              */}
       {/*************************************************************************/}
-      <div className={timestamp()}>
+      <div ref={timestampRef} className={cn("translate-y-5 opacity-0", timestamp())}>
         <TimestampDisplay
           timestampDateRef={timestampDateRef}
           timestampTimeRef={timestampTimeRef}
@@ -152,7 +163,10 @@ export const HeroLayout: React.FC<{
       {/*************************************************************************/}
       {/*  CONTACT ACTION BUTTONS                                               */}
       {/*************************************************************************/}
-      <div className={contactButtons()}>
+      <div
+        ref={contactButtonsRef}
+        className={cn("translate-y-5 opacity-0", contactButtons())}
+      >
         <Button icon variant="ghost">
           <Envelope className="!h-6 !w-6" />
         </Button>

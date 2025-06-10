@@ -53,6 +53,10 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
   const timestampDateRef = useRef<HTMLDivElement>(null)
   const timestampTimeRef = useRef<HTMLDivElement>(null)
   const heroContainerRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const secondaryContentRef = useRef<HTMLDivElement>(null)
+  const timestampRef = useRef<HTMLDivElement>(null)
+  const contactButtonsRef = useRef<HTMLDivElement>(null)
 
   // Parse heading and convert span tags to gradient elements
   const parsedHeading = heading
@@ -116,6 +120,38 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
             split.revert()
           })
         })
+
+        // Staggered content animation after title completes
+        const contentElements = [
+          contentRef.current,
+          secondaryContentRef.current,
+          timestampRef.current,
+          contactButtonsRef.current,
+        ].filter(Boolean)
+
+        if (contentElements.length > 0) {
+          gsap.fromTo(
+            contentElements,
+            {
+              autoAlpha: 0,
+              y: 20,
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.8,
+              ease: "power2.out",
+              stagger: 0.15,
+              delay: 1.8, // Start after title animation
+              onStart: () => {
+                // Remove Tailwind classes when animation starts
+                contentElements.forEach(el => {
+                  el?.classList.remove("opacity-0", "translate-y-5")
+                })
+              },
+            }
+          )
+        }
       }
 
       if (colorScheme === "background-image") {
@@ -169,6 +205,10 @@ export const HeroFullComponent: React.FC<HeroProps> = ({
             buttons={buttons}
             timestampDateRef={timestampDateRef}
             timestampTimeRef={timestampTimeRef}
+            contentRef={contentRef}
+            secondaryContentRef={secondaryContentRef}
+            timestampRef={timestampRef}
+            contactButtonsRef={contactButtonsRef}
           />
         </Grid>
       </div>
