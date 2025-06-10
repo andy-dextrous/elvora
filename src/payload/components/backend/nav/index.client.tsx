@@ -9,11 +9,13 @@ import LinkWithDefault from "next/link"
 import { NavPreferences } from "payload"
 import { FC, Fragment } from "react"
 import { getNavIcon } from "./navIconMap"
+import { NotificationBadge } from "./notification-badge"
 import "./styles.scss"
 
 type Props = {
-	groups: NavGroupType[]
-	navPreferences: NavPreferences | null
+  groups: NavGroupType[]
+  navPreferences?: NavPreferences | null
+  unreadFormSubmissionsCount: number
 }
 
 /*******************************************************/
@@ -26,91 +28,91 @@ const omittedEntities = ["search"]
 /*  Items to omit from the nav
 /*******************************************************/
 
-export const NavClient: FC<Props> = ({ groups, navPreferences }) => {
-	const pathname = usePathname()
+export const NavClient: FC<Props> = ({ groups, unreadFormSubmissionsCount }) => {
+  const pathname = usePathname()
 
-	const {
-		config: {
-			routes: { admin: adminRoute },
-		},
-	} = useConfig()
+  const {
+    config: {
+      routes: { admin: adminRoute },
+    },
+  } = useConfig()
 
-	const { i18n } = useTranslation()
+  const { i18n } = useTranslation()
 
-	return (
-		<Fragment>
-			{groups.map(({ entities }, key) => {
-				return (
-					<div key={key} className="nav__group">
-						{entities
-							.filter(({ slug }) => !omittedEntities.includes(slug))
-							.map(({ slug, type, label }, i) => {
-								let href: string
-								let id: string
+  return (
+    <Fragment>
+      {groups.map(({ entities }, key) => {
+        return (
+          <div key={key} className="nav__group">
+            {entities
+              .filter(({ slug }) => !omittedEntities.includes(slug))
+              .map(({ slug, type, label }, i) => {
+                let href: string
+                let id: string
 
-								if (type === EntityType.collection) {
-									href = formatAdminURL({
-										adminRoute,
-										path: `/collections/${slug}`,
-									})
-									id = `nav-${slug}`
-								} else {
-									href = formatAdminURL({
-										adminRoute,
-										path: `/globals/${slug}`,
-									})
-									id = `nav-global-${slug}`
-								}
+                if (type === EntityType.collection) {
+                  href = formatAdminURL({
+                    adminRoute,
+                    path: `/collections/${slug}`,
+                  })
+                  id = `nav-${slug}`
+                } else {
+                  href = formatAdminURL({
+                    adminRoute,
+                    path: `/globals/${slug}`,
+                  })
+                  id = `nav-global-${slug}`
+                }
 
-								const Link = LinkWithDefault
+                const Link = LinkWithDefault
 
-								const LinkElement = Link || "a"
-								const activeCollection =
-									pathname.startsWith(href) &&
-									["/", undefined].includes(pathname[href.length])
+                const LinkElement = Link || "a"
+                const activeCollection =
+                  pathname.startsWith(href) &&
+                  ["/", undefined].includes(pathname[href.length])
 
-								const Icon = getNavIcon(slug)
+                const Icon = getNavIcon(slug)
 
-								return (
-									<LinkElement
-										className={[
-											`${baseClass}__link`,
-											activeCollection && `active`,
-										]
-											.filter(Boolean)
-											.join(" ")}
-										href={href}
-										id={id}
-										key={i}
-										prefetch={false}
-									>
-										{activeCollection && (
-											<div className={`${baseClass}__link-indicator`} />
-										)}
-										{Icon && (
-											<Icon
-												className={[
-													`${baseClass}__icon`,
-													activeCollection && "active",
-												].join(" ")}
-											/>
-										)}
-										<span
-											className={[
-												`${baseClass}__link-label`,
-												activeCollection && "active",
-											]
-												.filter(Boolean)
-												.join(" ")}
-										>
-											{getTranslation(label, i18n)}
-										</span>
-									</LinkElement>
-								)
-							})}
-					</div>
-				)
-			})}
-		</Fragment>
-	)
+                return (
+                  <LinkElement
+                    className={[`${baseClass}__link`, activeCollection && `active`]
+                      .filter(Boolean)
+                      .join(" ")}
+                    href={href}
+                    id={id}
+                    key={i}
+                    prefetch={false}
+                  >
+                    {activeCollection && (
+                      <div className={`${baseClass}__link-indicator`} />
+                    )}
+                    {Icon && (
+                      <Icon
+                        className={[
+                          `${baseClass}__icon`,
+                          activeCollection && "active",
+                        ].join(" ")}
+                      />
+                    )}
+                    <span
+                      className={[
+                        `${baseClass}__link-label`,
+                        activeCollection && "active",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {getTranslation(label, i18n)}
+                    </span>
+                    {slug === "form-submissions" && unreadFormSubmissionsCount > 0 && (
+                      <NotificationBadge count={unreadFormSubmissionsCount} />
+                    )}
+                  </LinkElement>
+                )
+              })}
+          </div>
+        )
+      })}
+    </Fragment>
+  )
 }

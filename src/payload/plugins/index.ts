@@ -17,6 +17,7 @@ import { Page, Post } from "@/payload/payload-types"
 import { beforeSyncWithSearch } from "@/payload/search/beforeSync"
 import { searchFields } from "@/payload/search/fieldOverrides"
 import { getServerSideURL } from "@/utilities/getURL"
+import { markAsReadAfterRead } from "@/payload/hooks/form-submissions"
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title}` : "WILD Child Website Template"
@@ -138,6 +139,25 @@ export const plugins: Plugin[] = [
           }
           return field
         })
+      },
+    },
+    formSubmissionOverrides: {
+      fields: ({ defaultFields }) => {
+        return [
+          ...defaultFields,
+          {
+            name: "isRead",
+            type: "checkbox",
+            label: "Read Status",
+            defaultValue: false,
+            admin: {
+              hidden: true,
+            },
+          },
+        ]
+      },
+      hooks: {
+        afterRead: [markAsReadAfterRead],
       },
     },
   }),
