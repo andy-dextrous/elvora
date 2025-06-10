@@ -9,6 +9,7 @@ import { LatestArticlesComponent } from "@/components/sections/latest-articles/C
 import { FullwidthCtaComponent } from "@/components/sections/fullwidth-cta/Component"
 import { GlobeLocationsComponent } from "@/components/sections/globe-locations/Component"
 import { ContactFormComponent } from "@/components/sections/contact-form/Component"
+import { CtaFormComponent } from "@/components/sections/cta-form/Component"
 import { SimpleTextComponent } from "@/components/sections/simple-text/Component"
 import React, { Fragment } from "react"
 
@@ -28,6 +29,7 @@ const sectionsMap: Record<string, React.ComponentType<any>> = {
   "fullwidth-cta": FullwidthCtaComponent,
   "globe-locations": GlobeLocationsComponent,
   "contact-form": ContactFormComponent,
+  "cta-form": CtaFormComponent,
   "simple-text": SimpleTextComponent,
 }
 

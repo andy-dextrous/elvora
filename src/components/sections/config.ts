@@ -9,6 +9,7 @@ import { LatestArticles } from "@/components/sections/latest-articles/config"
 import { FullwidthCta } from "@/components/sections/fullwidth-cta/config"
 import { GlobeLocations } from "@/components/sections/globe-locations/config"
 import { ContactForm } from "@/components/sections/contact-form/config"
+import { CtaForm } from "@/components/sections/cta-form/config"
 import { SimpleText } from "@/components/sections/simple-text/config"
 
 export const sectionBlocks = [
@@ -23,5 +24,6 @@ export const sectionBlocks = [
   FullwidthCta,
   GlobeLocations,
   ContactForm,
+  CtaForm,
   SimpleText,
 ]

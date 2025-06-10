@@ -499,6 +499,7 @@ export interface Page {
     | FullwidthCtaBlock
     | GlobeLocationsBlock
     | ContactFormBlock
+    | CtaFormBlock
     | SimpleTextBlock
   )[];
   meta?: {
@@ -1294,6 +1295,53 @@ export interface ContactFormBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaFormBlock".
+ */
+export interface CtaFormBlock {
+  /**
+   * Main heading for the CTA form section. Use <span> tags for gradient text: 'Ready to get started? <span>Let's talk</span>'
+   */
+  heading: string;
+  /**
+   * Brief description that appears below the heading in the left column
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Choose background color scheme for the section
+   */
+  backgroundColorScheme: 'dark' | 'light' | 'neutral' | 'image';
+  /**
+   * Visual style for the form based on background
+   */
+  variant?: ('dark' | 'light' | 'neutral' | 'transparent') | null;
+  /**
+   * Background image for the CTA form section
+   */
+  backgroundImage?: (string | null) | Media;
+  /**
+   * Select the form to display in the right column
+   */
+  form: string | Form;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cta-form';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SimpleTextBlock".
  */
 export interface SimpleTextBlock {
@@ -1638,6 +1686,7 @@ export interface PagesSelect<T extends boolean = true> {
         'fullwidth-cta'?: T | FullwidthCtaBlockSelect<T>;
         'globe-locations'?: T | GlobeLocationsBlockSelect<T>;
         'contact-form'?: T | ContactFormBlockSelect<T>;
+        'cta-form'?: T | CtaFormBlockSelect<T>;
         'simple-text'?: T | SimpleTextBlockSelect<T>;
       };
   meta?:
@@ -1909,6 +1958,20 @@ export interface ContactFormBlockSelect<T extends boolean = true> {
   description?: T;
   form?: T;
   variant?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaFormBlock_select".
+ */
+export interface CtaFormBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  backgroundColorScheme?: T;
+  variant?: T;
+  backgroundImage?: T;
+  form?: T;
   id?: T;
   blockName?: T;
 }
