@@ -67,7 +67,9 @@ export async function Footer() {
                     <CMSLink
                       {...item.link}
                       className="text-sm text-white/80 transition-colors hover:text-white"
-                    />
+                    >
+                      {item.link.label}
+                    </CMSLink>
                   </li>
                 ))}
               </ul>
@@ -143,7 +145,9 @@ export async function Footer() {
               <div className="flex flex-wrap justify-center space-x-4 text-sm md:justify-start">
                 {footer.legals.map((legal, index) => (
                   <div key={index} className="flex items-center space-x-4">
-                    <CMSLink {...legal.link} className="text-white/80 hover:text-white" />
+                    <CMSLink {...legal.link} className="text-white/80 hover:text-white">
+                      {legal.link.label}
+                    </CMSLink>
                     {index < footer.legals!.length - 1 && (
                       <span className="text-white/60">|</span>
                     )}
