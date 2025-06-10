@@ -32,6 +32,8 @@
   }
 }
 
+/* Sitewide Typography Customizations */
+
 @layer base {
   h1 {
     font-family: theme(fontFamily.heading);
@@ -132,5 +134,23 @@
     font-size: theme(fontSize.base);
     line-height: theme(lineHeight.normal);
     letter-spacing: theme(letterSpacing.normal);
+  }
+}
+
+/* Rich Text Typography Customizations */
+
+@layer base {
+  .prose {
+    --tw-prose-headings: theme(colors.dark-950);
+
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & h5,
+    & h6 {
+      font-weight: theme(fontWeight.light) !important;
+      color: var(--tw-prose-headings) !important;
+    }
   }
 }
