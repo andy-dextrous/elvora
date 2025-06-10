@@ -9,7 +9,7 @@ export const ContactFormComponent: React.FC<ContactFormBlock> = ({
   form,
 }) => {
   return (
-    <section>
+    <section className="side-border-dark">
       <SectionIntro heading={heading} description={description} />
 
       {form && typeof form === "object" && (

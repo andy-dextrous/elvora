@@ -163,7 +163,7 @@ function LocationCards({
               "cursor-pointer border p-6 backdrop-blur-sm transition-all duration-300",
               selectedLocationId === locationId
                 ? "bg-dark-950/60 gradient-border"
-                : "bg-dark-950/40 hover:bg-dark-950/60 border-gray-700"
+                : "bg-dark-950/40 hover:bg-dark-950/60 border-light-border"
             )}
           >
             <div className="flex items-start gap-4">
@@ -239,7 +239,7 @@ export function GlobeLocationsClientComponent({
 
   if (validLocations.length === 0) {
     return (
-      <section className="bg-dark relative">
+      <section className="bg-dark side-border-light relative">
         <SectionIntro
           heading={heading}
           description={description}
