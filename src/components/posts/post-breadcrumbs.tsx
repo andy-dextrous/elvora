@@ -25,10 +25,7 @@ export function PostBreadcrumbs({ post, className }: PostBreadcrumbsProps) {
       <BreadcrumbList className="text-sm text-white/70">
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link
-              href="/"
-              className="text-secondary-600 hover:text-secondary-500 text-sm"
-            >
+            <Link href="/" className="text-sm text-white hover:text-white/80">
               Home
             </Link>
           </BreadcrumbLink>
@@ -36,17 +33,14 @@ export function PostBreadcrumbs({ post, className }: PostBreadcrumbsProps) {
         <BreadcrumbSeparator className="text-white/50" />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link
-              href="/insights"
-              className="text-secondary-600 hover:text-secondary-500 text-sm"
-            >
+            <Link href="/insights" className="text-sm text-white hover:text-white/80">
               Blog
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator className="text-white/50" />
         <BreadcrumbItem>
-          <BreadcrumbPage className="text-light text-sm text-white">
+          <BreadcrumbPage className="!text-light text-sm text-white">
             {post.title}
           </BreadcrumbPage>
         </BreadcrumbItem>

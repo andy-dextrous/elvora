@@ -15,7 +15,7 @@ import { cn } from "@/utilities/ui"
  ****************************************************/
 
 const postHeroVariants = tv({
-  base: "pt-first-section-nav-offset relative flex min-h-[70vh] w-full flex-col justify-between overflow-hidden border-b",
+  base: "pt-first-section-nav-offset relative flex min-h-[80vh] w-full flex-col justify-center overflow-hidden border-b",
   variants: {
     hasBackground: {
       true: "bg-dark border-light-border",
