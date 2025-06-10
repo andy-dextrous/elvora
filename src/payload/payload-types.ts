@@ -1280,9 +1280,13 @@ export interface ContactFormBlock {
     [k: string]: unknown;
   };
   /**
-   * Select the form to display in this section
+   * Select the form to display
    */
   form: string | Form;
+  /**
+   * Visual style based on background
+   */
+  variant?: ('white' | 'dark' | 'neutral' | 'transparent') | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'contact-form';
@@ -1878,6 +1882,7 @@ export interface ContactFormBlockSelect<T extends boolean = true> {
   heading?: T;
   description?: T;
   form?: T;
+  variant?: T;
   id?: T;
   blockName?: T;
 }

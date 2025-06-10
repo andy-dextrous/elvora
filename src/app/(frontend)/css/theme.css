@@ -92,4 +92,12 @@ imitate where the edges of the containers would be. */
 @theme {
   --color-dark-border: color-mix(in oklab, var(--color-dark) 7%, transparent);
   --color-light-border: color-mix(in oklab, var(--color-white) 7%, transparent);
+  --color-form-light-border: color-mix(in oklab, var(--color-dark) 10%, transparent);
+  --color-form-dark-border: color-mix(in oklab, var(--color-dark) 10%, transparent);
+  --color-form-neutral-border: color-mix(in oklab, var(--color-neutral) 10%, transparent);
+  --color-form-transparent-border: color-mix(
+    in oklab,
+    var(--color-transparent) 7%,
+    transparent
+  );
 }

@@ -1,5 +1,6 @@
 import type { Block } from "payload"
 import { sectionIntro } from "@/payload/fields/section-intro"
+import { formVariant } from "@/payload/fields/form"
 
 export const ContactForm: Block = {
   slug: "contact-form",
@@ -14,14 +15,10 @@ export const ContactForm: Block = {
         "Main heading for the form section. Use <span> tags for gradient text.",
       descriptionDescription: "Brief description that appears above the form",
     }),
-    {
-      name: "form",
-      type: "relationship",
-      relationTo: "forms",
-      required: true,
+    formVariant({
       admin: {
-        description: "Select the form to display in this section",
+        description: "Form configuration with contextual styling",
       },
-    },
+    }),
   ],
 }

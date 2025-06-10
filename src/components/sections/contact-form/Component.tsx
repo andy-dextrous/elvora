@@ -1,20 +1,20 @@
 import type { ContactFormBlock } from "@/payload/payload-types"
-import type { Form as FormType } from "@payloadcms/plugin-form-builder/types"
 import { SectionIntro } from "@/components/layout/section-intro"
-import { FormBlock } from "@/payload/blocks/form/component"
+import { CMSForm } from "@/payload/components/frontend/cms-form"
 
 export const ContactFormComponent: React.FC<ContactFormBlock> = ({
   heading,
   description,
   form,
+  variant,
 }) => {
   return (
     <section className="side-border-dark">
       <SectionIntro heading={heading} description={description} />
 
-      {form && typeof form === "object" && (
+      {form && (
         <div className="container-sm">
-          <FormBlock form={form as FormType} enableIntro={false} />
+          <CMSForm form={form} variant={variant} />
         </div>
       )}
     </section>
