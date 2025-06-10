@@ -41,6 +41,10 @@ const buttonVariants = tv({
         "hover:text-dark hover:bg-white",
         "focus-visible:ring-white/50",
       ],
+      phoneSelect: [
+        "border-input bg-background hover:bg-accent hover:text-accent-foreground border",
+        "text-foreground font-medium",
+      ],
       secondary: [
         "bg-secondary text-secondary-foreground shadow-xs",
         "hover:bg-secondary/80",
@@ -98,6 +102,10 @@ const buttonVariants = tv({
         "[&_svg:not([class*='size-'])]:size-6",
         "sm:[&_svg:not([class*='size-'])]:size-6",
         "lg:[&_svg:not([class*='size-'])]:size-6",
+      ],
+      phoneSelect: [
+        "h-10 gap-1 px-3 py-2 text-sm",
+        "[&_svg:not([class*='size-'])]:size-4",
       ],
     },
     icon: {

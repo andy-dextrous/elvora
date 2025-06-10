@@ -146,6 +146,8 @@ export const FormBlock: React.FC<
                     const Field: React.FC<any> =
                       fields?.[field.blockType as keyof typeof fields]
                     if (Field) {
+                      console.log({ field })
+
                       return (
                         <div className="mb-6 last:mb-0" key={index}>
                           <Field
@@ -158,7 +160,10 @@ export const FormBlock: React.FC<
                           />
                         </div>
                       )
+                    } else {
+                      console.log("field not found", field)
                     }
+
                     return null
                   })}
               </div>

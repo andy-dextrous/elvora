@@ -61,6 +61,63 @@ export const plugins: Plugin[] = [
   formBuilderPlugin({
     fields: {
       payment: false,
+      phone: {
+        slug: "phone",
+        labels: {
+          singular: "Phone Number",
+          plural: "Phone Numbers",
+        },
+        fields: [
+          {
+            type: "row",
+            fields: [
+              {
+                name: "name",
+                type: "text",
+                label: "Name (lowercase, no special characters)",
+                required: true,
+                admin: {
+                  width: "50%",
+                },
+              },
+              {
+                name: "label",
+                type: "text",
+                label: "Label",
+                admin: {
+                  width: "50%",
+                },
+              },
+            ],
+          },
+          {
+            type: "row",
+            fields: [
+              {
+                name: "width",
+                type: "number",
+                label: "Field Width (percentage)",
+                admin: {
+                  width: "50%",
+                },
+              },
+              {
+                name: "defaultValue",
+                type: "text",
+                label: "Default Value",
+                admin: {
+                  width: "50%",
+                },
+              },
+            ],
+          },
+          {
+            name: "required",
+            type: "checkbox",
+            label: "Required",
+          },
+        ],
+      } as any,
     },
     formOverrides: {
       fields: ({ defaultFields }) => {
