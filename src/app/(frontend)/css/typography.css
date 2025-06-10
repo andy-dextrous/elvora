@@ -153,4 +153,51 @@
       color: var(--tw-prose-headings) !important;
     }
   }
+
+  /* Force white text on prose content */
+  .prose-white {
+    & h1,
+    & h2,
+    & h3,
+    & h4,
+    & h5,
+    & h6 {
+      color: white !important;
+    }
+
+    & p {
+      color: color-mix(in oklab, var(--color-white) 80%, transparent) !important;
+    }
+
+    & li {
+      color: white !important;
+    }
+
+    & blockquote {
+      color: white !important;
+    }
+
+    & strong {
+      color: white !important;
+    }
+
+    &.gradient-headings {
+      & h1,
+      & h2,
+      & h3,
+      & h4,
+      & h5,
+      & h6 {
+        background: linear-gradient(
+          to right,
+          theme(colors.secondary-600),
+          theme(colors.primary-500)
+        );
+        background-clip: text;
+        color: transparent !important;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent !important;
+      }
+    }
+  }
 }

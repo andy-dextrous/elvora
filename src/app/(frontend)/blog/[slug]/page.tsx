@@ -8,6 +8,12 @@ import { LivePreviewListener } from "@/payload/components/frontend/live-preview-
 import { generateMeta } from "@/utilities/generateMeta"
 import { getCurrentUser } from "@/lib/queries/user"
 import { cn } from "@/utilities/ui"
+import { FullwidthCtaComponent } from "@/components/sections/fullwidth-cta/Component"
+import { fullwidthCtaDefault } from "@/payload/fields/default-values/fullwidth-cta"
+
+/*************************************************************************/
+/*  INDIVIDUAL BLOG POST PAGE COMPONENT
+/*************************************************************************/
 
 type Args = {
   params: Promise<{
@@ -33,10 +39,35 @@ export default async function Post({ params: paramsPromise }: Args) {
     >
       <PayloadRedirects disableNotFound url={url} />
       {draft && <LivePreviewListener />}
-      <article className="pt-16 pb-16">
-        <PostHero post={post} />
-        <PostBody post={post} />
-      </article>
+
+      <PostHero post={post} />
+
+      <section className="bg-dark side-border-light flicker-mask">
+        <article>
+          <PostBody post={post} />
+        </article>
+      </section>
+
+      <FullwidthCtaComponent
+        heading="See the Difference in Minutes"
+        description="Watch a fast demo and see how intelligent automation transforms your workflow: less effort, more results."
+        textAlignment="left"
+        colorScheme="gradient"
+        backgroundImage="https://res.cloudinary.com/wild-creative/image/upload/v1748834621/meeting_3_hbtmkr.jpg"
+        button={{
+          variant: "white",
+          size: "lg",
+          layout: "default",
+          icon: false,
+          link: {
+            type: "custom",
+            url: "/demo",
+            label: "Watch Demo",
+            newTab: false,
+          },
+        }}
+        blockType="fullwidth-cta"
+      />
     </main>
   )
 }
