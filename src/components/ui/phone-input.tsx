@@ -50,7 +50,7 @@ PhoneInput.displayName = "PhoneInput"
 
 // React 19 version without forwardRef
 function InputComponent({ className, ...props }: React.ComponentProps<"input">) {
-  return <Input className={cn("rounded-s-none rounded-e-lg", className)} {...props} />
+  return <Input className={cn("rounded-s-none", className)} {...props} />
 }
 InputComponent.displayName = "InputComponent"
 
@@ -80,7 +80,7 @@ const CountrySelect = ({
           type="button"
           variant="phoneSelect"
           size="phoneSelect"
-          className="rounded-s-lg rounded-e-none border-r-0 focus:z-10"
+          className="border-r-0 focus:z-10"
           disabled={disabled}
         >
           <FlagComponent country={selectedCountry} countryName={selectedCountry} />
