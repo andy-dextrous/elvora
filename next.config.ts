@@ -32,12 +32,12 @@ const nextConfig = {
       },
     ],
   },
-  // experimental: {
-  //   staleTimes: {
-  //     dynamic: 30,
-  //     static: 180,
-  //   },
-  // },
+  experimental: {
+    staleTimes: {
+      dynamic: 0,
+      static: 180,
+    },
+  },
   reactStrictMode: true,
   redirects,
   webpack: (config, { webpack }) => {
