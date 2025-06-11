@@ -8,6 +8,7 @@ import { LivePreviewListener } from "@/payload/components/frontend/live-preview-
 import { generateMeta } from "@/utilities/generateMeta"
 import { FullwidthCtaComponent } from "@/components/sections/fullwidth-cta/Component"
 
+export const dynamic = "force-static"
 export const revalidate = 600
 
 /*************************************************************************/

@@ -32,11 +32,6 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    staleTimes: {
-      static: 180,
-    },
-  },
   reactStrictMode: true,
   redirects,
   webpack: (config, { webpack }) => {
