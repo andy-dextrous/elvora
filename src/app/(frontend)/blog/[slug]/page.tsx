@@ -9,7 +9,6 @@ import { generateMeta } from "@/utilities/generateMeta"
 import { getCurrentUser } from "@/lib/queries/user"
 import { cn } from "@/utilities/ui"
 import { FullwidthCtaComponent } from "@/components/sections/fullwidth-cta/Component"
-import { fullwidthCtaDefault } from "@/payload/fields/default-values/fullwidth-cta"
 
 /*************************************************************************/
 /*  INDIVIDUAL BLOG POST PAGE COMPONENT
@@ -41,13 +40,7 @@ export default async function Post({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <PostHero post={post} />
-
-      <section className="bg-dark side-border-light flicker-mask">
-        <article>
-          <PostBody post={post} />
-        </article>
-      </section>
-
+      <PostBody post={post} />
       <FullwidthCtaComponent
         heading="See the Difference in Minutes"
         description="Watch a fast demo and see how intelligent automation transforms your workflow: less effort, more results."

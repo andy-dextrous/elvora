@@ -145,7 +145,7 @@ export const PostHero: React.FC<{
 
         // Fade in and gentle continuous zoom on background image
         const heroImageEl = backgroundContainerRef.current.querySelector(
-          '[data-id="post-hero-background-image"]'
+          '[data-id="post-hero-background-image"] img'
         )
 
         if (heroImageEl) {
@@ -171,16 +171,65 @@ export const PostHero: React.FC<{
       {/*  BACKGROUND IMAGE                                                     */}
       {/*************************************************************************/}
 
-      <div ref={backgroundContainerRef} className="absolute inset-0 z-0">
-        <Media
-          resource={heroImage as MediaType}
-          alt={title}
-          fill
-          priority
-          imgClassName="object-cover"
-          data-id="post-hero-background-image"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+      <div ref={backgroundContainerRef} className="absolute inset-0 z-0 overflow-hidden">
+        <div className="relative h-full w-full">
+          {/* Top Down Fade */}
+          <div
+            className={cn(
+              // Base styles
+              "absolute inset-0 z-10",
+              // Mobile
+              "from-dark-950 to-dark-950 via-dark/20 bg-gradient-to-b via-50% to-100%"
+            )}
+          />
+
+          {/* Background Image */}
+          <div
+            className="absolute inset-x-0 bottom-0 size-full"
+            data-id="post-hero-background-image"
+          >
+            <Media
+              resource={heroImage as MediaType}
+              alt={title}
+              fill
+              priority
+              imgClassName={cn(
+                // Base styles
+                "absolute inset-0 h-full w-full object-cover",
+                // Mobile
+                "object-[50%_50%]",
+                // Desktop
+                "lg:object-[80%_50%]"
+              )}
+            />
+          </div>
+
+          {/* Spotlight 1 - Royal Purple Spotlight */}
+          <div
+            className={cn(
+              // Base styles
+              "absolute z-50 h-[700px] w-[800px] blur-[350px]",
+              "-bottom-[148px] -left-[370px]",
+              // Mobile
+              "bg-primary/30",
+              // Desktop
+              "lg:bg-primary/60"
+            )}
+          />
+
+          {/* Spotlight 2 - Chrysler Blue Spotlight */}
+          <div
+            className={cn(
+              // Base styles
+              "absolute z-50 h-[1200px] w-[495.05px] -rotate-[15deg] blur-[350px]",
+              "-right-[80.43px] -bottom-[405.61px]",
+              // Mobile
+              "bg-secondary/30",
+              // Desktop
+              "lg:bg-secondary/40"
+            )}
+          />
+        </div>
       </div>
 
       <div className="relative z-10 h-full w-full">

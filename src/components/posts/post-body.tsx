@@ -10,26 +10,28 @@ import { PostBreadcrumbs } from "./post-breadcrumbs"
 
 export default function PostBody({ post }: { post: Post }) {
   return (
-    <Fragment>
-      <div className="container-sm">
-        <PostBreadcrumbs post={post} />
-        {post.content && (
-          <RichText
-            data={post.content}
-            className="prose prose-xl lg:prose-2xl prose-white gradient-headings !max-w-none"
-            enableGutter={false}
-            textColor="white"
-          />
-        )}
-      </div>
-
-      {post.relatedPosts && post.relatedPosts.length > 0 && (
-        <div className="mt-section-lg">
-          <RelatedPosts
-            docs={post.relatedPosts.filter(post => typeof post === "object")}
-          />
+    <article>
+      <section className="bg-dark side-border-light flicker-mask">
+        <div className="container-sm">
+          <PostBreadcrumbs post={post} />
+          {post.content && (
+            <RichText
+              data={post.content}
+              className="prose prose-xl lg:prose-2xl prose-white gradient-headings !max-w-none"
+              enableGutter={false}
+              textColor="white"
+            />
+          )}
         </div>
-      )}
-    </Fragment>
+
+        {post.relatedPosts && post.relatedPosts.length > 0 && (
+          <div className="mt-section-lg">
+            <RelatedPosts
+              docs={post.relatedPosts.filter(post => typeof post === "object")}
+            />
+          </div>
+        )}
+      </section>
+    </article>
   )
 }

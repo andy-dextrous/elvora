@@ -23,13 +23,14 @@ import {
 } from "@payloadcms/plugin-seo/fields"
 import { slugField } from "@/payload/fields/slug"
 import { lockSlugAfterPublish } from "./hooks/lockSlug"
+import { anyone } from "@/payload/access/anyone"
 
 export const Posts: CollectionConfig<"posts"> = {
   slug: "posts",
   access: {
     create: authenticated,
     delete: authenticated,
-    read: authenticatedOrPublished,
+    read: anyone,
     update: authenticated,
   },
   defaultPopulate: {
@@ -83,12 +84,40 @@ export const Posts: CollectionConfig<"posts"> = {
       admin: {
         position: "sidebar",
       },
-      filterOptions: ({ id }) => {
-        return {
+      filterOptions: ({ id, data }) => {
+        const query: any = {
           id: {
             not_in: [id],
           },
         }
+
+        // If the current post has categories, prioritize posts with matching categories
+        if (
+          data?.categories &&
+          Array.isArray(data.categories) &&
+          data.categories.length > 0
+        ) {
+          const categoryIds = data.categories.map((cat: any) =>
+            typeof cat === "object" ? cat.id : cat
+          )
+
+          query.or = [
+            // First priority: posts with matching categories
+            {
+              categories: {
+                in: categoryIds,
+              },
+            },
+            // Second priority: all other posts (as fallback)
+            {
+              categories: {
+                not_in: categoryIds,
+              },
+            },
+          ]
+        }
+
+        return query
       },
       hasMany: true,
       relationTo: "posts",
