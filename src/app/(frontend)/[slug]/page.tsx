@@ -39,12 +39,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   const { sections = [] } = page
 
   return (
-    <main
-      data-collection="pages"
-      data-single-type="page"
-      data-id={page.id}
-      // className={cn(user ? "relative !mt-[32px]" : "")}
-    >
+    <main data-collection="pages" data-single-type="page" data-id={page.id}>
       {/* Only use PayloadRedirects for non-home pages to prevent infinite loops */}
       {slug !== "home" && <PayloadRedirects disableNotFound url={url} />}
       {draft && <LivePreviewListener />}

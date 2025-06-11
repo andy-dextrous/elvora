@@ -10,6 +10,7 @@ import { FullwidthCtaComponent } from "@/components/sections/fullwidth-cta/Compo
 import { GlobeLocationsComponent } from "@/components/sections/globe-locations/Component"
 import { ContactFormComponent } from "@/components/sections/contact-form/Component"
 import { CtaFormComponent } from "@/components/sections/cta-form/Component"
+import { HeadingLeftContentComponent } from "@/components/sections/heading-left-content/Component"
 import { SimpleTextComponent } from "@/components/sections/simple-text/Component"
 import React, { Fragment } from "react"
 
@@ -30,6 +31,7 @@ const sectionsMap: Record<string, React.ComponentType<any>> = {
   "globe-locations": GlobeLocationsComponent,
   "contact-form": ContactFormComponent,
   "cta-form": CtaFormComponent,
+  "heading-left-content": HeadingLeftContentComponent,
   "simple-text": SimpleTextComponent,
 }
 

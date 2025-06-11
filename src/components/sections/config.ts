@@ -10,6 +10,7 @@ import { FullwidthCta } from "@/components/sections/fullwidth-cta/config"
 import { GlobeLocations } from "@/components/sections/globe-locations/config"
 import { ContactForm } from "@/components/sections/contact-form/config"
 import { CtaForm } from "@/components/sections/cta-form/config"
+import { HeadingLeftContent } from "@/components/sections/heading-left-content/config"
 import { SimpleText } from "@/components/sections/simple-text/config"
 
 export const sectionBlocks = [
@@ -25,5 +26,6 @@ export const sectionBlocks = [
   GlobeLocations,
   ContactForm,
   CtaForm,
+  HeadingLeftContent,
   SimpleText,
 ]

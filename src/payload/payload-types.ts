@@ -500,6 +500,7 @@ export interface Page {
     | GlobeLocationsBlock
     | ContactFormBlock
     | CtaFormBlock
+    | HeadingLeftContentBlock
     | SimpleTextBlock
   )[];
   meta?: {
@@ -1353,6 +1354,45 @@ export interface CtaFormBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeadingLeftContentBlock".
+ */
+export interface HeadingLeftContentBlock {
+  /**
+   * Main heading for the section. Use <span> tags for gradient text: 'Our Vision for a <span>Better Digital Future</span>'
+   */
+  heading: string;
+  /**
+   * Choose background color scheme for the section
+   */
+  backgroundColorScheme: 'dark' | 'light' | 'neutral';
+  /**
+   * Control the width ratio between heading and content columns
+   */
+  ratio: '1/2' | '1/1' | '2/1';
+  /**
+   * Rich text content to display in the right column
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'heading-left-content';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "SimpleTextBlock".
  */
 export interface SimpleTextBlock {
@@ -1698,6 +1738,7 @@ export interface PagesSelect<T extends boolean = true> {
         'globe-locations'?: T | GlobeLocationsBlockSelect<T>;
         'contact-form'?: T | ContactFormBlockSelect<T>;
         'cta-form'?: T | CtaFormBlockSelect<T>;
+        'heading-left-content'?: T | HeadingLeftContentBlockSelect<T>;
         'simple-text'?: T | SimpleTextBlockSelect<T>;
       };
   meta?:
@@ -1983,6 +2024,18 @@ export interface CtaFormBlockSelect<T extends boolean = true> {
   variant?: T;
   backgroundImage?: T;
   form?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeadingLeftContentBlock_select".
+ */
+export interface HeadingLeftContentBlockSelect<T extends boolean = true> {
+  heading?: T;
+  backgroundColorScheme?: T;
+  ratio?: T;
+  content?: T;
   id?: T;
   blockName?: T;
 }
