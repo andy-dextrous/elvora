@@ -19,7 +19,6 @@ const collections: CollectionConfig[] = [
   Media,
   Categories,
   Users,
-  // Menus,
 ]
 
 export default collections

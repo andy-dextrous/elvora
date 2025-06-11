@@ -6,9 +6,10 @@ import { PostHero } from "@/components/posts/post-hero"
 import { getPostBySlug, getPosts, getRelatedPosts } from "@/lib/queries/post"
 import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { generateMeta } from "@/utilities/generateMeta"
-import { getCurrentUser } from "@/lib/queries/user"
-import { cn } from "@/utilities/ui"
 import { FullwidthCtaComponent } from "@/components/sections/fullwidth-cta/Component"
+
+export const dynamic = "force-static"
+export const revalidate = 600
 
 /*************************************************************************/
 /*  INDIVIDUAL BLOG POST PAGE COMPONENT
@@ -54,7 +55,6 @@ export default async function Post({ params: paramsPromise }: Args) {
     >
       <PayloadRedirects disableNotFound url={url} />
       {draft && <LivePreviewListener />}
-
       <PostHero post={post} />
       <PostBody post={post} relatedPosts={relatedPosts} />
       <FullwidthCtaComponent

@@ -10,9 +10,8 @@ import { getPayload } from "payload"
 import React from "react"
 import { notFound } from "next/navigation"
 import { getSettings } from "@/lib/queries/globals"
-import { getCurrentUser } from "@/lib/queries/user"
-import { cn } from "@/utilities/ui"
 
+export const dynamic = "force-static"
 export const revalidate = 600
 
 /*************************************************************************/
