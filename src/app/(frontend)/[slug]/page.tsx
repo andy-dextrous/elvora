@@ -17,7 +17,7 @@ type Args = {
 }
 
 export default async function Page({ params: paramsPromise }: Args) {
-  const [{ isEnabled: draft }, user] = await Promise.all([draftMode(), getCurrentUser()])
+  const [{ isEnabled: draft }] = await Promise.all([draftMode()])
 
   const { slug = "" } = await paramsPromise
   const url = "/" + slug
