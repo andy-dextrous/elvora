@@ -28,7 +28,6 @@ type Args = {
 export default async function Page({ params: paramsPromise }: Args) {
   const { pageNumber } = await paramsPromise
   const payload = await getPayload({ config: configPromise })
-  const user = await getCurrentUser()
 
   const sanitizedPageNumber = Number(pageNumber)
 
@@ -52,7 +51,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   })
 
   return (
-    <main className={cn(user ? "relative !mt-[32px]" : "")}>
+    <main>
       <section className="bg-dark side-border-light flicker-mask-top">
         <SectionIntro
           heading="Latest <span>Articles</span>"

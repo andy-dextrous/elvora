@@ -24,8 +24,8 @@ export default async function Post({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = "" } = await paramsPromise
   const url = "/blog/" + slug
+
   const post = await getPostBySlug({ slug })
-  const user = await getCurrentUser()
 
   if (!post) return <PayloadRedirects url={url} />
 

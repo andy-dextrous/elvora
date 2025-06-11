@@ -1,15 +1,12 @@
 import type { Metadata } from "next/types"
 
-import { SectionIntro } from "@/components/layout/section-intro"
 import { SectionCta } from "@/components/layout/section-cta"
+import { SectionIntro } from "@/components/layout/section-intro"
 import { PostCard } from "@/components/posts/post-card"
 import { PageRange } from "@/payload/components/frontend/page-range"
 import { Pagination } from "@/payload/components/frontend/pagination"
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
-import React from "react"
-import { cn } from "@/utilities/ui"
-import { getCurrentUser } from "@/lib/queries/user"
 
 export const dynamic = "force-static"
 export const revalidate = 600
@@ -20,7 +17,6 @@ export const revalidate = 600
 
 export default async function Page() {
   const payload = await getPayload({ config: configPromise })
-  const user = await getCurrentUser()
 
   const posts =
     (await payload.find({
@@ -40,7 +36,7 @@ export default async function Page() {
     })) || []
 
   return (
-    <main className={cn(user ? "relative !mt-[32px]" : "")}>
+    <main>
       <section className="bg-dark side-border-light flicker-mask-top py-first-section-nav-offset">
         <SectionIntro
           heading="Latest <span>Articles</span>"
