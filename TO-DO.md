@@ -6,3 +6,4 @@
 - Easy opt in for collections in sitemap
 - Proper metadata and page-level SEO controls
 - Rebuild telephone component and restore smooth
+- Resolve headers - draftmode permanent loading states

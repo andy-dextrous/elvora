@@ -8,7 +8,6 @@ import { Pagination } from "@/payload/components/frontend/pagination"
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
 
-export const dynamic = "force-static"
 export const revalidate = 600
 
 /*************************************************************************/
