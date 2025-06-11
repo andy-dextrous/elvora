@@ -58,10 +58,12 @@ if (canUseDOM && wildChildConfig.gsap) {
 
 interface GSAPContextType {
   smootherInstance: ScrollSmoother | null
+  scrollToTop: () => void
 }
 
 const GSAPContext = createContext<GSAPContextType>({
   smootherInstance: null,
+  scrollToTop: () => {},
 })
 
 /****************************************************
@@ -74,6 +76,18 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname()
   const [smootherInstance, setSmootherInstance] = useState<ScrollSmoother | null>(null)
 
+  /*************************************************************************/
+  /*  SCROLL TO TOP UTILITY FUNCTION
+  /*************************************************************************/
+
+  const scrollToTop = () => {
+    if (smootherInstance) {
+      smootherInstance.scrollTo(0, true)
+    } else if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }
+
   useGSAP(
     () => {
       if (wildChildConfig.smoothScroll && !omittedPaths.includes(pathname)) {
@@ -83,6 +97,9 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
           normalizeScroll: true,
         })
         setSmootherInstance(smoother)
+
+        // Scroll to top on route change
+        smoother.scrollTo(0, true)
 
         return () => {
           smoother?.kill()
@@ -102,6 +119,8 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (smootherInstance) {
         smootherInstance.refresh()
+        // Also scroll to top when refreshing
+        smootherInstance.scrollTo(0, false)
       }
     },
     {
@@ -111,7 +130,9 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
   )
 
   return wildChildConfig.smoothScroll ? (
-    <GSAPContext.Provider value={{ smootherInstance }}>{children}</GSAPContext.Provider>
+    <GSAPContext.Provider value={{ smootherInstance, scrollToTop }}>
+      {children}
+    </GSAPContext.Provider>
   ) : (
     children
   )
@@ -119,6 +140,15 @@ const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useSmoothContext = () => {
   return useContext(GSAPContext)
+}
+
+/*************************************************************************/
+/*  SCROLL TO TOP HOOK
+/*************************************************************************/
+
+export const useScrollToTop = () => {
+  const { scrollToTop } = useContext(GSAPContext)
+  return scrollToTop
 }
 
 export default SmoothScrollProvider

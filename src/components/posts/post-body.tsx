@@ -9,7 +9,13 @@ import { PostBreadcrumbs } from "./post-breadcrumbs"
 /*  POST BODY COMPONENT
 /*************************************************************************/
 
-export default function PostBody({ post }: { post: Post }) {
+export default function PostBody({
+  post,
+  relatedPosts,
+}: {
+  post: Post
+  relatedPosts?: Post[]
+}) {
   return (
     <article>
       <section className="bg-dark border-light-border side-border-light z-50 translate-y-[-3px] border-t">
@@ -26,15 +32,13 @@ export default function PostBody({ post }: { post: Post }) {
           <PostAuthorInfo post={post} />
         </div>
       </section>
-      {post.relatedPosts && post.relatedPosts.length > 0 && (
+      {relatedPosts && relatedPosts.length > 0 && (
         <section className="bg-dark side-border-light flicker-mask-top border-light-border border-t">
           <SectionIntro
             heading="<span>Related</span> Posts"
             headingClassName="text-white"
           />
-          <RelatedPosts
-            docs={post.relatedPosts.filter(post => typeof post === "object")}
-          />
+          <RelatedPosts docs={relatedPosts} />
         </section>
       )}
     </article>

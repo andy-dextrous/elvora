@@ -3,7 +3,7 @@ import { PayloadRedirects } from "@/payload/components/frontend/payload-redirect
 import { draftMode } from "next/headers"
 import PostBody from "@/components/posts/post-body"
 import { PostHero } from "@/components/posts/post-hero"
-import { getPostBySlug, getPosts } from "@/lib/queries/post"
+import { getPostBySlug, getPosts, getRelatedPosts } from "@/lib/queries/post"
 import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { generateMeta } from "@/utilities/generateMeta"
 import { getCurrentUser } from "@/lib/queries/user"
@@ -29,6 +29,22 @@ export default async function Post({ params: paramsPromise }: Args) {
 
   if (!post) return <PayloadRedirects url={url} />
 
+  // Get related posts based on the post's categories
+  const categoryIds = post.categories
+    ? post.categories
+        .filter(cat => typeof cat === "object" && cat !== null)
+        .map(cat => (typeof cat === "object" ? cat.id : cat))
+        .filter(Boolean)
+    : []
+
+  const relatedPosts =
+    categoryIds.length > 0
+      ? await getRelatedPosts({
+          categories: categoryIds,
+          currentPostId: post.id,
+        })
+      : []
+
   return (
     <main
       data-collection="posts"
@@ -40,7 +56,7 @@ export default async function Post({ params: paramsPromise }: Args) {
       {draft && <LivePreviewListener />}
 
       <PostHero post={post} />
-      <PostBody post={post} />
+      <PostBody post={post} relatedPosts={relatedPosts} />
       <FullwidthCtaComponent
         heading="See the Difference in Minutes"
         description="Watch a fast demo and see how intelligent automation transforms your workflow: less effort, more results."
