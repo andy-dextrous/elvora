@@ -701,26 +701,43 @@ export interface HeroPrimaryBlock {
 export interface Service {
   id: string;
   title: string;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
+  /**
+   * Brief description of the service
+   */
+  description?: string | null;
+  publishedAt?: string | null;
+  featuredImage?: (string | null) | Media;
+  sections: (
+    | HeroPrimaryBlock
+    | HeroFullBlock
+    | TextImageBlock
+    | CirclesAnimationBlock
+    | ServiceCardsListBlock
+    | TestimonialsBlock
+    | InfoGridBlock
+    | LatestArticlesBlock
+    | FullwidthCtaBlock
+    | GlobeLocationsBlock
+    | ContactFormBlock
+    | CtaFormBlock
+    | HeadingLeftContentBlock
+    | SimpleTextBlock
+  )[];
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+    noIndex?: boolean | null;
+    canonicalUrl?: string | null;
   };
-  heroImage?: (string | null) | Media;
   slug?: string | null;
   slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1483,9 +1500,9 @@ export interface Template {
     | SimpleTextBlock
   )[];
   /**
-   * Use as default template for applicable collections
+   * Set this template as the default for selected collections
    */
-  isDefault?: boolean | null;
+  defaultForCollections?: ('pages' | 'services')[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2155,12 +2172,41 @@ export interface TeamSelect<T extends boolean = true> {
  */
 export interface ServicesSelect<T extends boolean = true> {
   title?: T;
-  content?: T;
-  heroImage?: T;
+  description?: T;
+  publishedAt?: T;
+  featuredImage?: T;
+  sections?:
+    | T
+    | {
+        'hero-primary'?: T | HeroPrimaryBlockSelect<T>;
+        'hero-full'?: T | HeroFullBlockSelect<T>;
+        'text-image'?: T | TextImageBlockSelect<T>;
+        'circles-animation'?: T | CirclesAnimationBlockSelect<T>;
+        'service-cards-list'?: T | ServiceCardsListBlockSelect<T>;
+        testimonials?: T | TestimonialsBlockSelect<T>;
+        'info-grid'?: T | InfoGridBlockSelect<T>;
+        'latest-articles'?: T | LatestArticlesBlockSelect<T>;
+        'fullwidth-cta'?: T | FullwidthCtaBlockSelect<T>;
+        'globe-locations'?: T | GlobeLocationsBlockSelect<T>;
+        'contact-form'?: T | ContactFormBlockSelect<T>;
+        'cta-form'?: T | CtaFormBlockSelect<T>;
+        'heading-left-content'?: T | HeadingLeftContentBlockSelect<T>;
+        'simple-text'?: T | SimpleTextBlockSelect<T>;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+        noIndex?: T;
+        canonicalUrl?: T;
+      };
   slug?: T;
   slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2202,7 +2248,7 @@ export interface TemplatesSelect<T extends boolean = true> {
         'heading-left-content'?: T | HeadingLeftContentBlockSelect<T>;
         'simple-text'?: T | SimpleTextBlockSelect<T>;
       };
-  isDefault?: T;
+  defaultForCollections?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3017,6 +3063,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'posts';
           value: string | Post;
+        } | null)
+      | ({
+          relationTo: 'services';
+          value: string | Service;
         } | null);
     global?: string | null;
     user?: (string | null) | User;

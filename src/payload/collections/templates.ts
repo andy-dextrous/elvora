@@ -14,7 +14,13 @@ export const Templates: CollectionConfig<"templates"> = {
   },
   admin: {
     useAsTitle: "name",
-    defaultColumns: ["name", "description", "applicableCollections", "updatedAt"],
+    defaultColumns: [
+      "name",
+      "description",
+      "applicableCollections",
+      "defaultForCollections",
+      "updatedAt",
+    ],
     group: "Content Management",
   },
   fields: [
@@ -56,11 +62,36 @@ export const Templates: CollectionConfig<"templates"> = {
       },
     },
     {
-      name: "isDefault",
-      type: "checkbox",
-      defaultValue: false,
+      name: "defaultForCollections",
+      label: "Default Template For",
+      type: "select",
+      hasMany: true,
+      options: [
+        { label: "Pages", value: "pages" },
+        { label: "Services", value: "services" },
+      ],
       admin: {
-        description: "Use as default template for applicable collections",
+        description: "Set this template as the default for selected collections",
+        condition: (data, siblingData) => {
+          // Only show if applicableCollections has values
+          return siblingData?.applicableCollections?.length > 0
+        },
+      },
+      validate: (value, { siblingData }) => {
+        // Ensure defaultForCollections is a subset of applicableCollections
+        if (value && value.length > 0 && siblingData) {
+          const applicable = (siblingData as any)?.applicableCollections as string[]
+          if (applicable) {
+            const invalidDefaults = value.filter(
+              (collection: string) => !applicable.includes(collection)
+            )
+
+            if (invalidDefaults.length > 0) {
+              return `Cannot set as default for collections that are not applicable: ${invalidDefaults.join(", ")}`
+            }
+          }
+        }
+        return true
       },
     },
   ],

@@ -147,7 +147,7 @@ export const Pages: CollectionConfig<"pages"> = {
       admin: {
         position: "sidebar",
         components: {
-          Field: "@/payload/components/backend/template-control-button/ui-field",
+          Field: "@/payload/components/backend/assign-template",
         },
       },
     },
