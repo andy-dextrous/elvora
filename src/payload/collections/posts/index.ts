@@ -48,7 +48,6 @@ export const Posts: CollectionConfig<"posts"> = {
       "featuredImage",
       "slug",
       "updatedAt",
-      "id",
       "categories",
       "status",
     ],
@@ -120,6 +119,7 @@ export const Posts: CollectionConfig<"posts"> = {
         return query
       },
       hasMany: true,
+      maxDepth: 2,
       relationTo: "posts",
     },
     {

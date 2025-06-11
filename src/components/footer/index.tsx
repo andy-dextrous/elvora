@@ -28,7 +28,7 @@ export async function Footer() {
   const settings = settingsData as Setting
 
   return (
-    <footer className="bg-dark side-border-light flicker-mask border-light-border relative min-h-[60vh] overflow-hidden border-t">
+    <footer className="bg-dark side-border-light flicker-mask-top border-light-border relative min-h-[60vh] overflow-hidden border-t">
       <div
         className="absolute right-[-150px] bottom-[30%] z-10 h-[80vh] w-auto lg:bottom-[-100px]"
         data-speed="0.8"

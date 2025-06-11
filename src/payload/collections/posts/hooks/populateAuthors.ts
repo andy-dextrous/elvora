@@ -18,22 +18,27 @@ export const populateAuthors: CollectionAfterReadHook = async ({
         const authorDoc = await payload.findByID({
           id: typeof author === "object" ? author?.id : author,
           collection: "users",
-          depth: 0,
+          depth: 2,
+          overrideAccess: true,
         })
 
         if (authorDoc) {
           authorDocs.push(authorDoc)
         }
-
-        if (authorDocs.length > 0) {
-          doc.populatedAuthors = authorDocs.map(authorDoc => ({
-            id: authorDoc.id,
-            name: authorDoc.name,
-          }))
-        }
       } catch {
         // swallow error
       }
+    }
+
+    if (authorDocs.length > 0) {
+      // Populate the full author data for frontend use
+      doc.authors = authorDocs
+
+      // Also maintain the limited populatedAuthors field for backward compatibility
+      doc.populatedAuthors = authorDocs.map(authorDoc => ({
+        id: authorDoc.id,
+        name: authorDoc.name,
+      }))
     }
   }
 

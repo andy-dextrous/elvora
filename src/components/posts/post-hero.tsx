@@ -15,7 +15,7 @@ import { cn } from "@/utilities/ui"
  ****************************************************/
 
 const postHeroVariants = tv({
-  base: "pt-first-section-nav-offset relative flex min-h-[80vh] w-full flex-col justify-center overflow-hidden border-b",
+  base: "pt-first-section-nav-offset flicker-mask-bottom relative z-20 flex min-h-[80vh] w-full flex-col justify-center overflow-hidden",
   variants: {
     hasBackground: {
       true: "bg-dark border-light-border",
@@ -171,36 +171,28 @@ export const PostHero: React.FC<{
       {/*  BACKGROUND IMAGE                                                     */}
       {/*************************************************************************/}
 
-      <div ref={backgroundContainerRef} className="absolute inset-0 z-0 overflow-hidden">
+      <div ref={backgroundContainerRef} className="absolute inset-0 z-10 overflow-hidden">
         <div className="relative h-full w-full">
-          {/* Top Down Fade */}
+          {/* Dark Gradient */}
           <div
             className={cn(
               // Base styles
               "absolute inset-0 z-10",
-              // Mobile
+              // Gradient
               "from-dark-950 to-dark-950 via-dark/20 bg-gradient-to-b via-50% to-100%"
             )}
           />
 
           {/* Background Image */}
           <div
-            className="absolute inset-x-0 bottom-0 size-full"
+            className="absolute inset-0 z-0 size-full"
             data-id="post-hero-background-image"
           >
             <Media
               resource={heroImage as MediaType}
-              alt={title}
               fill
               priority
-              imgClassName={cn(
-                // Base styles
-                "absolute inset-0 h-full w-full object-cover",
-                // Mobile
-                "object-[50%_50%]",
-                // Desktop
-                "lg:object-[80%_50%]"
-              )}
+              imgClassName="absolute size-full inset-0 object-cover"
             />
           </div>
 
@@ -213,7 +205,7 @@ export const PostHero: React.FC<{
               // Mobile
               "bg-primary/30",
               // Desktop
-              "lg:bg-primary/60"
+              "lg:bg-primary/30"
             )}
           />
 
@@ -226,7 +218,7 @@ export const PostHero: React.FC<{
               // Mobile
               "bg-secondary/30",
               // Desktop
-              "lg:bg-secondary/40"
+              "lg:bg-secondary/20"
             )}
           />
         </div>

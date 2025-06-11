@@ -84,7 +84,7 @@
 
   /* Prevents flickering when using scroll smoother over dark sections*/
 
-  .flicker-mask {
+  .flicker-mask-top {
     &::after {
       content: "";
       position: absolute;
@@ -95,6 +95,20 @@
       background-color: theme(colors.dark.950);
       pointer-events: none;
       z-index: -10;
+    }
+  }
+
+  .flicker-mask-bottom {
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background-color: theme(colors.dark.950);
+      pointer-events: none;
+      z-index: 50;
     }
   }
 }

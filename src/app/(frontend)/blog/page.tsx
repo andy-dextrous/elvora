@@ -41,7 +41,7 @@ export default async function Page() {
 
   return (
     <main className={cn(user ? "relative !mt-[32px]" : "")}>
-      <section className="bg-dark side-border-light flicker-mask py-first-section-nav-offset">
+      <section className="bg-dark side-border-light flicker-mask-top py-first-section-nav-offset">
         <SectionIntro
           heading="Latest <span>Articles</span>"
           headingClassName="text-white"

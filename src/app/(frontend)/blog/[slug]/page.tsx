@@ -34,7 +34,7 @@ export default async function Post({ params: paramsPromise }: Args) {
       data-collection="posts"
       data-single-type="post"
       data-id={post.id}
-      className={cn(user ? "relative !mt-[32px]" : "")}
+      className={cn("bg-dark-950", user ? "relative !mt-[32px]" : "")}
     >
       <PayloadRedirects disableNotFound url={url} />
       {draft && <LivePreviewListener />}

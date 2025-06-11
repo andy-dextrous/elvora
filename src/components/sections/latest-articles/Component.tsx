@@ -15,7 +15,7 @@ export const LatestArticlesComponent: React.FC<LatestArticlesBlock> = async prop
   const posts = await getRecentPosts()
 
   return (
-    <section className="bg-dark side-border-light flicker-mask">
+    <section className="bg-dark side-border-light flicker-mask-top">
       <SectionIntro
         heading={heading || undefined}
         description={description}

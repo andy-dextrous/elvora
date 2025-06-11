@@ -53,7 +53,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   return (
     <main className={cn(user ? "relative !mt-[32px]" : "")}>
-      <section className="bg-dark side-border-light flicker-mask">
+      <section className="bg-dark side-border-light flicker-mask-top">
         <SectionIntro
           heading="Latest <span>Articles</span>"
           description={[

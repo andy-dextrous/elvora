@@ -16,9 +16,9 @@ async function getPostBySlugInternal({ slug }: { slug: string }) {
   const result = await payload.find({
     collection: "posts",
     draft,
-    depth: 5,
+    depth: 2,
     limit: 1,
-    overrideAccess: draft,
+    overrideAccess: true,
     pagination: false,
     where: {
       slug: {

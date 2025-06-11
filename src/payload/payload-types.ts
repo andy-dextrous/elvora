@@ -612,6 +612,17 @@ export interface User {
   role: 'admin' | 'editor';
   avatar?: (string | null) | Media;
   bio?: string | null;
+  /**
+   * Add educational qualifications and certifications
+   */
+  education?:
+    | {
+        degree: string;
+        institution?: string | null;
+        year?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   socialLinks?:
     | {
         platform?:
@@ -2187,6 +2198,14 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T;
   avatar?: T;
   bio?: T;
+  education?:
+    | T
+    | {
+        degree?: T;
+        institution?: T;
+        year?: T;
+        id?: T;
+      };
   socialLinks?:
     | T
     | {
