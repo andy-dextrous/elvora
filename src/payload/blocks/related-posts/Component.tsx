@@ -19,29 +19,19 @@ export const RelatedPosts: React.FC<RelatedPostsProps> = props => {
   const { className, docs, introContent } = props
 
   return (
-    <div className={clsx("lg:container", className)}>
-      {introContent && (
-        <div className="container-sm mb-section-sm">
-          <RichText data={introContent} enableGutter={false} />
-        </div>
-      )}
+    <div className={clsx("container-md", className)}>
+      <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-8">
+        {docs?.map((doc, index) => {
+          if (typeof doc === "string") return null
 
-      <div className="border-dark-border w-full border-t">
-        <div className="py-section-md md:container-md">
-          <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:gap-8">
-            {docs?.map((doc, index) => {
-              if (typeof doc === "string") return null
-
-              return (
-                <PostCard
-                  key={index}
-                  post={doc}
-                  className="border-x-none border-y md:border-x"
-                />
-              )
-            })}
-          </div>
-        </div>
+          return (
+            <PostCard
+              key={index}
+              post={doc}
+              className="border-x-none border-y md:border-x"
+            />
+          )
+        })}
       </div>
     </div>
   )

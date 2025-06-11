@@ -3,6 +3,7 @@ import RichText from "@/payload/components/frontend/rich-text"
 import { Post } from "@/payload/payload-types"
 import { Fragment } from "react"
 import { PostBreadcrumbs } from "./post-breadcrumbs"
+import { SectionIntro } from "../layout/section-intro"
 
 /*************************************************************************/
 /*  POST BODY COMPONENT
@@ -23,15 +24,18 @@ export default function PostBody({ post }: { post: Post }) {
             />
           )}
         </div>
-
-        {post.relatedPosts && post.relatedPosts.length > 0 && (
-          <div className="mt-section-lg">
-            <RelatedPosts
-              docs={post.relatedPosts.filter(post => typeof post === "object")}
-            />
-          </div>
-        )}
       </section>
+      {post.relatedPosts && post.relatedPosts.length > 0 && (
+        <section className="bg-dark side-border-light flicker-mask border-light-border border-t">
+          <SectionIntro
+            heading="<span>Related</span> Posts"
+            headingClassName="text-white"
+          />
+          <RelatedPosts
+            docs={post.relatedPosts.filter(post => typeof post === "object")}
+          />
+        </section>
+      )}
     </article>
   )
 }
