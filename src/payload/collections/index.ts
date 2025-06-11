@@ -6,6 +6,7 @@ import { Categories } from "@/payload/collections/categories"
 import { Team } from "@/payload/collections/team"
 import { Services } from "@/payload/collections/services"
 import { Testimonials } from "@/payload/collections/testimonials"
+import { Templates } from "@/payload/collections/templates"
 import { CollectionConfig } from "payload"
 
 const collections: CollectionConfig[] = [
@@ -14,6 +15,7 @@ const collections: CollectionConfig[] = [
   Team,
   Services,
   Testimonials,
+  Templates,
   Media,
   Categories,
   Users,

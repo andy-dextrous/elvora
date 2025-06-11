@@ -7,6 +7,7 @@ import { slugField } from "@/payload/fields/slug"
 import { populatePublishedAt } from "@/payload/hooks/populatePublishedAt"
 import { generatePreviewPath } from "@/utilities/generatePreviewPath"
 import { revalidateDelete, revalidatePage } from "./hooks/revalidatePage"
+import { applyDefaultTemplate } from "./hooks/applyDefaultTemplate"
 
 import {
   MetaDescriptionField,
@@ -16,7 +17,6 @@ import {
   PreviewField,
 } from "@payloadcms/plugin-seo/fields"
 import { lockSlugAfterPublish } from "./hooks/lockSlug"
-// import { assignTemplate } from "./hooks/assignTemplate"
 
 export const Pages: CollectionConfig<"pages"> = {
   slug: "pages",
@@ -140,10 +140,21 @@ export const Pages: CollectionConfig<"pages"> = {
     },
 
     ...slugField(),
+    {
+      name: "templateControl",
+      type: "ui",
+      label: "Apply Template",
+      admin: {
+        position: "sidebar",
+        components: {
+          Field: "@/payload/components/backend/template-control-button/ui-field",
+        },
+      },
+    },
   ],
   hooks: {
     afterChange: [revalidatePage],
-    beforeChange: [populatePublishedAt],
+    beforeChange: [populatePublishedAt, applyDefaultTemplate],
     afterDelete: [revalidateDelete],
     beforeOperation: [lockSlugAfterPublish],
   },

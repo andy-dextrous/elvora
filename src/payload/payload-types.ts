@@ -76,6 +76,7 @@ export interface Config {
     team: Team;
     services: Service;
     testimonials: Testimonial;
+    templates: Template;
     media: Media;
     categories: Category;
     users: User;
@@ -99,6 +100,7 @@ export interface Config {
     team: TeamSelect<false> | TeamSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    templates: TemplatesSelect<false> | TemplatesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -1445,6 +1447,50 @@ export interface Team {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "templates".
+ */
+export interface Template {
+  id: string;
+  /**
+   * Template name (e.g. 'Service Page', 'Product Landing')
+   */
+  name: string;
+  /**
+   * What this template is used for
+   */
+  description?: string | null;
+  /**
+   * Which content types can use this template
+   */
+  applicableCollections?: ('pages' | 'services')[] | null;
+  /**
+   * Pre-configured sections with default content
+   */
+  sections: (
+    | HeroPrimaryBlock
+    | HeroFullBlock
+    | TextImageBlock
+    | CirclesAnimationBlock
+    | ServiceCardsListBlock
+    | TestimonialsBlock
+    | InfoGridBlock
+    | LatestArticlesBlock
+    | FullwidthCtaBlock
+    | GlobeLocationsBlock
+    | ContactFormBlock
+    | CtaFormBlock
+    | HeadingLeftContentBlock
+    | SimpleTextBlock
+  )[];
+  /**
+   * Use as default template for applicable collections
+   */
+  isDefault?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1640,6 +1686,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'testimonials';
         value: string | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'templates';
+        value: string | Template;
       } | null)
     | ({
         relationTo: 'media';
@@ -2123,6 +2173,36 @@ export interface TestimonialsSelect<T extends boolean = true> {
   company?: T;
   companyLogo?: T;
   featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "templates_select".
+ */
+export interface TemplatesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  applicableCollections?: T;
+  sections?:
+    | T
+    | {
+        'hero-primary'?: T | HeroPrimaryBlockSelect<T>;
+        'hero-full'?: T | HeroFullBlockSelect<T>;
+        'text-image'?: T | TextImageBlockSelect<T>;
+        'circles-animation'?: T | CirclesAnimationBlockSelect<T>;
+        'service-cards-list'?: T | ServiceCardsListBlockSelect<T>;
+        testimonials?: T | TestimonialsBlockSelect<T>;
+        'info-grid'?: T | InfoGridBlockSelect<T>;
+        'latest-articles'?: T | LatestArticlesBlockSelect<T>;
+        'fullwidth-cta'?: T | FullwidthCtaBlockSelect<T>;
+        'globe-locations'?: T | GlobeLocationsBlockSelect<T>;
+        'contact-form'?: T | ContactFormBlockSelect<T>;
+        'cta-form'?: T | CtaFormBlockSelect<T>;
+        'heading-left-content'?: T | HeadingLeftContentBlockSelect<T>;
+        'simple-text'?: T | SimpleTextBlockSelect<T>;
+      };
+  isDefault?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -28,6 +28,7 @@ import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { SlugComponent as SlugComponent_06f5ecd34cec23977f48ef7f3504e5cd } from '@/payload/fields/slug/slug-component'
+import { default as default_5b0cb91ecac9825caddaa87ce74ec107 } from '@/payload/components/backend/template-control-button/ui-field'
 import { LinkToDoc as LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from '@payloadcms/plugin-search/client'
 import { RowLabel as RowLabel_ac590f04e7b67b0cd330fd91c828079e } from '@/payload/globals/header/row-label'
@@ -73,6 +74,7 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@/payload/fields/slug/slug-component#SlugComponent": SlugComponent_06f5ecd34cec23977f48ef7f3504e5cd,
+  "@/payload/components/backend/template-control-button/ui-field#default": default_5b0cb91ecac9825caddaa87ce74ec107,
   "@payloadcms/plugin-search/client#LinkToDoc": LinkToDoc_aead06e4cbf6b2620c5c51c9ab283634,
   "@payloadcms/plugin-search/client#ReindexButton": ReindexButton_aead06e4cbf6b2620c5c51c9ab283634,
   "@/payload/globals/header/row-label#RowLabel": RowLabel_ac590f04e7b67b0cd330fd91c828079e,
