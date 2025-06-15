@@ -21,7 +21,6 @@ export const Templates: CollectionConfig<"templates"> = {
       "defaultForCollections",
       "updatedAt",
     ],
-    group: "Content Management",
   },
   fields: [
     {

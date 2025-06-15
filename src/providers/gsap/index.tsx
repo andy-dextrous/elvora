@@ -70,7 +70,7 @@ const GSAPContext = createContext<GSAPContextType>({
  * Smooth Scroll Provider
  ****************************************************/
 
-const omittedPaths = ["/contact"]
+const omittedPaths = [] as string[]
 
 const SmoothScrollProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname()
