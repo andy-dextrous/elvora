@@ -30,6 +30,17 @@
     -webkit-background-clip: text;
     color: transparent;
   }
+
+  .text-gradient-hover:hover {
+    background: linear-gradient(
+      to right,
+      theme(colors.secondary-600),
+      theme(colors.primary-500)
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
 }
 
 /* Sitewide Typography Customizations */
