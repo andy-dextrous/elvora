@@ -48,7 +48,7 @@ const NavItem: React.FC<{ link: NavItemLink }> = ({ link }) => {
   return (
     <li className="relative block">
       <CMSLink
-        className="mx-1 flex h-10 cursor-pointer items-center px-4 text-sm leading-10 !font-light text-white uppercase no-underline transition-colors duration-100"
+        className="text-gradient-hover mx-1 flex h-10 cursor-pointer items-center px-4 text-sm leading-10 !font-light text-white uppercase no-underline transition-colors duration-100"
         {...link}
       >
         {link?.label}
@@ -68,7 +68,7 @@ const NavItemWithDropdown: React.FC<{
     <li className="group relative block">
       <CMSLink
         {...item?.link}
-        className="mx-1 flex h-10 cursor-pointer items-center px-4 text-sm leading-10 !font-light text-white uppercase no-underline transition-colors duration-100"
+        className="text-gradient-hover mx-1 flex h-10 cursor-pointer items-center px-4 text-sm leading-10 !font-light text-white uppercase no-underline transition-colors duration-100"
       >
         <span>{item?.link?.label}</span>
         <ChevronDown className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
