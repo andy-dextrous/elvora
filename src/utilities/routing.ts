@@ -24,10 +24,56 @@ export function getFrontendCollections(): Array<{
 }
 
 /*************************************************************************/
-/*  GENERATE DYNAMIC ROUTING FIELDS FOR SETTINGS
+/*  GET EFFECTIVE COLLECTION SLUG (CUSTOM OR DEFAULT)
 /*************************************************************************/
 
-export function generateRoutingFields(): Field[] {
+export function getEffectiveCollectionSlug(
+  collectionSlug: string,
+  settings?: any
+): string {
+  if (!settings?.routing) {
+    return collectionSlug
+  }
+
+  const customSlugField = `${collectionSlug}CustomSlug`
+  const customSlug = settings.routing[customSlugField]
+
+  // Return custom slug if set, otherwise fallback to original
+  return customSlug && customSlug.trim() !== "" ? customSlug : collectionSlug
+}
+
+/*************************************************************************/
+/*  GENERATE READING SETTINGS FIELDS
+/*************************************************************************/
+
+export function generateReadingSettingsFields(): Field[] {
+  return [
+    {
+      name: "homepage",
+      type: "relationship",
+      relationTo: "pages",
+      label: "Homepage",
+      admin: {
+        description: "Choose which page displays as your site's front page",
+      },
+    },
+    {
+      name: "postsPage",
+      type: "relationship",
+      relationTo: "pages",
+      label: "Posts Page",
+      admin: {
+        description: "Choose which page displays your blog posts",
+      },
+    },
+  ]
+}
+
+/*************************************************************************/
+/*  GENERATE COLLECTION ROUTING FIELDS
+/*************************************************************************/
+
+export function generateCollectionRoutingFields(): Field[] {
   const frontendCollections = getFrontendCollections()
 
   const fields: Field[] = frontendCollections.map(collection => {
@@ -44,6 +90,15 @@ export function generateRoutingFields(): Field[] {
             hidden: true,
           },
           label: "Collection",
+        },
+        {
+          name: `${collection.slug}CustomSlug`,
+          type: "text",
+          label: `Collection Slug -> /${collection.slug}/post-name`,
+          defaultValue: collection.slug,
+          admin: {
+            placeholder: collection.slug,
+          },
         },
         {
           name: `${collection.slug}ArchivePage`,
@@ -78,4 +133,12 @@ export function generateRoutingFields(): Field[] {
       fields,
     },
   ]
+}
+
+/*************************************************************************/
+/*  GENERATE ALL ROUTING FIELDS
+/*************************************************************************/
+
+export function generateRoutingFields(): Field[] {
+  return [...generateReadingSettingsFields(), ...generateCollectionRoutingFields()]
 }

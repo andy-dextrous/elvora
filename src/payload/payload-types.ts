@@ -2890,23 +2890,36 @@ export interface Setting {
       | null;
   };
   routing?: {
+    /**
+     * Choose which page displays as your site's front page
+     */
+    homepage?: (string | null) | Page;
+    /**
+     * Choose which page displays your blog posts
+     */
+    postsPage?: (string | null) | Page;
     postsCollectionLabel?: string | null;
+    postsCustomSlug?: string | null;
     postsArchivePage?: (string | null) | Page;
     postsArchiveTemplate?: (string | null) | Template;
     postsSingleTemplate?: (string | null) | Template;
     teamCollectionLabel?: string | null;
+    teamCustomSlug?: string | null;
     teamArchivePage?: (string | null) | Page;
     teamArchiveTemplate?: (string | null) | Template;
     teamSingleTemplate?: (string | null) | Template;
     servicesCollectionLabel?: string | null;
+    servicesCustomSlug?: string | null;
     servicesArchivePage?: (string | null) | Page;
     servicesArchiveTemplate?: (string | null) | Template;
     servicesSingleTemplate?: (string | null) | Template;
     testimonialsCollectionLabel?: string | null;
+    testimonialsCustomSlug?: string | null;
     testimonialsArchivePage?: (string | null) | Page;
     testimonialsArchiveTemplate?: (string | null) | Template;
     testimonialsSingleTemplate?: (string | null) | Template;
     categoriesCollectionLabel?: string | null;
+    categoriesCustomSlug?: string | null;
     categoriesArchivePage?: (string | null) | Page;
     categoriesArchiveTemplate?: (string | null) | Template;
     categoriesSingleTemplate?: (string | null) | Template;
@@ -3068,23 +3081,30 @@ export interface SettingsSelect<T extends boolean = true> {
   routing?:
     | T
     | {
+        homepage?: T;
+        postsPage?: T;
         postsCollectionLabel?: T;
+        postsCustomSlug?: T;
         postsArchivePage?: T;
         postsArchiveTemplate?: T;
         postsSingleTemplate?: T;
         teamCollectionLabel?: T;
+        teamCustomSlug?: T;
         teamArchivePage?: T;
         teamArchiveTemplate?: T;
         teamSingleTemplate?: T;
         servicesCollectionLabel?: T;
+        servicesCustomSlug?: T;
         servicesArchivePage?: T;
         servicesArchiveTemplate?: T;
         servicesSingleTemplate?: T;
         testimonialsCollectionLabel?: T;
+        testimonialsCustomSlug?: T;
         testimonialsArchivePage?: T;
         testimonialsArchiveTemplate?: T;
         testimonialsSingleTemplate?: T;
         categoriesCollectionLabel?: T;
+        categoriesCustomSlug?: T;
         categoriesArchivePage?: T;
         categoriesArchiveTemplate?: T;
         categoriesSingleTemplate?: T;
