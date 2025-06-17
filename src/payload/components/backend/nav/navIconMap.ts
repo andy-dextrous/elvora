@@ -5,7 +5,9 @@ import { IoIosDocument } from "react-icons/io"
 import { IoDocumentsSharp, IoSettings } from "react-icons/io5"
 import { HiTemplate } from "react-icons/hi"
 import { IconType } from "react-icons/lib"
+
 import {
+  MdReviews,
   MdBorderBottom,
   MdBorderTop,
   MdBusinessCenter,
@@ -32,6 +34,7 @@ export const navIconMap: Partial<
   services: MdBusinessCenter,
   templates: HiTemplate,
   default: IoIosDocument,
+  testimonials: MdReviews,
 }
 
 export const getNavIcon = (slug: string) =>
