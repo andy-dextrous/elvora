@@ -2,11 +2,11 @@ import { RenderSections } from "@/components/sections/RenderSections"
 import { getAllPages, getPageBySlug } from "@/lib/queries/page"
 import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { PayloadRedirects } from "@/payload/components/frontend/payload-redirects"
+import { type RequiredDataFromCollectionSlug } from "payload"
 import { generateMeta } from "@/utilities/generateMeta"
 import { Metadata } from "next"
 import { draftMode } from "next/headers"
 import { redirect } from "next/navigation"
-import { type RequiredDataFromCollectionSlug } from "payload"
 
 type Args = {
   params: Promise<{

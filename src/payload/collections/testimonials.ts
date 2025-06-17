@@ -2,6 +2,7 @@ import { CollectionConfig } from "payload"
 import { createRevalidationHooks } from "@/payload/hooks/revalidateCollection"
 import { anyone } from "@/payload/access/anyone"
 import { canEditContent } from "@/payload/access/editor"
+import { slugField } from "../fields/slug"
 
 const { afterChange, afterDelete } = createRevalidationHooks({
   collectionSlug: "testimonials",
@@ -33,6 +34,7 @@ export const Testimonials: CollectionConfig = {
         description: "The testimonial quote from the client",
       },
     },
+    ...slugField(),
     {
       type: "row",
       fields: [

@@ -1014,6 +1014,8 @@ export interface Testimonial {
    * The testimonial quote from the client
    */
   quote: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
   /**
    * Full name of the person giving the testimonial
    */
@@ -1442,6 +1444,8 @@ export interface SimpleTextBlock {
  */
 export interface Team {
   id: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
   name: string;
   email: string;
   /**
@@ -2151,6 +2155,8 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "team_select".
  */
 export interface TeamSelect<T extends boolean = true> {
+  slug?: T;
+  slugLock?: T;
   name?: T;
   email?: T;
   image?: T;
@@ -2214,6 +2220,8 @@ export interface ServicesSelect<T extends boolean = true> {
  */
 export interface TestimonialsSelect<T extends boolean = true> {
   quote?: T;
+  slug?: T;
+  slugLock?: T;
   name?: T;
   title?: T;
   company?: T;
@@ -2881,6 +2889,28 @@ export interface Setting {
         }[]
       | null;
   };
+  routing?: {
+    postsCollectionLabel?: string | null;
+    postsArchivePage?: (string | null) | Page;
+    postsArchiveTemplate?: (string | null) | Template;
+    postsSingleTemplate?: (string | null) | Template;
+    teamCollectionLabel?: string | null;
+    teamArchivePage?: (string | null) | Page;
+    teamArchiveTemplate?: (string | null) | Template;
+    teamSingleTemplate?: (string | null) | Template;
+    servicesCollectionLabel?: string | null;
+    servicesArchivePage?: (string | null) | Page;
+    servicesArchiveTemplate?: (string | null) | Template;
+    servicesSingleTemplate?: (string | null) | Template;
+    testimonialsCollectionLabel?: string | null;
+    testimonialsArchivePage?: (string | null) | Page;
+    testimonialsArchiveTemplate?: (string | null) | Template;
+    testimonialsSingleTemplate?: (string | null) | Template;
+    categoriesCollectionLabel?: string | null;
+    categoriesArchivePage?: (string | null) | Page;
+    categoriesArchiveTemplate?: (string | null) | Template;
+    categoriesSingleTemplate?: (string | null) | Template;
+  };
   integrations?: {
     googleAnalytics?: string | null;
     googleTagManager?: string | null;
@@ -3034,6 +3064,30 @@ export interface SettingsSelect<T extends boolean = true> {
               longitude?: T;
               id?: T;
             };
+      };
+  routing?:
+    | T
+    | {
+        postsCollectionLabel?: T;
+        postsArchivePage?: T;
+        postsArchiveTemplate?: T;
+        postsSingleTemplate?: T;
+        teamCollectionLabel?: T;
+        teamArchivePage?: T;
+        teamArchiveTemplate?: T;
+        teamSingleTemplate?: T;
+        servicesCollectionLabel?: T;
+        servicesArchivePage?: T;
+        servicesArchiveTemplate?: T;
+        servicesSingleTemplate?: T;
+        testimonialsCollectionLabel?: T;
+        testimonialsArchivePage?: T;
+        testimonialsArchiveTemplate?: T;
+        testimonialsSingleTemplate?: T;
+        categoriesCollectionLabel?: T;
+        categoriesArchivePage?: T;
+        categoriesArchiveTemplate?: T;
+        categoriesSingleTemplate?: T;
       };
   integrations?:
     | T

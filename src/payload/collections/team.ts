@@ -2,6 +2,7 @@ import { CollectionConfig } from "payload"
 import { createRevalidationHooks } from "@/payload/hooks/revalidateCollection"
 import { anyone } from "@/payload/access/anyone"
 import { canEditContent } from "@/payload/access/editor"
+import { slugField } from "../fields/slug"
 
 const { afterChange, afterDelete } = createRevalidationHooks({
   collectionSlug: "team",
@@ -25,6 +26,7 @@ export const Team: CollectionConfig = {
       "Team members are used to display the team on the website. They are different to users, which are used for the admin panel.",
   },
   fields: [
+    ...slugField(),
     {
       type: "row",
       fields: [
