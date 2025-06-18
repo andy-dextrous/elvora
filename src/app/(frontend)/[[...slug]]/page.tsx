@@ -1,12 +1,12 @@
 import { RenderSections } from "@/components/sections/RenderSections"
-import { getAllPages, getPageBySlug, getHomepageFromSettings } from "@/lib/queries/page"
+import { getHomepageFromSettings } from "@/lib/queries/page"
+import { getAllRoutes, getRoute } from "@/lib/queries/route"
 import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { PayloadRedirects } from "@/payload/components/frontend/payload-redirects"
-import { type RequiredDataFromCollectionSlug } from "payload"
 import { generateMeta } from "@/utilities/generateMeta"
 import { Metadata } from "next"
 import { draftMode } from "next/headers"
-import { redirect } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 
 type Args = {
   params: Promise<{
@@ -15,57 +15,29 @@ type Args = {
 }
 
 export default async function Page({ params: paramsPromise }: Args) {
-  const [{ isEnabled: draft }] = await Promise.all([draftMode()])
-
+  const { isEnabled: draft } = await draftMode()
   const { slug = [] } = await paramsPromise
   const slugPath = slug.join("/")
-  const url = "/" + slugPath
 
-  // Handle homepage (empty slug)
-  if (slugPath === "") {
+  if (slugPath) {
     const homepage = await getHomepageFromSettings()
-    if (homepage) {
-      const { sections = [] } = homepage
-      return (
-        <main data-collection="pages" data-single-type="page" data-id={homepage.id}>
-          {draft && <LivePreviewListener />}
-          <RenderSections sections={sections} />
-        </main>
-      )
-    }
-    // Fallback to "home" slug if no homepage set in settings
-    const homePage = await getPageBySlug({ slug: "home", draft })
-    if (homePage) {
-      const { sections = [] } = homePage
-      return (
-        <main data-collection="pages" data-single-type="page" data-id={homePage.id}>
-          {draft && <LivePreviewListener />}
-          <RenderSections sections={sections} />
-        </main>
-      )
+
+    if (homepage?.slug === slugPath) {
+      redirect("/")
     }
   }
 
-  // Handle "home" redirect
-  if (slugPath === "home") {
-    redirect("/")
+  const routeDocument = await getRoute(slugPath)
+
+  if (!routeDocument) {
+    return notFound()
   }
 
-  // Try to find page by slug
-  const page: RequiredDataFromCollectionSlug<"pages"> | null = await getPageBySlug({
-    slug: slugPath,
-    draft,
-  })
-
-  if (!page) {
-    return <PayloadRedirects url={url} />
-  }
-
-  const { sections = [] } = page
+  const { document, collection, type, sections = [] } = routeDocument
 
   return (
-    <main data-collection="pages" data-single-type="page" data-id={page.id}>
-      <PayloadRedirects disableNotFound url={url} />
+    <main data-collection={collection} data-single-type={type} data-id={document.id}>
+      <PayloadRedirects disableNotFound url={`/${slugPath}`} />
       {draft && <LivePreviewListener />}
       <RenderSections sections={sections} />
     </main>
@@ -77,21 +49,11 @@ export default async function Page({ params: paramsPromise }: Args) {
 /*******************************************************/
 
 export async function generateStaticParams() {
-  const pages = await getAllPages()
+  const routes = await getAllRoutes()
 
-  if (!pages) {
-    return []
-  }
-
-  const params = pages
-    ?.filter(doc => {
-      return doc.slug !== "home"
-    })
-    .map(({ slug }) => {
-      return { slug: (slug || "").split("/").filter(Boolean) }
-    })
-
-  return params
+  return routes.map(route => ({
+    slug: route.split("/").filter(Boolean),
+  }))
 }
 
 /*******************************************************/
@@ -103,25 +65,7 @@ export async function generateMetadata({
 }: Args): Promise<Metadata> {
   const { slug = [] } = await paramsPromise
   const slugPath = slug.join("/")
-  const { isEnabled: draft } = await draftMode()
+  const route = await getRoute(slugPath)
 
-  // Handle homepage metadata
-  if (slugPath === "") {
-    const homepage = await getHomepageFromSettings()
-    if (homepage) {
-      return generateMeta({ doc: homepage })
-    }
-    // Fallback to "home" slug
-    const homePage = await getPageBySlug({ slug: "home", draft })
-    if (homePage) {
-      return generateMeta({ doc: homePage })
-    }
-  }
-
-  const page = await getPageBySlug({
-    slug: slugPath,
-    draft,
-  })
-
-  return generateMeta({ doc: page })
+  return route ? generateMeta({ doc: route.document as any }) : {}
 }
