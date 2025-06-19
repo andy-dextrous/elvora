@@ -19,6 +19,7 @@
 - AI metadescription
 - tie users to team members
 - structured data (JSON LD)
+- Wordpress auto migrate feature! Site Uplift Engine
 
 ## AI components (mastra)
 
