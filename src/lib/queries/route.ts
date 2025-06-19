@@ -13,8 +13,12 @@ interface RouteResult {
   document: CollectionDocument
   collection: string
   fullSlug: string
-  type: "homepage" | "page" | "single"
+  type: "homepage" | "page" | "single" | "archive"
   sections: BlocksField[]
+  archiveData?: {
+    collectionSlug: string
+    totalItems: number
+  }
 }
 
 /*************************************************************************/
@@ -110,9 +114,25 @@ export const getAllRoutes = unstable_cache(
       }
     })
 
-    // Add collection document routes
+    // Add collection routes (both archives and singles)
     const frontendCollections = getFrontendCollections()
     const collections = frontendCollections.map(collection => collection.slug)
+
+    for (const collectionSlug of collections) {
+      const effectiveSlug = getEffectiveCollectionSlug(collectionSlug, {
+        routing: routingSettings,
+      })
+
+      // Check if there's an archive page assigned for this collection
+      const archiveField = `${collectionSlug}Archive`
+      const archivePage = (routingSettings as any)[archiveField]
+
+      if (archivePage && typeof archivePage === "object") {
+        routes.push(effectiveSlug)
+      }
+    }
+
+    // Add collection document routes
 
     // Collections that have draft/publish workflow (have _status field)
     const collectionsWithStatus = ["posts", "services"]

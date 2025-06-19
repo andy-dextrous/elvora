@@ -27,6 +27,7 @@ export default async function Page({ params: paramsPromise }: Args) {
     }
   }
 
+  // getRoute matches the slugPath to a route from any collection that has a slug field
   const routeDocument = await getRoute(slugPath)
 
   if (!routeDocument) {
