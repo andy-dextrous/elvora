@@ -89,11 +89,7 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {
-    categories: {
-      posts: 'posts';
-    };
-  };
+  collectionsJoins: {};
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
@@ -538,13 +534,6 @@ export interface Category {
   id: string;
   title: string;
   description?: string | null;
-  posts?: {
-    docs?: (string | Post)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  slug?: string | null;
-  slugLock?: boolean | null;
   parent?: (string | null) | Category;
   breadcrumbs?:
     | {
@@ -556,6 +545,51 @@ export interface Category {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroPrimaryBlock".
+ */
+export interface HeroPrimaryBlock {
+  heading: string;
+  content: string;
+  /**
+   * The unique selling proposition text that appears below the hero content
+   */
+  usp: string;
+  /**
+   * Optional background image for the hero section
+   */
+  backgroundImage?: (string | null) | Media;
+  buttons?:
+    | {
+        button: {
+          link: {
+            type?: ('reference' | 'custom') | null;
+            newTab?: boolean | null;
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: string | Page;
+                } | null)
+              | ({
+                  relationTo: 'posts';
+                  value: string | Post;
+                } | null)
+              | ({
+                  relationTo: 'services';
+                  value: string | Service;
+                } | null);
+            url?: string | null;
+            label: string;
+          };
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero-primary';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -646,51 +680,6 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HeroPrimaryBlock".
- */
-export interface HeroPrimaryBlock {
-  heading: string;
-  content: string;
-  /**
-   * The unique selling proposition text that appears below the hero content
-   */
-  usp: string;
-  /**
-   * Optional background image for the hero section
-   */
-  backgroundImage?: (string | null) | Media;
-  buttons?:
-    | {
-        button: {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?:
-              | ({
-                  relationTo: 'pages';
-                  value: string | Page;
-                } | null)
-              | ({
-                  relationTo: 'posts';
-                  value: string | Post;
-                } | null)
-              | ({
-                  relationTo: 'services';
-                  value: string | Service;
-                } | null);
-            url?: string | null;
-            label: string;
-          };
-        };
-        id?: string | null;
-      }[]
-    | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'hero-primary';
 }
 /**
  * Services represent the core business offerings of the company that should have a page dedicated to them for converting specific leads and customers. They are a great addition for SEO and marketing.
@@ -1014,6 +1003,8 @@ export interface Testimonial {
    * The testimonial quote from the client
    */
   quote: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
   /**
    * Full name of the person giving the testimonial
    */
@@ -1442,6 +1433,8 @@ export interface SimpleTextBlock {
  */
 export interface Team {
   id: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
   name: string;
   email: string;
   /**
@@ -2151,6 +2144,8 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "team_select".
  */
 export interface TeamSelect<T extends boolean = true> {
+  slug?: T;
+  slugLock?: T;
   name?: T;
   email?: T;
   image?: T;
@@ -2214,6 +2209,8 @@ export interface ServicesSelect<T extends boolean = true> {
  */
 export interface TestimonialsSelect<T extends boolean = true> {
   quote?: T;
+  slug?: T;
+  slugLock?: T;
   name?: T;
   title?: T;
   company?: T;
@@ -2352,9 +2349,6 @@ export interface MediaSelect<T extends boolean = true> {
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   description?: T;
-  posts?: T;
-  slug?: T;
-  slugLock?: T;
   parent?: T;
   breadcrumbs?:
     | T
@@ -2881,6 +2875,28 @@ export interface Setting {
         }[]
       | null;
   };
+  routing?: {
+    /**
+     * Choose which page displays as your site's front page
+     */
+    homepage?: (string | null) | Page;
+    postsCollectionLabel?: string | null;
+    postsCustomSlug?: string | null;
+    postsArchivePage?: (string | null) | Page;
+    postsSingleTemplate?: (string | null) | Template;
+    teamCollectionLabel?: string | null;
+    teamCustomSlug?: string | null;
+    teamArchivePage?: (string | null) | Page;
+    teamSingleTemplate?: (string | null) | Template;
+    servicesCollectionLabel?: string | null;
+    servicesCustomSlug?: string | null;
+    servicesArchivePage?: (string | null) | Page;
+    servicesSingleTemplate?: (string | null) | Template;
+    testimonialsCollectionLabel?: string | null;
+    testimonialsCustomSlug?: string | null;
+    testimonialsArchivePage?: (string | null) | Page;
+    testimonialsSingleTemplate?: (string | null) | Template;
+  };
   integrations?: {
     googleAnalytics?: string | null;
     googleTagManager?: string | null;
@@ -3034,6 +3050,27 @@ export interface SettingsSelect<T extends boolean = true> {
               longitude?: T;
               id?: T;
             };
+      };
+  routing?:
+    | T
+    | {
+        homepage?: T;
+        postsCollectionLabel?: T;
+        postsCustomSlug?: T;
+        postsArchivePage?: T;
+        postsSingleTemplate?: T;
+        teamCollectionLabel?: T;
+        teamCustomSlug?: T;
+        teamArchivePage?: T;
+        teamSingleTemplate?: T;
+        servicesCollectionLabel?: T;
+        servicesCustomSlug?: T;
+        servicesArchivePage?: T;
+        servicesSingleTemplate?: T;
+        testimonialsCollectionLabel?: T;
+        testimonialsCustomSlug?: T;
+        testimonialsArchivePage?: T;
+        testimonialsSingleTemplate?: T;
       };
   integrations?:
     | T

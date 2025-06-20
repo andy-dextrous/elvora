@@ -72,12 +72,10 @@ export const Templates: CollectionConfig<"templates"> = {
       admin: {
         description: "Set this template as the default for selected collections",
         condition: (data, siblingData) => {
-          // Only show if applicableCollections has values
           return siblingData?.applicableCollections?.length > 0
         },
       },
       validate: (value, { siblingData }) => {
-        // Ensure defaultForCollections is a subset of applicableCollections
         if (value && value.length > 0 && siblingData) {
           const applicable = (siblingData as any)?.applicableCollections as string[]
           if (applicable) {

@@ -12,9 +12,6 @@ import { draftMode } from "next/headers"
 
 import "./css/globals.css"
 
-export const dynamic = "force-static"
-export const revalidate = 3600
-
 export async function generateMetadata() {
   const settings = await getSettings()
 

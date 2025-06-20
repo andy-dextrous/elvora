@@ -33,16 +33,6 @@ export const Categories: CollectionConfig = {
       label: "Category Description",
       type: "textarea",
     },
-    {
-      name: "posts",
-      type: "join",
-      collection: "posts",
-      defaultLimit: 0,
-      label: "Posts in Category",
-      maxDepth: 2,
-      on: "categories",
-    },
-    ...slugField(),
   ],
   hooks: {
     afterChange: [afterChange],
