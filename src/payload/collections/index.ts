@@ -26,20 +26,30 @@ const collections: CollectionConfig[] = [
 ]
 
 /*************************************************************************/
-/*  FRONTEND COLLECTIONS WITH SLUG FIELDS (DYNAMIC AUTO-DISCOVERY)
+/*  FRONTEND COLLECTIONS (STATIC - REQUIRED FOR FIELD CONFIGS)
 /*************************************************************************/
 
-export const frontendCollections = collections
-  .filter(collection => {
-    if (["users", "media", "templates"].includes(collection.slug)) {
-      return false
-    }
-
-    return collection.fields?.some(field => "name" in field && field.name === "slug")
-  })
-  .map(collection => ({
-    slug: collection.slug,
-    label: collection.slug.charAt(0).toUpperCase() + collection.slug.slice(1),
-  }))
+export const frontendCollections = [
+  {
+    slug: "pages",
+    label: "Pages",
+  },
+  {
+    slug: "posts",
+    label: "Posts",
+  },
+  {
+    slug: "team",
+    label: "Team",
+  },
+  {
+    slug: "services",
+    label: "Services",
+  },
+  {
+    slug: "testimonials",
+    label: "Testimonials",
+  },
+]
 
 export default collections
