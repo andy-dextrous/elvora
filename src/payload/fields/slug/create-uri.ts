@@ -14,9 +14,10 @@ export const createURIHook = (): FieldHook => {
       return data?.uri || originalDoc?.uri
     }
 
-    // Don't regenerate if URI is manually set and we're not changing slug
-    if (data?.uri && data?.slug === originalDoc?.slug) {
-      return data.uri
+    // Always regenerate URI when slug changes
+    // Only skip regeneration if slug hasn't changed
+    if (data?.slug === originalDoc?.slug && originalDoc?.uri) {
+      return originalDoc.uri
     }
 
     const slug = data?.slug || originalDoc?.slug

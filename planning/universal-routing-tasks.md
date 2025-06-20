@@ -44,14 +44,6 @@
 - [x] Implement multi-segment nested page resolution (leverage nestedDocsPlugin)
 - [x] Implement two-segment collection item resolution (using enhanced slug field URIs)
 
-### Task 2.2: URI Migration & Bulk Update
-
-- [ ] Create migration utility to populate URI fields for all existing content
-- [ ] Add bulk URI regeneration for all collections with slug fields
-- [ ] Create safe testing mechanism (database backup/restore)
-- [ ] Test URI generation across all existing content
-- [ ] Verify no URI conflicts in existing data
-
 ## Phase 3: Dynamic Routing Updates
 
 ### Task 3.1: Update Main Dynamic Route
