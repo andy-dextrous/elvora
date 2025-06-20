@@ -1,5 +1,4 @@
 import type { CollectionBeforeChangeHook } from "payload"
-import { getDefaultTemplate } from "@/lib/payload/templates"
 
 /*************************************************************************/
 /*  EXTRACT IDS FROM POPULATED RELATIONSHIPS
@@ -58,7 +57,32 @@ export function createApplyDefaultTemplateHook(
         console.log(
           `🎯 Template Hook - Looking for default template for ${collectionName}`
         )
-        const defaultTemplate = await getDefaultTemplate(collectionName)
+
+        // Get template directly from routing settings to avoid circular dependency
+        const settings = await req.payload.findGlobal({
+          slug: "settings",
+          depth: 1,
+        })
+
+        const templateField =
+          collectionName === "pages"
+            ? "pagesDefaultTemplate"
+            : `${collectionName}SingleTemplate`
+        const templateId = (settings?.routing as any)?.[templateField]
+
+        let defaultTemplate = null
+        if (templateId) {
+          try {
+            defaultTemplate = await req.payload.findByID({
+              collection: "templates",
+              id: typeof templateId === "object" ? templateId.id : templateId,
+              depth: 2,
+            })
+          } catch (error) {
+            console.warn(`Failed to fetch template ${templateId}:`, error)
+          }
+        }
+
         console.log(
           `🎯 Template Hook - Found template:`,
           !!defaultTemplate,

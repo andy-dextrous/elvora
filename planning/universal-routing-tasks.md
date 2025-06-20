@@ -4,11 +4,11 @@
 
 ### Task 1.1: Enhance Slug Field Structure
 
-- [ ] Add hidden `uri` field to the `slugField()` return array in `src/payload/fields/slug/index.ts`
-- [ ] Create `src/payload/fields/slug/create-uri.ts` with universal URI generation logic
-- [ ] Update `slugField()` to return `[slugField, uriField, checkBoxField]`
-- [ ] Leverage existing `nestedDocsPlugin` breadcrumbs for parent hierarchy
-- [ ] Update TypeScript types for enhanced slug field structure
+- [x] Add hidden `uri` field to the `slugField()` return array in `src/payload/fields/slug/index.ts`
+- [x] Create `src/payload/fields/slug/create-uri.ts` with universal URI generation logic
+- [x] Update `slugField()` to return `[slugField, uriField, checkBoxField]`
+- [x] Leverage existing `nestedDocsPlugin` breadcrumbs for parent hierarchy
+- [x] Update TypeScript types for enhanced slug field structure
 
 ### Task 1.2: URI Generation Logic in Slug Field
 
@@ -20,51 +20,44 @@
 
 ### Task 1.3: URI Hook Integration
 
-- [ ] Add URI generation hook to slug field's existing hooks array
-- [ ] Ensure URI updates whenever slug or parent changes
-- [ ] Handle URI generation on both create and update operations
-- [ ] Add URI recalculation when routing settings change
+- [x] Add URI generation hook to slug field's existing hooks array
+- [x] Ensure URI updates whenever slug or parent changes
+- [x] Handle URI generation on both create and update operations
+- [x] Add URI recalculation when routing settings change
 
 ### Task 1.4: Automatic Collection Integration
 
-- [ ] Verify all existing collections using `slugField()` automatically get URI functionality
-- [ ] Test URI generation across Pages (hierarchical), Posts, Services, Team, Testimonials
-- [ ] Confirm nestedDocsPlugin breadcrumbs work with new URI system
-- [ ] Update payload-types.ts to reflect URI field in all slug-enabled collections
+- [x] Verify all existing collections using `slugField()` automatically get URI functionality
+- [x] Test URI generation across Pages (hierarchical), Posts, Services, Team, Testimonials
+- [x] Confirm nestedDocsPlugin breadcrumbs work with new URI system
+- [x] Update payload-types.ts to reflect URI field in all slug-enabled collections
 
 ## Phase 2: Universal Document Resolution
 
 ### Task 2.1: Build Document Resolution System
 
-- [ ] Create `src/lib/payload/universal-resolver.ts`
-- [ ] Implement `getDocumentByURI()` function with first-match-wins logic
-- [ ] Implement homepage resolution from settings
-- [ ] Implement single-segment page resolution (using existing slug field)
-- [ ] Implement single-segment collection archive resolution
-- [ ] Implement multi-segment nested page resolution (leverage nestedDocsPlugin)
-- [ ] Implement two-segment collection item resolution (using enhanced slug field URIs)
+- [x] Create `src/lib/payload/universal-resolver.ts`
+- [x] Implement `getDocumentByURI()` function with first-match-wins logic
+- [x] Implement homepage resolution from settings
+- [x] Implement single-segment page resolution (using existing slug field)
+- [x] Implement single-segment collection archive resolution
+- [x] Implement multi-segment nested page resolution (leverage nestedDocsPlugin)
+- [x] Implement two-segment collection item resolution (using enhanced slug field URIs)
 
-### Task 2.2: Create URI Segment Analysis
+### Task 2.2: URI Migration & Bulk Update
 
-- [ ] Build `analyzeURISegments()` function to categorize URI patterns
-- [ ] Implement segment validation logic
-- [ ] Add support for deep nesting (3+ segments)
-- [ ] Create URI-to-collection mapping utilities
-
-### Task 2.3: Settings Integration
-
-- [ ] Create `getRoutingSettings()` server action
-- [ ] Implement homepage page resolution
-- [ ] Implement collection archive page resolution
-- [ ] Implement custom collection slug resolution
-- [ ] Cache routing settings for performance
+- [ ] Create migration utility to populate URI fields for all existing content
+- [ ] Add bulk URI regeneration for all collections with slug fields
+- [ ] Create safe testing mechanism (database backup/restore)
+- [ ] Test URI generation across all existing content
+- [ ] Verify no URI conflicts in existing data
 
 ## Phase 3: Dynamic Routing Updates
 
 ### Task 3.1: Update Main Dynamic Route
 
 - [ ] Modify `src/app/(frontend)/[slug]/page.tsx` to handle single segments
-- [ ] Create `src/app/(frontend)/[...segments]/page.tsx` for multi-segment URIs
+- [ ] Create `src/app/(frontend)/[...slug]/page.tsx` for multi-segment URIs (catch-all)
 - [ ] Implement universal document resolution in route handlers
 - [ ] Add proper TypeScript typing for resolved documents
 - [ ] Update generateStaticParams for all URI patterns
@@ -113,9 +106,9 @@
 
 ### Task 5.1: Caching Strategy
 
-- [ ] Implement URI-based caching for document resolution
+- [x] Implement URI-based caching for document resolution
 - [ ] Add cache invalidation on URI changes
-- [ ] Create cached routing settings retrieval
+- [x] Create cached routing settings retrieval
 - [ ] Optimize database queries for URI lookups
 
 ### Task 5.2: Validation & Admin UX

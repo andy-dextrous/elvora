@@ -31,6 +31,15 @@ export function generateReadingSettingsFields(): Field[] {
             description: "Choose which page displays as your site's front page",
           },
         },
+        {
+          name: "pagesDefaultTemplate",
+          type: "relationship",
+          relationTo: "templates",
+          label: "Default Page Template",
+          admin: {
+            description: "Default template for new pages (if no template is specified)",
+          },
+        },
       ],
     },
   ]
@@ -43,45 +52,39 @@ export function generateReadingSettingsFields(): Field[] {
 export function generateCollectionRoutingFields(): Field[] {
   const frontendCollections = getFrontendCollections()
 
-  const fields: Field[] = frontendCollections.map(collection => {
-    return {
-      type: "group",
-      label: collection.label,
-      fields: [
-        {
-          name: `${collection.slug}CollectionLabel`,
-          type: "text",
-          defaultValue: collection.label,
-          admin: {
-            readOnly: true,
-            hidden: true,
+  const fields: Field[] = frontendCollections
+    .filter(collection => collection.slug !== "pages")
+    .map(collection => {
+      return {
+        type: "group",
+        label: collection.label,
+        fields: [
+          {
+            name: `${collection.slug}CollectionLabel`,
+            type: "text",
+            defaultValue: collection.label,
+            admin: {
+              readOnly: true,
+              hidden: true,
+            },
+            label: "Collection",
           },
-          label: "Collection",
-        },
-        {
-          name: `${collection.slug}CustomSlug`,
-          type: "text",
-          label: `Collection Slug -> /${collection.slug}/post-name`,
-          defaultValue: collection.slug,
-          admin: {
-            placeholder: collection.slug,
+
+          {
+            name: `${collection.slug}ArchivePage`,
+            type: "relationship",
+            relationTo: "pages" as const,
+            label: "Archive Page",
           },
-        },
-        {
-          name: `${collection.slug}ArchivePage`,
-          type: "relationship",
-          relationTo: "pages" as const,
-          label: "Archive Page",
-        },
-        {
-          name: `${collection.slug}SingleTemplate`,
-          type: "relationship",
-          relationTo: "templates" as const,
-          label: "Single Template",
-        },
-      ],
-    }
-  })
+          {
+            name: `${collection.slug}SingleTemplate`,
+            type: "relationship",
+            relationTo: "templates" as const,
+            label: "Single Template",
+          },
+        ],
+      }
+    })
 
   return [
     {

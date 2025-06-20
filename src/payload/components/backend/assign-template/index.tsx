@@ -19,16 +19,10 @@ export default function TemplateControlUIField() {
   const [selectedTemplate, setSelectedTemplate] = useState<string>("")
   const [isApplying, setIsApplying] = useState(false)
 
-  const { collectionSlug } = useDocumentInfo()
   const { addFieldRow, removeFieldRow, getFields } = useForm()
 
   const [{ data: templatesResponse, isLoading }] = usePayloadAPI("/api/templates", {
     initialParams: {
-      where: {
-        applicableCollections: {
-          contains: collectionSlug,
-        },
-      },
       limit: 100,
       sort: "name",
     },

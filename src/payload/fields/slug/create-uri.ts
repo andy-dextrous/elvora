@@ -175,17 +175,18 @@ async function generateCollectionItemURI({
   settings: any
   payload: any
 }): Promise<string> {
-  const collectionSettings = settings[collection] || {}
+  // Use the actual settings field names: postsArchivePage, servicesArchivePage, etc.
+  const archivePageField = `${collection}ArchivePage`
 
-  // Priority 1: Archive page slug
-  if (collectionSettings.archivePage) {
+  // Priority 1: Archive page slug (if collection has designated archive page)
+  if (settings[archivePageField]) {
     try {
       const archivePage = await payload.findByID({
         collection: "pages",
         id:
-          typeof collectionSettings.archivePage === "object"
-            ? collectionSettings.archivePage.id
-            : collectionSettings.archivePage,
+          typeof settings[archivePageField] === "object"
+            ? settings[archivePageField].id
+            : settings[archivePageField],
         depth: 0,
       })
 
@@ -197,12 +198,7 @@ async function generateCollectionItemURI({
     }
   }
 
-  // Priority 2: Custom collection slug
-  if (collectionSettings.customSlug) {
-    return `/${collectionSettings.customSlug}/${slug}`
-  }
-
-  // Priority 3: Default collection slug
+  // Priority 2: Original collection slug (fallback)
   return `/${collection}/${slug}`
 }
 

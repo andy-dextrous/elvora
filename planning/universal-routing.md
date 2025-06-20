@@ -40,10 +40,7 @@
 │                                    │
 ├─ Does collection have archive page? ─┐
 │  ├─ YES → Use archive page slug      │
-│  └─ NO ─┐                           │
-│         ├─ Has custom collection slug? ─┐
-│         │  ├─ YES → Use custom slug     │
-│         │  └─ NO → Use original collection slug
+│  └─ NO → Use original collection slug│
 │         └─ Final: /[determined-slug]/[item-slug]
 └────────────────────────────────────┘
 ```
@@ -83,7 +80,7 @@ REQUEST URI: /segment1/segment2/segment3/...
 ├─ COLLECTION ARCHIVES: Use designated page slug or collection default
 │  └─ /[archive-page-slug OR collection-slug]
 └─ COLLECTION ITEMS: Collection prefix + item slug
-   └─ /[archive-page-slug OR custom-collection-slug OR collection-slug]/[item-slug]
+   └─ /[archive-page-slug OR collection-slug]/[item-slug]
 ```
 
 ### URI Segment Priority Chain
@@ -91,10 +88,9 @@ REQUEST URI: /segment1/segment2/segment3/...
 **For determining segment1:**
 
 1. Archive page slug (if collection has designated archive page)
-2. Custom collection slug (if set)
-3. Original collection slug (fallback)
-4. Page slug (for pages)
-5. Parent page slug (for nested pages)
+2. Original collection slug (fallback)
+3. Page slug (for pages)
+4. Parent page slug (for nested pages)
 
 **For determining segment2+:**
 

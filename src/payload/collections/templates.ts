@@ -14,13 +14,7 @@ export const Templates: CollectionConfig<"templates"> = {
   },
   admin: {
     useAsTitle: "name",
-    defaultColumns: [
-      "name",
-      "description",
-      "applicableCollections",
-      "defaultForCollections",
-      "updatedAt",
-    ],
+    defaultColumns: ["name", "description", "updatedAt"],
   },
   fields: [
     {
@@ -38,18 +32,7 @@ export const Templates: CollectionConfig<"templates"> = {
         description: "What this template is used for",
       },
     },
-    {
-      name: "applicableCollections",
-      type: "select",
-      hasMany: true,
-      options: [
-        { label: "Pages", value: "pages" },
-        { label: "Services", value: "services" },
-      ],
-      admin: {
-        description: "Which content types can use this template",
-      },
-    },
+
     {
       name: "sections",
       label: "Template Sections",
@@ -58,37 +41,6 @@ export const Templates: CollectionConfig<"templates"> = {
       required: true,
       admin: {
         description: "Pre-configured sections with default content",
-      },
-    },
-    {
-      name: "defaultForCollections",
-      label: "Default Template For",
-      type: "select",
-      hasMany: true,
-      options: [
-        { label: "Pages", value: "pages" },
-        { label: "Services", value: "services" },
-      ],
-      admin: {
-        description: "Set this template as the default for selected collections",
-        condition: (data, siblingData) => {
-          return siblingData?.applicableCollections?.length > 0
-        },
-      },
-      validate: (value, { siblingData }) => {
-        if (value && value.length > 0 && siblingData) {
-          const applicable = (siblingData as any)?.applicableCollections as string[]
-          if (applicable) {
-            const invalidDefaults = value.filter(
-              (collection: string) => !applicable.includes(collection)
-            )
-
-            if (invalidDefaults.length > 0) {
-              return `Cannot set as default for collections that are not applicable: ${invalidDefaults.join(", ")}`
-            }
-          }
-        }
-        return true
       },
     },
   ],

@@ -43,7 +43,7 @@ export default async function Page({ params: paramsPromise }: Args) {
     <main data-collection="pages" data-single-type="page" data-id={page.id}>
       {/* Only use PayloadRedirects for non-home pages to prevent infinite loops */}
       {slug !== "home" && <PayloadRedirects disableNotFound url={url} />}
-      {draft && <LivePreviewListener />}
+      {/* {draft && <LivePreviewListener />} */}
       <RenderSections sections={sections} />
     </main>
   )
