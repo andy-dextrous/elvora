@@ -29,6 +29,7 @@ export const Pages: CollectionConfig<"pages"> = {
   defaultPopulate: {
     title: true,
     slug: true,
+    uri: true,
     breadcrumbs: true,
   },
   admin: {

@@ -12,11 +12,11 @@
 
 ### Task 1.2: URI Generation Logic in Slug Field
 
-- [ ] Implement collection detection within URI hook (using collection context)
-- [ ] Add Pages-specific URI logic (use nestedDocsPlugin's `generateURL` for parent hierarchy)
-- [ ] Add Collection items logic (archive page/custom slug/default slug + item slug)
-- [ ] Create `getCollectionSettings()` function to read routing settings from global
-- [ ] Add URI validation and conflict detection utilities
+- [x] Implement collection detection within URI hook (using collection context)
+- [x] Add Pages-specific URI logic (use nestedDocsPlugin's `generateURL` for parent hierarchy)
+- [x] Add Collection items logic (archive page/custom slug/default slug + item slug)
+- [x] Create `getCollectionSettings()` function to read routing settings from global
+- [x] Add URI validation and conflict detection utilities
 
 ### Task 1.3: URI Hook Integration
 

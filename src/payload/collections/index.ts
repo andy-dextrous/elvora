@@ -9,6 +9,10 @@ import { Testimonials } from "@/payload/collections/testimonials"
 import { Templates } from "@/payload/collections/templates"
 import { CollectionConfig } from "payload"
 
+/*************************************************************************/
+/*  COLLECTIONS
+/*************************************************************************/
+
 const collections: CollectionConfig[] = [
   Pages,
   Posts,
@@ -20,5 +24,22 @@ const collections: CollectionConfig[] = [
   Categories,
   Users,
 ]
+
+/*************************************************************************/
+/*  FRONTEND COLLECTIONS WITH SLUG FIELDS (DYNAMIC AUTO-DISCOVERY)
+/*************************************************************************/
+
+export const frontendCollections = collections
+  .filter(collection => {
+    if (["users", "media", "templates"].includes(collection.slug)) {
+      return false
+    }
+
+    return collection.fields?.some(field => "name" in field && field.name === "slug")
+  })
+  .map(collection => ({
+    slug: collection.slug,
+    label: collection.slug.charAt(0).toUpperCase() + collection.slug.slice(1),
+  }))
 
 export default collections

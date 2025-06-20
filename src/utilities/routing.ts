@@ -1,26 +1,15 @@
-import collections from "@/payload/collections"
 import type { Field } from "payload"
+import { frontendCollections } from "@/payload/collections"
 
 /*************************************************************************/
-/*  DISCOVER FRONTEND COLLECTIONS WITH SLUG FIELDS
+/*  DISCOVER FRONTEND COLLECTIONS WITH SLUG FIELDS (DYNAMIC AUTO-DISCOVERY)
 /*************************************************************************/
 
 export function getFrontendCollections(): Array<{
   slug: string
   label: string
 }> {
-  return collections
-    .filter(collection => {
-      if (["users", "media", "templates", "pages"].includes(collection.slug)) {
-        return false
-      }
-
-      return collection.fields.some(field => "name" in field && field.name === "slug")
-    })
-    .map(collection => ({
-      slug: collection.slug,
-      label: collection.slug.charAt(0).toUpperCase() + collection.slug.slice(1),
-    }))
+  return frontendCollections
 }
 
 /*************************************************************************/

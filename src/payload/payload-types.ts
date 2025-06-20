@@ -512,6 +512,10 @@ export interface Page {
     canonicalUrl?: string | null;
   };
   slug?: string | null;
+  /**
+   * Auto-generated based on slug and routing settings
+   */
+  uri?: string | null;
   slugLock?: boolean | null;
   parent?: (string | null) | Page;
   breadcrumbs?:
@@ -633,6 +637,10 @@ export interface Post {
       }[]
     | null;
   slug?: string | null;
+  /**
+   * Auto-generated based on slug and routing settings
+   */
+  uri?: string | null;
   slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -723,6 +731,10 @@ export interface Service {
     canonicalUrl?: string | null;
   };
   slug?: string | null;
+  /**
+   * Auto-generated based on slug and routing settings
+   */
+  uri?: string | null;
   slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -1004,6 +1016,10 @@ export interface Testimonial {
    */
   quote: string;
   slug?: string | null;
+  /**
+   * Auto-generated based on slug and routing settings
+   */
+  uri?: string | null;
   slugLock?: boolean | null;
   /**
    * Full name of the person giving the testimonial
@@ -1434,6 +1450,10 @@ export interface SimpleTextBlock {
 export interface Team {
   id: string;
   slug?: string | null;
+  /**
+   * Auto-generated based on slug and routing settings
+   */
+  uri?: string | null;
   slugLock?: boolean | null;
   name: string;
   email: string;
@@ -1811,6 +1831,7 @@ export interface PagesSelect<T extends boolean = true> {
         canonicalUrl?: T;
       };
   slug?: T;
+  uri?: T;
   slugLock?: T;
   parent?: T;
   breadcrumbs?:
@@ -2134,6 +2155,7 @@ export interface PostsSelect<T extends boolean = true> {
         name?: T;
       };
   slug?: T;
+  uri?: T;
   slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2145,6 +2167,7 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface TeamSelect<T extends boolean = true> {
   slug?: T;
+  uri?: T;
   slugLock?: T;
   name?: T;
   email?: T;
@@ -2198,6 +2221,7 @@ export interface ServicesSelect<T extends boolean = true> {
         canonicalUrl?: T;
       };
   slug?: T;
+  uri?: T;
   slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2210,6 +2234,7 @@ export interface ServicesSelect<T extends boolean = true> {
 export interface TestimonialsSelect<T extends boolean = true> {
   quote?: T;
   slug?: T;
+  uri?: T;
   slugLock?: T;
   name?: T;
   title?: T;
@@ -2880,6 +2905,10 @@ export interface Setting {
      * Choose which page displays as your site's front page
      */
     homepage?: (string | null) | Page;
+    pagesCollectionLabel?: string | null;
+    pagesCustomSlug?: string | null;
+    pagesArchivePage?: (string | null) | Page;
+    pagesSingleTemplate?: (string | null) | Template;
     postsCollectionLabel?: string | null;
     postsCustomSlug?: string | null;
     postsArchivePage?: (string | null) | Page;
@@ -3055,6 +3084,10 @@ export interface SettingsSelect<T extends boolean = true> {
     | T
     | {
         homepage?: T;
+        pagesCollectionLabel?: T;
+        pagesCustomSlug?: T;
+        pagesArchivePage?: T;
+        pagesSingleTemplate?: T;
         postsCollectionLabel?: T;
         postsCustomSlug?: T;
         postsArchivePage?: T;
