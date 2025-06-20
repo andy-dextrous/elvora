@@ -3,14 +3,17 @@ import React from "react"
 
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
-import { getSettings } from "@/lib/queries/globals"
-import { getCurrentUser } from "@/lib/queries/user"
+import { getSettings } from "@/lib/payload/globals"
+import { getCurrentUser } from "@/lib/payload/user"
 import { WildChildAdminBar } from "@/payload/components/backend/admin-bar"
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
 import parse from "html-react-parser"
 import { draftMode } from "next/headers"
 
 import "./css/globals.css"
+
+export const dynamic = "force-static"
+export const revalidate = 3600
 
 export async function generateMetadata() {
   const settings = await getSettings()

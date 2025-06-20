@@ -1,5 +1,5 @@
 import { RenderSections } from "@/components/sections/RenderSections"
-import { getAllPages, getPageBySlug } from "@/lib/queries/page"
+import { getAllPages, getPageBySlug } from "@/lib/payload/page"
 import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { PayloadRedirects } from "@/payload/components/frontend/payload-redirects"
 import { generateMeta } from "@/utilities/generateMeta"
@@ -13,6 +13,9 @@ type Args = {
     slug?: string
   }>
 }
+
+export const dynamic = "force-static"
+export const revalidate = 3600
 
 export default async function Page({ params: paramsPromise }: Args) {
   const [{ isEnabled: draft }] = await Promise.all([draftMode()])

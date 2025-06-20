@@ -1,13 +1,13 @@
 import { HeaderNavigation } from "@/components/header/nav"
-import { getCachedGlobal } from "@/lib/queries/globals"
-import { getSettings } from "@/lib/queries/globals"
+import { getCachedGlobal } from "@/lib/payload/globals"
+import { getSettings } from "@/lib/payload/globals"
 import type { Header, Setting } from "@/payload/payload-types"
 import Link from "next/link"
 
 import type { Config } from "payload"
 import LogoPrimaryLight from "../logos/logo-light"
 import { MobileNavUpdated } from "./mobile-nav"
-import { getCurrentUser } from "@/lib/queries/user"
+import { getCurrentUser } from "@/lib/payload/user"
 import { cn } from "@/utilities/ui"
 
 export async function Header() {

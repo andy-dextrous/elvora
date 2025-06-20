@@ -9,7 +9,7 @@ import configPromise from "@payload-config"
 import { getPayload } from "payload"
 import React from "react"
 import { notFound } from "next/navigation"
-import { getSettings } from "@/lib/queries/globals"
+import { getSettings } from "@/lib/payload/globals"
 
 export const dynamic = "force-static"
 export const revalidate = 600

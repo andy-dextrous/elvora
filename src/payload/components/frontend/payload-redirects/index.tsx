@@ -1,7 +1,7 @@
 import type React from "react"
 
-import { getCachedDocument } from "@/lib/queries/document"
-import { getCachedRedirects } from "@/lib/queries/redirects"
+import { getCachedDocument } from "@/lib/payload/document"
+import { getCachedRedirects } from "@/lib/payload/redirects"
 import { notFound, redirect } from "next/navigation"
 
 interface Props {

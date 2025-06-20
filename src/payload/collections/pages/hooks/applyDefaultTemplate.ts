@@ -1,5 +1,5 @@
 import type { CollectionBeforeChangeHook } from "payload"
-import { getDefaultTemplate } from "@/lib/queries/templates"
+import { getDefaultTemplate } from "@/lib/payload/templates"
 
 /*************************************************************************/
 /*  EXTRACT IDS FROM POPULATED RELATIONSHIPS

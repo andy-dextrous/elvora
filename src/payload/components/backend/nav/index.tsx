@@ -8,7 +8,7 @@ import { getNavPrefs } from "./getNavPrefs"
 import { NavClient } from "./index.client"
 import { NavHamburger } from "./NavHamburger"
 import { NavWrapper } from "./NavWrapper"
-import { getUnreadFormSubmissionsCount } from "@/lib/queries/form-submissions"
+import { getUnreadFormSubmissionsCount } from "@/lib/payload/form-submissions"
 
 export const baseClass = "nav"
 

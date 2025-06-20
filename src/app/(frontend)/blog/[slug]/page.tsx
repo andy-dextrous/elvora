@@ -3,7 +3,7 @@ import { PayloadRedirects } from "@/payload/components/frontend/payload-redirect
 import { draftMode } from "next/headers"
 import PostBody from "@/components/posts/post-body"
 import { PostHero } from "@/components/posts/post-hero"
-import { getPostBySlug, getPosts, getRelatedPosts } from "@/lib/queries/post"
+import { getPostBySlug, getPosts, getRelatedPosts } from "@/lib/payload/post"
 import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { generateMeta } from "@/utilities/generateMeta"
 import { FullwidthCtaComponent } from "@/components/sections/fullwidth-cta/Component"

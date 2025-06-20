@@ -6,7 +6,7 @@ import { getPayload } from "payload"
 import React from "react"
 import { Search } from "@/payload/search/components"
 import { CardPostData } from "@/payload/components/frontend/card"
-import { getCurrentUser } from "@/lib/queries/user"
+import { getCurrentUser } from "@/lib/payload/user"
 import { cn } from "@/utilities/ui"
 
 type Args = {

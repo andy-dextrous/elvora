@@ -1,0 +1,2 @@
+- currently live previews are loaded on the actual main slug entrypoint which opts this into dynamic rendering
+- need to have static pages for rapid loading

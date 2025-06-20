@@ -1,4 +1,4 @@
-import { getSettings } from "@/lib/queries/globals"
+import { getSettings } from "@/lib/payload/globals"
 import type { GlobeLocationsBlock, Setting } from "@/payload/payload-types"
 import { GlobeLocationsClientComponent } from "./client-component"
 

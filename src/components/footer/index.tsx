@@ -1,5 +1,5 @@
 import LogoPrimaryLight from "@/components/logos/logo-light"
-import { getCachedGlobal, getSettings } from "@/lib/queries/globals"
+import { getCachedGlobal, getSettings } from "@/lib/payload/globals"
 import { CMSLink } from "@/payload/components/frontend/cms-link"
 import { SocialLinks } from "@/payload/components/frontend/social-links"
 import type { Footer as FooterType, Setting } from "@/payload/payload-types"

@@ -3,7 +3,7 @@ import type { Media, Page, Post, Config } from "@/payload/payload-types"
 
 import { mergeOpenGraph } from "./mergeOpenGraph"
 import { getServerSideURL } from "./getURL"
-import { getSettings } from "@/lib/queries/globals"
+import { getSettings } from "@/lib/payload/globals"
 
 const getImageURL = (image?: Media | Config["db"]["defaultIDType"] | null) => {
   const serverUrl = getServerSideURL()
