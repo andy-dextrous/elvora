@@ -1,16 +1,5 @@
+import { frontendCollections } from "@/payload/collections/frontend"
 import type { Field } from "payload"
-import { frontendCollections } from "@/payload/collections"
-
-/*************************************************************************/
-/*  DISCOVER FRONTEND COLLECTIONS WITH SLUG FIELDS (DYNAMIC AUTO-DISCOVERY)
-/*************************************************************************/
-
-export function getFrontendCollections(): Array<{
-  slug: string
-  label: string
-}> {
-  return frontendCollections
-}
 
 /*************************************************************************/
 /*  GENERATE READING SETTINGS FIELDS
@@ -49,9 +38,7 @@ export function generateReadingSettingsFields(): Field[] {
 /*  GENERATE COLLECTION ROUTING FIELDS
 /*************************************************************************/
 
-export function generateCollectionRoutingFields(): Field[] {
-  const frontendCollections = getFrontendCollections()
-
+export async function generateCollectionRoutingFields(): Promise<Field[]> {
   const fields: Field[] = frontendCollections
     .filter(collection => collection.slug !== "pages")
     .map(collection => {
@@ -103,6 +90,9 @@ export function generateCollectionRoutingFields(): Field[] {
 /*  GENERATE ALL ROUTING FIELDS
 /*************************************************************************/
 
-export function generateRoutingFields(): Field[] {
-  return [...generateReadingSettingsFields(), ...generateCollectionRoutingFields()]
+export async function generateRoutingFields(): Promise<Field[]> {
+  return [
+    ...(await generateReadingSettingsFields()),
+    ...(await generateCollectionRoutingFields()),
+  ]
 }

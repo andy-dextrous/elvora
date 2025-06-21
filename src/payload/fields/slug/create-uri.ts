@@ -1,7 +1,5 @@
+import { frontendCollections } from "@/payload/collections/frontend"
 import type { FieldHook } from "payload"
-import configPromise from "@payload-config"
-import { getPayload } from "payload"
-import { frontendCollections } from "@/payload/collections"
 
 /*************************************************************************/
 /*  UNIVERSAL URI GENERATION HOOK
@@ -31,7 +29,7 @@ export const createURIHook = (): FieldHook => {
     }
 
     try {
-      const payload = await getPayload({ config: configPromise })
+      const payload = req.payload
 
       // Get routing settings from global
       const settings = await payload.findGlobal({
@@ -218,14 +216,6 @@ function generateFallbackURI(collection: string, slug: string, data: any): strin
 }
 
 /*************************************************************************/
-/*  FRONTEND COLLECTIONS ACCESS (USES PRE-COMPUTED LIST)
-/*************************************************************************/
-
-function getFrontendCollectionsList(): Array<{ slug: string; label: string }> {
-  return frontendCollections
-}
-
-/*************************************************************************/
 /*  URI CONFLICT DETECTION
 /*************************************************************************/
 
@@ -249,11 +239,8 @@ async function checkURIConflict({
 }): Promise<URIConflictResult | null> {
   if (!uri || uri === "") return null
 
-  // Get frontend collections from pre-computed list
-  const frontendCollectionsList = getFrontendCollectionsList()
-
   // Check all frontend collections for URI conflicts
-  for (const collectionConfig of frontendCollectionsList) {
+  for (const collectionConfig of frontendCollections) {
     if (collectionConfig.slug === collection && documentId) {
       // Skip checking the same document being updated
       continue
