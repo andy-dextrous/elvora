@@ -5,7 +5,7 @@ import { authenticated } from "@/payload/access/authenticated"
 import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublished"
 import { slugField } from "@/payload/fields/slug"
 import { populatePublishedAt } from "@/payload/hooks/populatePublishedAt"
-import { generatePreviewPath } from "@/utilities/generatePreviewPath"
+import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { revalidateDelete, revalidatePage } from "./hooks/revalidatePage"
 import { applyDefaultTemplate } from "./hooks/applyDefaultTemplate"
 

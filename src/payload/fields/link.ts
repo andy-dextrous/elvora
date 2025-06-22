@@ -1,5 +1,5 @@
 import type { Field, GroupField } from "payload"
-import deepMerge from "@/utilities/deepMerge"
+import deepMerge from "@/utilities/deep-merge"
 
 type LinkType = (options?: {
   disableLabel?: boolean

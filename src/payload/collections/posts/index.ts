@@ -10,7 +10,7 @@ import {
 
 import { authenticated } from "@/payload/access/authenticated"
 import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublished"
-import { generatePreviewPath } from "@/utilities/generatePreviewPath"
+import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { populateAuthors } from "./hooks/populateAuthors"
 import { revalidateDelete, revalidatePost } from "./hooks/revalidatePost"
 

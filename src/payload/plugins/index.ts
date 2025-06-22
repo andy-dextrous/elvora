@@ -16,7 +16,7 @@ import { Plugin } from "payload"
 import { Page, Post } from "@/payload/payload-types"
 import { beforeSyncWithSearch } from "@/payload/search/beforeSync"
 import { searchFields } from "@/payload/search/fieldOverrides"
-import { getServerSideURL } from "@/utilities/getURL"
+import { getServerSideURL } from "@/utilities/get-url"
 import { markAsReadAfterRead } from "@/payload/hooks/form-submissions"
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {

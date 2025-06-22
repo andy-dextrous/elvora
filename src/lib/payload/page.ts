@@ -1,6 +1,7 @@
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
 import { unstable_cache } from "next/cache"
+import { Page } from "@/payload/payload-types"
 
 /*******************************************************/
 /* Get Page By Slug
@@ -61,3 +62,47 @@ export const getAllPages = () =>
   unstable_cache(async () => getAllPagesInternal(), ["all-pages"], {
     tags: ["pages"],
   })()
+
+/*******************************************************/
+/* Get Homepage From Settings
+/*******************************************************/
+
+async function getHomepageFromSettingsInternal() {
+  const payload = await getPayload({ config: configPromise })
+
+  try {
+    const settings = await payload.findGlobal({
+      slug: "settings",
+      depth: 5,
+    })
+
+    const homepage = settings.routing?.homepage as Partial<Page>
+
+    const page = await payload.find({
+      collection: "pages",
+      depth: 5,
+      limit: 1,
+      overrideAccess: true,
+      where: {
+        id: { equals: homepage.id },
+      },
+    })
+
+    if (page.docs?.[0]) {
+      return page.docs[0] as Page
+    }
+  } catch (error) {
+    console.log("Settings not found, using fallback homepage detection")
+  }
+
+  return null
+}
+
+export const getHomepage = () =>
+  unstable_cache(
+    async () => getHomepageFromSettingsInternal(),
+    ["homepage-from-settings"],
+    {
+      tags: ["settings", "homepage"],
+    }
+  )()

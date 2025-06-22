@@ -1,6 +1,6 @@
 "use client"
 
-import useClickableCard from "@/utilities/useClickableCard"
+import useClickableCard from "@/utilities/use-clickable-card"
 import Link from "next/link"
 import React, { Fragment } from "react"
 import { Media } from "../media"

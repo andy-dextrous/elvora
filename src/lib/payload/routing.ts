@@ -10,7 +10,8 @@ import { frontendCollections } from "@/payload/collections/frontend"
 async function getDocumentByURIInternal(uri: string, draft: boolean = false) {
   const payload = await getPayload({ config: configPromise })
 
-  const normalizedURI = uri === "/" || uri === "" ? "/" : uri.replace(/\/+$/, "")
+  // Homepage URI is empty string
+  const normalizedURI = uri === "/" ? "" : uri.replace(/\/+$/, "")
 
   for (const collection of frontendCollections) {
     try {
@@ -24,7 +25,10 @@ async function getDocumentByURIInternal(uri: string, draft: boolean = false) {
       })
 
       if (result.docs?.[0]) {
-        return result.docs[0]
+        return {
+          document: result.docs[0],
+          collection: collection.slug,
+        }
       }
     } catch (error) {
       continue

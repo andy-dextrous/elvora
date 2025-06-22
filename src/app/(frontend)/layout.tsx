@@ -1,25 +1,14 @@
-import Providers from "@/providers"
-import React from "react"
-
-import { Footer } from "@/components/footer"
-import { Header } from "@/components/header"
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
+import { WildChildAdminBar } from "@/payload/components/backend/admin-bar"
 import { getSettings } from "@/lib/payload/globals"
 import { getCurrentUser } from "@/lib/payload/user"
-import { WildChildAdminBar } from "@/payload/components/backend/admin-bar"
-import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google"
-import parse from "html-react-parser"
+import { Footer } from "@/components/footer"
+import { Header } from "@/components/header"
 import { draftMode } from "next/headers"
-
+import parse from "html-react-parser"
+import Providers from "@/providers"
+import React from "react"
 import "./css/globals.css"
-
-export async function generateMetadata() {
-  const settings = await getSettings()
-
-  return {
-    description: settings.general?.siteDescription || "Wild Child",
-    title: settings.general?.siteName || "Wild Child",
-  }
-}
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
@@ -69,4 +58,13 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       </body>
     </html>
   )
+}
+
+export async function generateMetadata() {
+  const settings = await getSettings()
+
+  return {
+    description: settings.general?.siteDescription || "Wild Child",
+    title: settings.general?.siteName || "Wild Child",
+  }
 }

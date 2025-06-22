@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical"
 
 import { fields } from "./fields"
-import { getClientSideURL } from "@/utilities/getURL"
+import { getClientSideURL } from "@/utilities/get-url"
 import { cn } from "@/utilities/ui"
 
 export type FormVariant = "white" | "dark" | "neutral" | "transparent"

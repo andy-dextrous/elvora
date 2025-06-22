@@ -8,7 +8,7 @@ import React from "react"
 
 import type { Props as MediaProps } from "../types"
 
-import { getClientSideURL } from "@/utilities/getURL"
+import { getClientSideURL } from "@/utilities/get-url"
 
 const breakpoints = {
   "3xl": 1920,

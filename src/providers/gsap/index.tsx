@@ -1,6 +1,6 @@
 "use client"
 
-import canUseDOM from "@/utilities/canUseDOM"
+import canUseDOM from "@/utilities/can-use-dom"
 import wildChildConfig from "@/wc.config"
 import { useGSAP } from "@gsap/react"
 import { gsap } from "gsap"

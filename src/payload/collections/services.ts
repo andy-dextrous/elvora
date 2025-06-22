@@ -7,7 +7,7 @@ import { createApplyDefaultTemplateHook } from "@/payload/collections/pages/hook
 import { slugField } from "@/payload/fields/slug"
 import { populatePublishedAt } from "@/payload/hooks/populatePublishedAt"
 import { createRevalidationHooks } from "@/payload/hooks/revalidateCollection"
-import { generatePreviewPath } from "@/utilities/generatePreviewPath"
+import { generatePreviewPath } from "@/utilities/generate-preview-path"
 
 import {
   MetaDescriptionField,

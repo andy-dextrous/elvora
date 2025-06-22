@@ -1,4 +1,4 @@
-import deepMerge from "@/utilities/deepMerge"
+import deepMerge from "@/utilities/deep-merge"
 import type { Field } from "payload"
 import { getFormVariantOptions, createDefaultForm } from "@/utilities/form-variants"
 

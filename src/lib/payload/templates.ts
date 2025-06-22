@@ -19,7 +19,6 @@ export async function getDefaultTemplate(collection: string) {
         depth: 1,
       })
 
-      // Handle pages collection differently (uses pagesDefaultTemplate)
       const templateField =
         collection === "pages" ? "pagesDefaultTemplate" : `${collection}SingleTemplate`
       const templateId = (settings?.routing as any)?.[templateField]
@@ -28,7 +27,6 @@ export async function getDefaultTemplate(collection: string) {
         return null
       }
 
-      // Get the assigned template
       const template = await payload.findByID({
         collection: "templates",
         id: typeof templateId === "object" ? templateId.id : templateId,
@@ -53,7 +51,6 @@ export async function getTemplatesForCollection(collection: string) {
     async () => {
       const payload = await getPayload({ config: configPromise })
 
-      // Get all templates (no filtering by applicableCollections)
       const result = await payload.find({
         collection: "templates",
         depth: 2,
@@ -61,7 +58,6 @@ export async function getTemplatesForCollection(collection: string) {
         limit: 100,
       })
 
-      // Get default template from routing settings
       const defaultTemplate = await getDefaultTemplate(collection)
 
       return {

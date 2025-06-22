@@ -1,4 +1,4 @@
-import deepMerge from "@/utilities/deepMerge"
+import deepMerge from "@/utilities/deep-merge"
 import { link } from "@/payload/fields/link"
 import type { Field } from "payload"
 import { getButtonVariantOptions, createDefaultButton } from "@/utilities/button-variants"

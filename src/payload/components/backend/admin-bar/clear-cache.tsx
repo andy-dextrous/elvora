@@ -4,7 +4,7 @@
 /* Clear Cache
 /*******************************************************/
 
-import { getClientSideURL } from "@/utilities/getURL"
+import { getClientSideURL } from "@/utilities/get-url"
 import { toast } from "sonner"
 
 function ClearCache() {
