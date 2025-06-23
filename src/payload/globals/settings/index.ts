@@ -1,11 +1,9 @@
 import type { GlobalConfig } from "payload"
 import { socialLinks } from "@/payload/fields/social-links"
-import { createGlobalHooks } from "@/payload/hooks/hooks"
+import { afterGlobalChange } from "@/payload/hooks/hooks"
 import { generateRoutingFields } from "@/utilities/routing"
 import { authenticated } from "@/payload/access/authenticated"
 import { anyone } from "@/payload/access/anyone"
-
-const { afterChange } = createGlobalHooks("settings")
 
 export const Settings: GlobalConfig = {
   slug: "settings",
@@ -140,6 +138,6 @@ export const Settings: GlobalConfig = {
     },
   ],
   hooks: {
-    afterChange,
+    afterChange: [afterGlobalChange],
   },
 }

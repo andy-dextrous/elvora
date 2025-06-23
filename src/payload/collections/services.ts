@@ -6,7 +6,7 @@ import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublis
 import { createApplyDefaultTemplateHook } from "@/payload/collections/pages/hooks/applyDefaultTemplate"
 import { slugField } from "@/payload/fields/slug"
 import { populatePublishedAt } from "@/payload/hooks/populatePublishedAt"
-import { createHooks } from "@/payload/hooks/hooks"
+import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 
 import {
@@ -16,8 +16,6 @@ import {
   OverviewField,
   PreviewField,
 } from "@payloadcms/plugin-seo/fields"
-
-const { afterChange, afterDelete } = createHooks("services")
 
 const applyDefaultTemplate = createApplyDefaultTemplateHook("services")
 
@@ -153,9 +151,9 @@ export const Services: CollectionConfig<"services"> = {
     },
   ],
   hooks: {
-    afterChange,
+    afterChange: [afterCollectionChange],
     beforeChange: [populatePublishedAt, applyDefaultTemplate],
-    afterDelete,
+    afterDelete: [afterCollectionDelete],
   },
   versions: {
     drafts: {

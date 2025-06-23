@@ -38,7 +38,7 @@ export function generateReadingSettingsFields(): Field[] {
 /*  GENERATE COLLECTION ROUTING FIELDS
 /*************************************************************************/
 
-export async function generateCollectionRoutingFields(): Promise<Field[]> {
+export function generateCollectionRoutingFields(): Field[] {
   const fields: Field[] = frontendCollections
     .filter(collection => collection.slug !== "pages")
     .map(collection => {
@@ -90,9 +90,6 @@ export async function generateCollectionRoutingFields(): Promise<Field[]> {
 /*  GENERATE ALL ROUTING FIELDS
 /*************************************************************************/
 
-export async function generateRoutingFields(): Promise<Field[]> {
-  return [
-    ...(await generateReadingSettingsFields()),
-    ...(await generateCollectionRoutingFields()),
-  ]
+export function generateRoutingFields(): Field[] {
+  return [...generateReadingSettingsFields(), ...generateCollectionRoutingFields()]
 }

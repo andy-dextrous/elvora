@@ -6,104 +6,101 @@ import type {
 import { revalidate } from "@/lib/cache/revalidation"
 
 /*************************************************************************/
-/*  COLLECTION HOOKS FACTORY
+/*  UNIVERSAL COLLECTION HOOKS
 /*************************************************************************/
 
 /**
- * Creates universal hooks for any collection
- * Handles smart revalidation using cache config and universal revalidation engine
+ * Universal afterChange hook that works for any collection
+ * Automatically detects the collection from Payload's context
  */
-export function createHooks(collection: string) {
-  const afterChange: CollectionAfterChangeHook = async ({
-    doc,
-    previousDoc,
-    operation,
-    req: { payload, context },
-  }) => {
-    if (context.disableRevalidate) {
-      return doc
-    }
-
-    // Use universal revalidation system
-    try {
-      await revalidate({
-        collection,
-        doc,
-        previousDoc,
-        action: operation === "create" ? "create" : "update",
-        logger: payload.logger,
-      })
-    } catch (error) {
-      payload.logger.error(`Smart revalidation failed for ${collection}:`, error)
-    }
-
+export const afterCollectionChange: CollectionAfterChangeHook = async ({
+  doc,
+  previousDoc,
+  operation,
+  req: { payload, context },
+  collection, // This is provided by Payload!
+}) => {
+  if (context.disableRevalidate) {
     return doc
   }
 
-  const afterDelete: CollectionAfterDeleteHook = async ({
-    doc,
-    req: { payload, context },
-  }) => {
-    if (context.disableRevalidate) {
-      return doc
-    }
+  // Use universal revalidation system
+  try {
+    await revalidate({
+      collection: collection.slug,
+      doc,
+      previousDoc,
+      action: operation === "create" ? "create" : "update",
+      logger: payload.logger,
+    })
+  } catch (error) {
+    payload.logger.error(`Smart revalidation failed for ${collection.slug}:`, error)
+  }
 
-    // Use universal revalidation system
-    try {
-      await revalidate({
-        collection,
-        doc,
-        action: "delete",
-        logger: payload.logger,
-      })
-    } catch (error) {
-      payload.logger.error(`Smart revalidation failed for ${collection} delete:`, error)
-    }
+  return doc
+}
 
+/**
+ * Universal afterDelete hook that works for any collection
+ * Automatically detects the collection from Payload's context
+ */
+export const afterCollectionDelete: CollectionAfterDeleteHook = async ({
+  doc,
+  req: { payload, context },
+  collection, // This is provided by Payload!
+}) => {
+  if (context.disableRevalidate) {
     return doc
   }
 
-  return {
-    afterChange: [afterChange],
-    afterDelete: [afterDelete],
+  // Use universal revalidation system
+  try {
+    await revalidate({
+      collection: collection.slug,
+      doc,
+      action: "delete",
+      logger: payload.logger,
+    })
+  } catch (error) {
+    payload.logger.error(
+      `Smart revalidation failed for ${collection.slug} delete:`,
+      error
+    )
   }
+
+  return doc
 }
 
 /*************************************************************************/
-/*  GLOBAL HOOKS FACTORY
+/*  UNIVERSAL GLOBAL HOOKS
 /*************************************************************************/
 
 /**
- * Creates universal hooks for any global
- * Handles smart revalidation with proper tag naming and dependency cascading
+ * Universal afterChange hook for globals
+ * Automatically detects the global from Payload's context
  */
-export function createGlobalHooks(globalSlug: string) {
-  const afterChange: GlobalAfterChangeHook = async ({
-    doc,
-    previousDoc,
-    req: { payload, context },
-  }) => {
-    if (context.disableRevalidate) {
-      return doc
-    }
-
-    // Use universal revalidation system for globals
-    try {
-      await revalidate({
-        collection: `global:${globalSlug}`, // Use proper global naming convention
-        doc,
-        previousDoc,
-        action: "update",
-        logger: payload.logger,
-      })
-    } catch (error) {
-      payload.logger.error(`Smart revalidation failed for global ${globalSlug}:`, error)
-    }
-
+export const afterGlobalChange: GlobalAfterChangeHook = async ({
+  doc,
+  previousDoc,
+  req: { payload, context },
+  global, // This is provided by Payload!
+}) => {
+  if (context.disableRevalidate) {
     return doc
   }
 
-  return {
-    afterChange: [afterChange],
+  // Use universal revalidation system for globals
+  try {
+    await revalidate({
+      collection: `global:${global.slug}`, // Use proper global naming convention
+      doc,
+      previousDoc,
+      action: "update",
+      logger: payload.logger,
+    })
+  } catch (error) {
+    payload.logger.error(`Smart revalidation failed for global ${global.slug}:`, error)
   }
+
+  return doc
 }

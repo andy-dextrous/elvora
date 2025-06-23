@@ -1,9 +1,7 @@
 import type { GlobalConfig } from "payload"
 
 import { link } from "@/payload/fields/link"
-import { createGlobalHooks } from "@/payload/hooks/hooks"
-
-const { afterChange } = createGlobalHooks("footer")
+import { afterGlobalChange } from "@/payload/hooks/hooks"
 
 export const Footer: GlobalConfig = {
   slug: "footer",
@@ -55,6 +53,6 @@ export const Footer: GlobalConfig = {
     },
   ],
   hooks: {
-    afterChange,
+    afterChange: [afterGlobalChange],
   },
 }

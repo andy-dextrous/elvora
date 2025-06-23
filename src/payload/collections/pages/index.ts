@@ -6,8 +6,8 @@ import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublis
 import { slugField } from "@/payload/fields/slug"
 import { populatePublishedAt } from "@/payload/hooks/populatePublishedAt"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
-import { revalidateDelete, revalidatePage } from "./hooks/revalidatePage"
 import { applyDefaultTemplate } from "./hooks/applyDefaultTemplate"
+import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
 
 import {
   MetaDescriptionField,
@@ -154,9 +154,9 @@ export const Pages: CollectionConfig<"pages"> = {
     },
   ],
   hooks: {
-    afterChange: [revalidatePage],
+    afterChange: [afterCollectionChange],
     beforeChange: [populatePublishedAt, applyDefaultTemplate],
-    afterDelete: [revalidateDelete],
+    afterDelete: [afterCollectionDelete],
     beforeOperation: [lockSlugAfterPublish],
   },
   versions: {

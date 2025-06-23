@@ -12,7 +12,7 @@ import { authenticated } from "@/payload/access/authenticated"
 import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublished"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { populateAuthors } from "./hooks/populateAuthors"
-import { revalidateDelete, revalidatePost } from "./hooks/revalidatePost"
+import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
 
 import {
   MetaDescriptionField,
@@ -247,9 +247,9 @@ export const Posts: CollectionConfig<"posts"> = {
     ...slugField(),
   ],
   hooks: {
-    afterChange: [revalidatePost],
+    afterChange: [afterCollectionChange],
     afterRead: [populateAuthors],
-    afterDelete: [revalidateDelete],
+    afterDelete: [afterCollectionDelete],
     beforeOperation: [lockSlugAfterPublish],
   },
   versions: {

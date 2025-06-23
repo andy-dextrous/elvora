@@ -1,10 +1,8 @@
 import { CollectionConfig } from "payload"
-import { createHooks } from "@/payload/hooks/hooks"
+import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
 import { anyone } from "@/payload/access/anyone"
 import { canEditContent } from "@/payload/access/editor"
 import { slugField } from "../fields/slug"
-
-const { afterChange, afterDelete } = createHooks("testimonials")
 
 export const Testimonials: CollectionConfig = {
   slug: "testimonials",
@@ -84,7 +82,7 @@ export const Testimonials: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange,
-    afterDelete,
+    afterChange: [afterCollectionChange],
+    afterDelete: [afterCollectionDelete],
   },
 }

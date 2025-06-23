@@ -2,10 +2,7 @@ import type { CollectionConfig } from "payload"
 
 import { anyone } from "@/payload/access/anyone"
 import { authenticated } from "@/payload/access/authenticated"
-import { slugField } from "@/payload/fields/slug"
-import { createHooks } from "@/payload/hooks/hooks"
-
-const { afterChange, afterDelete } = createHooks("categories")
+import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
 
 export const Categories: CollectionConfig = {
   slug: "categories",
@@ -33,7 +30,7 @@ export const Categories: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange,
-    afterDelete,
+    afterChange: [afterCollectionChange],
+    afterDelete: [afterCollectionDelete],
   },
 }
