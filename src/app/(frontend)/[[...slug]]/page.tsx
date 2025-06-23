@@ -1,7 +1,7 @@
 import { RenderSections } from "@/components/sections/RenderSections"
 import { cache } from "@/lib/cache"
 import { getHomepage } from "@/lib/data/globals"
-import { routingEngine } from "@/lib/routing-engine"
+import { routingEngine } from "@/lib/routing"
 import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { PayloadRedirects } from "@/payload/components/frontend/payload-redirects"
 import { generateMeta } from "@/utilities/generate-meta"

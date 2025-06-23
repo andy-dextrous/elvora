@@ -36,7 +36,11 @@
 
 **✅ Phase 5 - URI-Based Sitemaps: COMPLETE**
 
-**🔄 Next Up: Phase 6 - Collection Integration**
+**✅ Phase 6 - Collection Integration: COMPLETE**
+
+**✅ Phase 6.5 - Routing Module Organization: COMPLETE**
+
+**🔄 Next Up: Phase 7 - Component & Code Migration to URI System**
 
 ## 📋 Table of Contents - Logical Construction Process
 
@@ -62,10 +66,13 @@
 🛣️ Phase 6.5: Routing Module Organization
    └── Organize routing system into clean, documented module structure
 
-🚀 Phase 7: Advanced Features
+🔄 Phase 7: Component & Code Migration to URI System
+   └── Update all components, links, and code to use URI fields instead of manual path construction
+
+🚀 Phase 8: Advanced Features
    └── Add cache warming, performance monitoring, and smart invalidation
 
-🏁 Phase 8: Final Integration
+🏁 Phase 9: Final Integration
    └── Complete migration, cleanup, and production readiness
 ```
 
@@ -256,43 +263,217 @@ The complete planning history and architecture details are in:
 - [x] Implement canonical URL handling logic
 - [x] Add external canonical URL detection and exclusion
 
-## 🔧 **Phase 6: Collection Integration**
+## 🔧 **Phase 6: Collection Integration** ✅ **COMPLETE**
 
-### Hook Migration
+### Hook Migration ✅ **COMPLETE**
 
-- [ ] Replace `revalidatePage.ts` with new hooks
-- [ ] Replace `revalidatePost.ts` with new hooks
-- [ ] Replace `createRevalidationHooks()` with new hooks
-- [ ] Replace `revalidateSettings.ts`, `revalidateHeader.ts`, `revalidateFooter.ts` with new global hooks
-- [ ] Update all collection configurations to use new hooks
-- [ ] Update all global configurations to use new global hooks
+- [x] Replace `revalidatePage.ts` with new hooks _(DONE: Using universal afterCollectionChange)_
+- [x] Replace `revalidatePost.ts` with new hooks _(DONE: Using universal afterCollectionChange)_
+- [x] Replace `createRevalidationHooks()` with new hooks _(DONE: All collections using universal hooks)_
+- [x] Replace `revalidateSettings.ts`, `revalidateHeader.ts`, `revalidateFooter.ts` with new global hooks _(DONE: Using universal afterGlobalChange)_
+- [x] Update all collection configurations to use new hooks _(DONE: All collections updated)_
+- [x] Update all global configurations to use new global hooks _(DONE: All globals updated)_
 
-### Remove Legacy Revalidation
+### Remove Legacy Revalidation ✅ **COMPLETE**
 
-- [ ] Delete `src/payload/hooks/revalidateCollection.ts`
-- [ ] Delete `src/payload/collections/pages/hooks/revalidatePage.ts`
-- [ ] Delete `src/payload/collections/posts/hooks/revalidatePost.ts`
-- [ ] Clean up any remaining manual revalidation code
+- [x] Delete `src/payload/hooks/revalidateCollection.ts` _(DONE: File already removed)_
+- [x] Delete `src/payload/collections/pages/hooks/revalidatePage.ts` _(DONE: File already removed)_
+- [x] Delete `src/payload/collections/posts/hooks/revalidatePost.ts` _(DONE: File already removed)_
+- [x] Clean up any remaining manual revalidation code _(DONE: All using universal system)_
 
-### Universal Routing Integration
+### Universal Routing Integration ✅ **COMPLETE**
 
-- [ ] Update `universal-resolver.ts` to use universal cache
-- [ ] Implement URI-first caching in resolver
-- [ ] Add cache warming for newly generated URIs
-- [ ] Optimize resolver performance with smart caching
+- [x] Update `universal-resolver.ts` to use universal cache _(DONE: [[...slug]]/page.tsx uses cache.getByURI())_
+- [x] Implement URI-first caching in resolver _(DONE: Resolver uses URI-first lookup)_
+- [x] Add cache warming for newly generated URIs _(DONE: Smart revalidation system handles this)_
+- [x] Optimize resolver performance with smart caching _(DONE: Universal cache with proper tags)_
 
-## 🛣️ **Phase 6.5: Routing Module Organization**
+## 🛣️ **Phase 6.5: Routing Module Organization** ✅ **COMPLETE**
 
-### Routing Module Organization
+### Routing Module Organization ✅ **COMPLETE**
 
-- [ ] Create `src/lib/routing/` folder structure
-- [ ] Create `src/lib/routing/README.md` - URI engine documentation
-- [ ] Create `src/lib/routing/index.ts` - Clean exports for all routing functionality
-- [ ] Move `src/lib/routing-engine.ts` to `src/lib/routing/uri-engine.ts`
-- [ ] Create `src/lib/routing/conflict-detection.ts` - Enhanced conflict detection
-- [ ] Update all imports to use new routing module structure
+- [x] Create `src/lib/routing/` folder structure _(DONE: Module created)_
+- [x] Create `src/lib/routing/README.md` - URI engine documentation _(DONE: Comprehensive docs with examples)_
+- [x] Create `src/lib/routing/index.ts` - Clean exports for all routing functionality _(DONE: Clean exports with convenience functions)_
+- [x] Move `src/lib/routing-engine.ts` to `src/lib/routing/uri-engine.ts` _(DONE: File moved)_
+- [x] ~~Create `src/lib/routing/conflict-detection.ts` - Enhanced conflict detection~~ _(SKIPPED: Over-engineering, existing conflict detection is sufficient)_
+- [x] Update all imports to use new routing module structure _(DONE: All imports updated)_
 
-## 🚀 **Phase 7: Advanced Features**
+## 🚀 **Phase 7: Component & Code Migration to URI System**
+
+### **🚨 CRITICAL: Link Components (Week 1 - High Priority)**
+
+#### **Task 7.1: Update CMSLink Component**
+
+- [ ] **File**: `src/payload/components/frontend/cms-link/index.tsx`
+- [ ] Replace `pathMapping` usage with URI field access
+- [ ] Update href construction logic to use `reference.value.uri`
+- [ ] Add fallback logic for backward compatibility
+- [ ] Remove dependency on `path-mapping.ts`
+- [ ] Test with all collection types (pages, posts, services)
+
+#### **Task 7.2: Update Rich Text Internal Links**
+
+- [ ] **File**: `src/payload/components/frontend/rich-text/index.tsx`
+- [ ] Replace hardcoded `/blog/` path construction in `internalDocToHref`
+- [ ] Update to use `value.uri` field with slug fallback
+- [ ] Ensure works for all collection types with relationTo
+- [ ] Test rich text links in pages and posts
+
+#### **Task 7.3: Update Post Card Component**
+
+- [ ] **File**: `src/components/posts/post-card.tsx`
+- [ ] Replace hardcoded `/blog/${post.slug}` with `post.uri`
+- [ ] Add fallback to slug-based construction if no URI
+- [ ] Test post cards in archive listings and related posts
+- [ ] Verify proper hover states and interactions
+
+#### **Task 7.4: Delete Path Mapping System**
+
+- [ ] **Remove**: `src/payload/path-mapping.ts` (entire file)
+- [ ] Update all imports that reference path mapping
+- [ ] Verify no components still depend on pathMapping object
+- [ ] Clean up any TypeScript types related to path mapping
+
+### **📋 PREVIEW & ADMIN SYSTEM (Week 1)**
+
+#### **Task 7.5: Update Preview Path Generation**
+
+- [ ] **File**: `src/utilities/generate-preview-path.ts`
+- [ ] Replace `collectionPrefixMap` with URI field usage
+- [ ] Update function signature to accept URI instead of slug
+- [ ] Create fallback logic for documents without URI field
+- [ ] Test preview links in admin for all collections
+
+#### **Task 7.6: Update Collection Preview URLs**
+
+- [ ] **File**: `src/payload/collections/pages/index.ts`
+- [ ] **File**: `src/payload/collections/posts/index.ts`
+- [ ] **File**: `src/payload/collections/services.ts`
+- [ ] Update `livePreview.url` to use URI field
+- [ ] Update `preview` function to use URI field
+- [ ] Test live preview functionality for all collections
+
+#### **Task 7.7: Update Plugin generateURL**
+
+- [ ] **File**: `src/payload/plugins/index.ts`
+- [ ] Update `generateURL` function to use URI field with slug fallback
+- [ ] Ensure compatibility with nestedDocsPlugin breadcrumbs
+- [ ] Test breadcrumb generation in admin interface
+
+### **🗂️ COLLECTION CONFIGURATIONS (Week 1)**
+
+#### **Task 7.8: Add Missing URI Fields to defaultPopulate**
+
+- [ ] **File**: `src/payload/collections/services.ts` - Add `uri: true` to defaultPopulate
+- [ ] **File**: `src/payload/collections/team.ts` - Add `uri: true` to defaultPopulate
+- [ ] **File**: `src/payload/collections/testimonials.ts` - Add `uri: true` to defaultPopulate
+- [ ] Verify all collections with slug fields have URI in defaultPopulate
+- [ ] Test admin interface shows URI fields properly
+
+### **🎯 NAVIGATION & BREADCRUMBS (Week 2)**
+
+#### **Task 7.9: Update Post Breadcrumbs**
+
+- [ ] **File**: `src/components/posts/post-breadcrumbs.tsx`
+- [ ] Replace hardcoded `/insights` link with dynamic archive page resolution
+- [ ] Create `getArchivePageUri("posts")` utility function
+- [ ] Use settings global to determine correct archive page URI
+- [ ] Add fallback logic if no archive page is configured
+- [ ] Test breadcrumbs with different archive page configurations
+
+#### **Task 7.10: Update Pagination Component**
+
+- [ ] **File**: `src/payload/components/frontend/pagination/index.tsx`
+- [ ] Replace hardcoded `/blog/page/` paths with dynamic archive URI
+- [ ] Integrate with archive page resolution system
+- [ ] Update all router.push calls to use dynamic paths
+- [ ] Test pagination on blog archive and search results
+
+#### **Task 7.11: Update Card Component**
+
+- [ ] **File**: `src/payload/components/frontend/card/index.tsx`
+- [ ] Replace manual `/${relationTo}/${slug}` construction with `doc.uri`
+- [ ] Add fallback logic for backward compatibility
+- [ ] Test card links in various contexts (related posts, archive listings)
+
+### **🔧 UTILITY FUNCTIONS (Week 2)**
+
+#### **Task 7.12: Update Generate Meta**
+
+- [ ] **File**: `src/utilities/generate-meta.ts`
+- [ ] Replace slug array URL construction with URI field usage
+- [ ] Update canonical URL generation to use `doc.uri`
+- [ ] Ensure proper SEO metadata generation
+- [ ] Test meta tags for pages, posts, and collection items
+
+#### **Task 7.13: Update Payload Redirects**
+
+- [ ] **File**: `src/payload/components/frontend/payload-redirects/index.tsx`
+- [ ] Replace manual path construction with URI field usage
+- [ ] Update redirect URL generation to use document URI field
+- [ ] Add fallback logic for documents without URI
+- [ ] Test redirect functionality with various redirect configurations
+
+### **⚙️ API & ROUTING ENHANCEMENTS (Week 2)**
+
+#### **Task 7.14: Update API Preview Route**
+
+- [ ] **File**: `src/app/(frontend)/api/preview/route.ts`
+- [ ] Enhance to validate URIs in addition to existing slug validation
+- [ ] Consider URI-based preview path construction
+- [ ] Maintain backward compatibility with existing preview system
+- [ ] Test preview mode with all collection types
+
+#### **Task 7.15: Archive Page Resolution System**
+
+- [ ] **Create**: `src/lib/routing/archive-resolution.ts`
+- [ ] Build `getArchivePageUri(collection)` function
+- [ ] Integrate with settings global and routing configuration
+- [ ] Add caching for archive page lookups
+- [ ] Create fallback logic for collections without archives
+
+### **🧪 TESTING & VALIDATION (Week 2)**
+
+#### **Task 7.16: Component Integration Testing**
+
+- [ ] Test all updated components work together
+- [ ] Verify navigation flows use correct URIs throughout
+- [ ] Test preview system works with new URI-based logic
+- [ ] Validate breadcrumbs work across all content types
+- [ ] Test link generation in rich text and CMS links
+
+#### **Task 7.17: Fallback System Validation**
+
+- [ ] Verify graceful fallbacks when URI field is missing
+- [ ] Test backward compatibility with existing content
+- [ ] Validate error handling for malformed URIs
+- [ ] Test performance impact of URI field queries
+
+#### **Task 7.18: SEO & Link Validation**
+
+- [ ] Verify all internal links use proper URI structure
+- [ ] Test canonical URL generation with new system
+- [ ] Validate no broken internal links exist
+- [ ] Test sitemap URLs match component-generated links
+
+### **📚 DOCUMENTATION & CLEANUP (Week 2)**
+
+#### **Task 7.19: Update Component Documentation**
+
+- [ ] Document URI field usage in component documentation
+- [ ] Update any README files that reference old path system
+- [ ] Create migration guide for future component development
+- [ ] Document fallback patterns for URI field usage
+
+#### **Task 7.20: Final Component Cleanup**
+
+- [ ] Remove any remaining references to old path mapping
+- [ ] Clean up unused imports and dependencies
+- [ ] Verify TypeScript types are updated for URI usage
+- [ ] Remove any TODO comments related to path construction
+
+## 🚀 **Phase 8: Advanced Features** _(Previously Phase 7)_
 
 ### Cache Warming
 
@@ -322,7 +503,7 @@ The complete planning history and architecture details are in:
 - [ ] Create URI analytics and monitoring
 - [ ] Build advanced conflict resolution strategies
 
-## 🏁 **Phase 8: Final Integration**
+## 🏁 **Phase 9: Final Integration** _(Previously Phase 8)_
 
 ### Complete API Replacement
 

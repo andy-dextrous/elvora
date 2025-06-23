@@ -168,7 +168,7 @@ function generateFallbackURI(collection: string, slug: string, data?: any): stri
 /*  URI CONFLICT DETECTION
 /*************************************************************************/
 
-interface URIConflictResult {
+export interface URIConflictResult {
   collection: string
   slug: string
   id: string

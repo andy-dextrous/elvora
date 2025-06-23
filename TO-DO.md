@@ -1,9 +1,6 @@
 # Tasks
 
 - Test redirects
-- universal slug routing
-- Collection slugs (ie /services/ai-engineer)
-- Easy opt in for collections in sitemap
 - Proper metadata and page-level SEO controls
 - Resolve headers - draftmode permanent loading states. Do we want a separate route for live preview?
 - re-examine fields/components
@@ -13,12 +10,9 @@
 - empty avatar centered icon
 - should payload frontend components be coupled with their config?
 - organised navigation
-- rethink designation of homepage? isHomePage? isPostsPage? etc
 - remove admin bar live preview
 - autopopulation of SEO fields
-- AI metadescription
 - tie users to team members
-- structured data (JSON LD)
 - Wordpress auto migrate feature! Site Uplift Engine
 
 ## AI components (mastra)
