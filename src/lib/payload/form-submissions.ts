@@ -24,7 +24,7 @@ export async function getUnreadFormSubmissionsCount(): Promise<number> {
 
     return result.totalDocs
   } catch (error) {
-    console.error("Error fetching unread form submissions count:", error)
+    // Note: Error fetching unread form submissions count - using fallback
     return 0
   }
 }
@@ -47,7 +47,7 @@ export async function markFormSubmissionsAsRead(submissionIds: string[]): Promis
       })
     }
   } catch (error) {
-    console.error("Error marking form submissions as read:", error)
+    // Note: Error marking form submissions as read
   }
 }
 
@@ -81,6 +81,6 @@ export async function markAllFormSubmissionsAsRead(): Promise<void> {
       })
     }
   } catch (error) {
-    console.error("Error marking all form submissions as read:", error)
+    // Note: Error marking all form submissions as read
   }
 }

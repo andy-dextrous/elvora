@@ -1,6 +1,6 @@
 import type { CheckboxField, TextField } from "payload"
 import { formatSlugHook } from "./format-slug"
-import { createURIHook } from "./create-uri"
+import { createURIHook } from "@/lib/payload/routing-engine"
 
 type Overrides = {
   slugOverrides?: Partial<TextField>

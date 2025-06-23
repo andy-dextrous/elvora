@@ -1,86 +1,35 @@
+import { getPayload } from "payload"
+import { unstable_cache } from "next/cache"
+import configPromise from "@payload-config"
 import { frontendCollections } from "@/payload/collections/frontend"
 import type { FieldHook } from "payload"
 
 /*************************************************************************/
-/*  UNIVERSAL URI GENERATION HOOK
+/*  CACHED ROUTING SETTINGS
 /*************************************************************************/
 
-export const createURIHook = (): FieldHook => {
-  return async ({ data, req, operation, originalDoc, collection }) => {
-    // Only generate URI on create or when slug changes
-    if (operation !== "create" && operation !== "update") {
-      return data?.uri || originalDoc?.uri
-    }
-
-    // Always regenerate URI when slug changes
-    // Only skip regeneration if slug hasn't changed
-    if (data?.slug === originalDoc?.slug && originalDoc?.uri) {
-      return originalDoc.uri
-    }
-
-    const slug = data?.slug || originalDoc?.slug
-    if (!slug) {
-      return ""
-    }
-
-    const collectionSlug = collection?.slug
-    if (!collectionSlug) {
-      return `/${slug}`
-    }
-
-    try {
-      const payload = req.payload
-
-      // Get routing settings from global
+const getRoutingSettings = () =>
+  unstable_cache(
+    async () => {
+      const payload = await getPayload({ config: configPromise })
       const settings = await payload.findGlobal({
         slug: "settings",
         depth: 1,
       })
-
-      const generatedURI = await generateURI({
-        collection: collectionSlug,
-        slug,
-        data,
-        originalDoc,
-        settings: settings?.routing || {},
-        payload,
-      })
-
-      // Check for URI conflicts
-      const currentDocId = data?.id || originalDoc?.id
-      const conflict = await checkURIConflict({
-        uri: generatedURI,
-        collection: collectionSlug,
-        documentId: currentDocId,
-        payload,
-      })
-
-      if (conflict) {
-        console.warn(
-          `⚠️  URI Conflict Detected: ${generatedURI}\n` +
-            `   Current: ${collectionSlug}/${slug}\n` +
-            `   Conflicts with: ${conflict.collection}/${conflict.slug}\n` +
-            `   Using first-match-wins priority`
-        )
-      }
-
-      return generatedURI
-    } catch (error) {
-      console.warn(`URI generation failed for ${collectionSlug}/${slug}:`, error)
-      // Fallback to basic URI generation
-      return generateFallbackURI(collectionSlug, slug, data)
-    }
-  }
-}
+      return settings?.routing || {}
+    },
+    ["routing-settings"],
+    { tags: ["global:settings"], revalidate: 3600 }
+  )()
 
 /*************************************************************************/
-/*  URI GENERATION LOGIC
+/*  CORE URI GENERATION LOGIC
 /*************************************************************************/
 
 interface GenerateURIProps {
   collection: string
   slug: string
-  data: any
+  data?: any
   originalDoc?: any
   settings: any
   payload: any
@@ -124,7 +73,7 @@ async function generatePageURI({
   payload,
 }: {
   slug: string
-  data: any
+  data?: any
   originalDoc?: any
   payload: any
 }): Promise<string> {
@@ -154,7 +103,7 @@ async function generatePageURI({
 
     return `${parentDoc.uri}/${slug}`
   } catch (error) {
-    console.warn("Failed to generate hierarchical page URI:", error)
+    payload.logger.warn("Failed to generate hierarchical page URI:", error)
     return `/${slug}`
   }
 }
@@ -193,7 +142,7 @@ async function generateCollectionItemURI({
         return `/${archivePage.slug}/${slug}`
       }
     } catch (error) {
-      console.warn(`Failed to fetch archive page for ${collection}:`, error)
+      payload.logger.warn(`Failed to fetch archive page for ${collection}:`, error)
     }
   }
 
@@ -205,7 +154,7 @@ async function generateCollectionItemURI({
 /*  FALLBACK URI GENERATION
 /*************************************************************************/
 
-function generateFallbackURI(collection: string, slug: string, data: any): string {
+function generateFallbackURI(collection: string, slug: string, data?: any): string {
   // Simple fallback logic
   if (collection === "pages") {
     if (slug === "home") return ""
@@ -317,5 +266,189 @@ export function validateURI(uri: string): { isValid: boolean; errors: string[] }
   return {
     isValid: errors.length === 0,
     errors,
+  }
+}
+
+/*************************************************************************/
+/*  ROUTING ENGINE API
+/*************************************************************************/
+
+export const routingEngine = {
+  /**
+   * Generate URI for document (used in Payload hooks)
+   */
+  generate: async ({
+    collection,
+    slug,
+    data,
+    originalDoc,
+  }: {
+    collection: string
+    slug: string
+    data?: any
+    originalDoc?: any
+  }): Promise<string> => {
+    const payload = await getPayload({ config: configPromise })
+    const settings = await getRoutingSettings()
+
+    const generatedURI = await generateURI({
+      collection,
+      slug,
+      data,
+      originalDoc,
+      settings,
+      payload,
+    })
+
+    // Check for URI conflicts
+    const currentDocId = data?.id || originalDoc?.id
+    const conflict = await checkURIConflict({
+      uri: generatedURI,
+      collection,
+      documentId: currentDocId,
+      payload,
+    })
+
+    if (conflict) {
+      payload.logger.warn(
+        `⚠️  URI Conflict Detected: ${generatedURI}\n` +
+          `   Current: ${collection}/${slug}\n` +
+          `   Conflicts with: ${conflict.collection}/${conflict.slug}\n` +
+          `   Using first-match-wins priority`
+      )
+    }
+
+    return generatedURI
+  },
+
+  /**
+   * Get all URIs for static generation
+   */
+  getAllURIs: async (draft: boolean = false): Promise<string[]> => {
+    const cacheKey = ["all-uris", draft ? "draft" : "published"]
+    const tags = ["routes"]
+
+    return unstable_cache(
+      async () => {
+        const payload = await getPayload({ config: configPromise })
+        const uris: string[] = []
+
+        for (const collection of frontendCollections) {
+          try {
+            const result = await payload.find({
+              collection: collection.slug as any,
+              where: {
+                uri: { exists: true },
+                _status: { equals: "published" },
+              },
+              limit: 1000,
+              depth: 0,
+              draft,
+              select: { uri: true },
+            })
+
+            result.docs.forEach((doc: any) => {
+              if (doc.uri) {
+                uris.push(doc.uri)
+              }
+            })
+          } catch (error) {
+            continue
+          }
+        }
+
+        return [...new Set(uris)]
+      },
+      cacheKey,
+      { tags }
+    )()
+  },
+
+  /**
+   * Check conflicts (used during generation)
+   */
+  checkConflicts: async (
+    uri: string,
+    excludeDocId?: string
+  ): Promise<URIConflictResult | null> => {
+    const payload = await getPayload({ config: configPromise })
+    return await checkURIConflict({
+      uri,
+      collection: "",
+      documentId: excludeDocId,
+      payload,
+    })
+  },
+
+  /**
+   * Validate URI format
+   */
+  validate: validateURI,
+
+  /**
+   * Convert Next.js slug array to URI (standardizes slug-to-URI conversion)
+   */
+  slugToURI: (slugArray: string[]): string => {
+    if (!slugArray || slugArray.length === 0) {
+      return "/"
+    }
+    const slugPath = slugArray.join("/")
+    return `/${slugPath}`
+  },
+
+  /**
+   * Convert URI to Next.js slug array (for generateStaticParams)
+   */
+  uriToSlug: (uri: string): string[] => {
+    if (!uri || uri === "/" || uri === "") {
+      return []
+    }
+    return uri.split("/").filter(Boolean)
+  },
+}
+
+/*************************************************************************/
+/*  PAYLOAD FIELD HOOK (REPLACES create-uri.ts)
+/*************************************************************************/
+
+export const createURIHook = (): FieldHook => {
+  return async ({ data, req, operation, originalDoc, collection }) => {
+    // Only generate URI on create or when slug changes
+    if (operation !== "create" && operation !== "update") {
+      return data?.uri || originalDoc?.uri
+    }
+
+    // Always regenerate URI when slug changes
+    // Only skip regeneration if slug hasn't changed
+    if (data?.slug === originalDoc?.slug && originalDoc?.uri) {
+      return originalDoc.uri
+    }
+
+    const slug = data?.slug || originalDoc?.slug
+    if (!slug) {
+      return ""
+    }
+
+    const collectionSlug = collection?.slug
+    if (!collectionSlug) {
+      return `/${slug}`
+    }
+
+    try {
+      // Use the routing engine
+      return await routingEngine.generate({
+        collection: collectionSlug,
+        slug,
+        data,
+        originalDoc,
+      })
+    } catch (error) {
+      req.payload.logger.warn(
+        `URI generation failed for ${collectionSlug}/${slug}:`,
+        error
+      )
+      // Fallback to basic URI generation
+      return generateFallbackURI(collectionSlug, slug, data)
+    }
   }
 }

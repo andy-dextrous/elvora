@@ -1,5 +1,5 @@
 ---
-description: When asked to work on the smart routing engine plan.
+description: When asked to work on the smart routing engine plan. Or even if the user asks to work on the next phase of "the build" or "the tasklist" they mean this.
 globs:
 alwaysApply: false
 ---
@@ -18,3 +18,6 @@ This is a shorter, overview doc to be used for quick reference.
 ## Rules
 - Work part by part. Each phase is broken into parts with a title and tasklist. Consult me on the parts and be sure to mark the document with its status.
 - Before you start building, make sure you familiarise yourself with the parts that have already been completed, to stay on top of the work as a whole.
+- Stay focused on what is next to do according to the plan. You are welcome to suggest edits to how we proceed but always look ahead to the whole plan to make sure you are not jumping ahead.
+- As we build, I really only want to add the parts that are necessary at the current moment in time. So if part of a phase seems to be redundant for now, feel free to suggest we push it back to a later phase.
+- You might see example code with lots of inline comments that explain stuff within functions etc. I don't like this. Pay attention to my coding rules please and even if you see rules being broken in the tasklist or overview docs, make sure you adjust it to abide.

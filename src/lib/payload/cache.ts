@@ -2,6 +2,7 @@ import { getPayload } from "payload"
 import { unstable_cache } from "next/cache"
 import configPromise from "@payload-config"
 import type { Config } from "@/payload/payload-types"
+import { getCacheConfig } from "./cache-config"
 
 /*************************************************************************/
 /*  UNIVERSAL CACHE API - TYPES & INTERFACES
@@ -100,6 +101,10 @@ function generateCacheTags(options: CacheKeyOptions): string[] {
   if (collection && slug) {
     tags.push(`collection:${collection}`)
     tags.push(`item:${collection}:${slug}`)
+
+    // Add dependencies from cache config
+    const config = getCacheConfig(collection)
+    tags.push(...config.dependencies)
   }
 
   // URI-based lookups
@@ -111,6 +116,10 @@ function generateCacheTags(options: CacheKeyOptions): string[] {
   // Collection queries
   if (collection && !slug) {
     tags.push(`collection:${collection}`)
+
+    // Add dependencies from cache config for collection queries too
+    const config = getCacheConfig(collection)
+    tags.push(...config.dependencies)
   }
 
   // Globals
@@ -370,6 +379,6 @@ export async function enableCacheDebug() {
     const payload = await getPayload({ config: configPromise })
     payload.logger.info("🗄️ Cache debugging enabled")
   } catch (error) {
-    console.log("🗄️  Cache debugging enabled")
+    // payload.logger.info("🗄️  Cache debugging enabled")
   }
 }

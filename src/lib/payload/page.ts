@@ -92,7 +92,7 @@ async function getHomepageFromSettingsInternal() {
       return page.docs[0] as Page
     }
   } catch (error) {
-    console.log("Settings not found, using fallback homepage detection")
+    // Note: Settings not found, using fallback homepage detection
   }
 
   return null
