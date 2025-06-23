@@ -26,6 +26,12 @@ const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
   const url = getServerSideURL()
 
+  // Priority 1: Use URI field if available (Smart Routing Engine)
+  if ((doc as any)?.uri) {
+    return `${url}${(doc as any).uri}`
+  }
+
+  // Fallback: Basic slug construction
   return doc?.slug ? `${url}/${doc.slug}` : url
 }
 
@@ -184,6 +190,15 @@ export const plugins: Plugin[] = [
   nestedDocsPlugin({
     collections: ["pages", "categories"],
     generateLabel: (_, doc) => doc.title as string,
-    generateURL: docs => docs.reduce((url, doc) => `${url}/${doc.slug as string}`, ""),
+    generateURL: docs => {
+      // Use URI field if available on the final document, otherwise fallback to slug construction
+      const finalDoc = docs[docs.length - 1]
+      if ((finalDoc as any)?.uri) {
+        return (finalDoc as any).uri
+      }
+
+      // Fallback: Traditional slug concatenation
+      return docs.reduce((url, doc) => `${url}/${doc.slug as string}`, "")
+    },
   }),
 ]

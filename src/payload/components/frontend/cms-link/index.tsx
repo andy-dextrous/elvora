@@ -1,5 +1,4 @@
 import { Button, type ButtonProps } from "@/components/ui/button"
-import { pathMapping } from "@/payload/path-mapping"
 import { cn } from "@/utilities/ui"
 import Link from "next/link"
 import React from "react"
@@ -18,6 +17,10 @@ type CMSLinkType = {
   url?: string | null // The external URL if type is "custom"
 } & Omit<React.ComponentProps<typeof Link>, "href" | "children" | "className" | "type">
 
+/*************************************************************************/
+/*  CMS LINK COMPONENT - URI-FIRST ARCHITECTURE
+/*************************************************************************/
+
 export const CMSLink: React.FC<CMSLinkType> = props => {
   const {
     type,
@@ -31,23 +34,35 @@ export const CMSLink: React.FC<CMSLinkType> = props => {
     ...linkProps
   } = props
 
-  // Collection-to-path mapping for custom routing
-  const getCollectionPath = (relationTo: string): string => {
-    return pathMapping[relationTo] || "" // if no mapping is found, return an empty string which means no path is needed
+  // Generate href using URI-first approach
+  const generateHref = (): string | null => {
+    if (type === "custom") {
+      return url || null
+    }
+
+    if (type === "reference" && typeof reference?.value === "object" && reference.value) {
+      const doc = reference.value
+
+      // Homepage special case
+      if (doc.slug === "home") {
+        return "/"
+      }
+
+      // Priority 1: Use URI field if available (Smart Routing Engine)
+      if (doc.uri && typeof doc.uri === "string") {
+        return doc.uri.startsWith("/") ? doc.uri : `/${doc.uri}`
+      }
+
+      // Fallback: Basic slug construction (documents without URI field)
+      if (doc.slug && typeof doc.slug === "string") {
+        return `/${doc.slug}`
+      }
+    }
+
+    return url || null
   }
 
-  const relationToPath = reference?.relationTo
-    ? getCollectionPath(reference.relationTo)
-    : ""
-
-  const href =
-    type === "reference" && typeof reference?.value === "object" && reference.value.slug
-      ? reference.value.slug === "home"
-        ? `${process.env.NEXT_PUBLIC_URL}/`
-        : relationToPath === ""
-          ? `${process.env.NEXT_PUBLIC_URL}/${reference.value.slug}`
-          : `${process.env.NEXT_PUBLIC_URL}/${relationToPath}/${reference.value.slug}`
-      : url
+  const href = generateHref()
 
   if (!href) return null
 
@@ -60,12 +75,7 @@ export const CMSLink: React.FC<CMSLinkType> = props => {
   /* Ensure we don't break any styles set by richText */
   if (appearance === "inline") {
     return (
-      <Link
-        className={cn(className)}
-        href={href || url || ""}
-        {...newTabProps}
-        {...linkProps}
-      >
+      <Link className={cn(className)} href={href} {...newTabProps} {...linkProps}>
         {content}
       </Link>
     )
@@ -73,12 +83,7 @@ export const CMSLink: React.FC<CMSLinkType> = props => {
 
   return (
     <Button asChild className={className} size={size} variant={appearance}>
-      <Link
-        className={cn(className)}
-        href={href || url || ""}
-        {...newTabProps}
-        {...linkProps}
-      >
+      <Link className={cn(className)} href={href} {...newTabProps} {...linkProps}>
         {content}
       </Link>
     </Button>

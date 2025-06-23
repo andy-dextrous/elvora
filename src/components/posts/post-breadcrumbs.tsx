@@ -17,9 +17,14 @@ import {
 interface PostBreadcrumbsProps {
   post: Post
   className?: string
+  blogArchiveUri?: string // Archive page URI passed from parent component
 }
 
-export function PostBreadcrumbs({ post, className }: PostBreadcrumbsProps) {
+export function PostBreadcrumbs({
+  post,
+  className,
+  blogArchiveUri = "/blog",
+}: PostBreadcrumbsProps) {
   return (
     <Breadcrumb className={cn("mb-20", className)}>
       <BreadcrumbList className="text-sm text-white/70">
@@ -33,7 +38,10 @@ export function PostBreadcrumbs({ post, className }: PostBreadcrumbsProps) {
         <BreadcrumbSeparator className="text-white/50" />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/insights" className="text-sm text-white hover:text-white/80">
+            <Link
+              href={blogArchiveUri}
+              className="text-sm text-white hover:text-white/80"
+            >
               Blog
             </Link>
           </BreadcrumbLink>

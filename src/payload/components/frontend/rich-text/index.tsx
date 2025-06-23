@@ -18,13 +18,29 @@ import "./styles.scss"
 
 type NodeTypes = DefaultNodeTypes | SerializedBlockNode<any | CodeBlockProps>
 
+/*************************************************************************/
+/*  INTERNAL LINK RESOLVER - URI-FIRST ARCHITECTURE
+/*************************************************************************/
+
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
   const { value, relationTo } = linkNode.fields.doc!
   if (typeof value !== "object") {
     throw new Error("Expected value to be an object")
   }
+
+  // Homepage special case
+  if (value.slug === "home") {
+    return "/"
+  }
+
+  // Priority 1: Use URI field if available (Smart Routing Engine)
+  if (value.uri && typeof value.uri === "string") {
+    return value.uri.startsWith("/") ? value.uri : `/${value.uri}`
+  }
+
+  // Fallback: Basic slug construction (documents without URI field)
   const slug = value.slug
-  return relationTo === "posts" ? `/blog/${slug}` : `/${slug}`
+  return slug && typeof slug === "string" ? `/${slug}` : "/"
 }
 
 const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) => ({

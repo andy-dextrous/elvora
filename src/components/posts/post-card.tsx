@@ -35,7 +35,7 @@ export function PostCard({ post, className }: PostCardProps) {
       </div>
       <div className="z-30 flex flex-1 flex-col px-6 pt-8 pb-12 md:p-6 lg:p-8">
         <Link
-          href={`/blog/${post.slug || ""}`}
+          href={post.uri || `/blog/${post.slug || ""}`}
           className="z-40 before:absolute before:inset-0 before:z-40 before:size-full"
         >
           <h5 className="z-50 mb-3 text-white md:mb-4">{post.title}</h5>
