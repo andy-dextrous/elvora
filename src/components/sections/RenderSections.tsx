@@ -12,6 +12,10 @@ import { ContactFormComponent } from "@/components/sections/contact-form/Compone
 import { CtaFormComponent } from "@/components/sections/cta-form/Component"
 import { HeadingLeftContentComponent } from "@/components/sections/heading-left-content/Component"
 import { SimpleTextComponent } from "@/components/sections/simple-text/Component"
+import { PostHeroComponent } from "@/components/sections/post-hero/Component"
+import { PostContentComponent } from "@/components/sections/post-content/Component"
+import { PostsArchiveComponent } from "@/components/sections/posts-archive/Component"
+import { RelatedPostsComponent } from "@/components/sections/related-posts/Component"
 import React, { Fragment } from "react"
 
 /*******************************************************/
@@ -33,18 +37,29 @@ const sectionsMap: Record<string, React.ComponentType<any>> = {
   "cta-form": CtaFormComponent,
   "heading-left-content": HeadingLeftContentComponent,
   "simple-text": SimpleTextComponent,
+  "post-hero": PostHeroComponent,
+  "post-content": PostContentComponent,
+  "posts-archive": PostsArchiveComponent,
+  "related-posts": RelatedPostsComponent,
 }
 
 /*******************************************************/
 /*  Render Component
+/*
+/*  Automatically passes currentDocument and currentCollection
+/*  to all sections as optional props for dynamic content access
 /*******************************************************/
 
 export const RenderSections: React.FC<{
   sections: any[]
+  document?: any
+  collection?: string
 }> = props => {
-  const { sections } = props
+  const { sections, document, collection } = props
 
   const hasSections = sections && Array.isArray(sections) && sections.length > 0
+
+  // console.log("sections", sections)
 
   if (hasSections) {
     return (
@@ -56,7 +71,14 @@ export const RenderSections: React.FC<{
             const Section = sectionsMap[blockType]
 
             if (Section) {
-              return <Section {...section} key={index} />
+              // Pass current document and collection to ALL sections as optional props
+              const sectionProps = {
+                ...section,
+                currentDocument: document,
+                currentCollection: collection,
+              }
+
+              return <Section {...sectionProps} key={index} />
             }
           }
           return null

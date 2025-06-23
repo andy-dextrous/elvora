@@ -12,6 +12,10 @@ import { ContactForm } from "@/components/sections/contact-form/config"
 import { CtaForm } from "@/components/sections/cta-form/config"
 import { HeadingLeftContent } from "@/components/sections/heading-left-content/config"
 import { SimpleText } from "@/components/sections/simple-text/config"
+import { PostHero } from "@/components/sections/post-hero/config"
+import { PostContent } from "@/components/sections/post-content/config"
+import { PostsArchive } from "@/components/sections/posts-archive/config"
+import { RelatedPosts } from "@/components/sections/related-posts/config"
 
 export const sectionBlocks = [
   HeroPrimary,
@@ -28,4 +32,8 @@ export const sectionBlocks = [
   CtaForm,
   HeadingLeftContent,
   SimpleText,
+  PostHero,
+  PostContent,
+  PostsArchive,
+  RelatedPosts,
 ]
