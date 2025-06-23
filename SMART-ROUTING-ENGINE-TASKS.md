@@ -34,7 +34,9 @@
 
 **✅ Phase 4 - API Migration: COMPLETE**
 
-**🔄 Next Up: Phase 5 - URI-Based Sitemaps**
+**✅ Phase 5 - URI-Based Sitemaps: COMPLETE**
+
+**🔄 Next Up: Phase 6 - Collection Integration**
 
 ## 📋 Table of Contents - Logical Construction Process
 
@@ -215,44 +217,44 @@ The complete planning history and architecture details are in:
 - [x] Add templates collection to cache configuration with proper dependencies
 - [x] Complete migration of all complex cache functions to universal cache
 
-## 🗺️ **Phase 5: URI-Based Sitemaps**
+## 🗺️ **Phase 5: URI-Based Sitemaps** ✅ **COMPLETE**
 
-### Sitemaps Module Organization
+### Sitemaps Module Organization ✅ **COMPLETE**
 
-- [ ] Create `src/lib/sitemaps/` folder structure
-- [ ] Create `src/lib/sitemaps/README.md` - How URI-based sitemaps work
-- [ ] Create `src/lib/sitemaps/index.ts` - Clean exports for all sitemap functionality
-- [ ] Create `src/lib/sitemaps/config.ts` with SITEMAP_CONFIG
-- [ ] Create `src/lib/sitemaps/generator.ts` - Universal sitemap generator
-- [ ] Create `src/lib/sitemaps/route-factory.ts` - Dynamic route creation
-- [ ] Create `src/lib/sitemaps/seo-filters.ts` - noIndex, canonical URL logic
+- [x] Create `src/lib/sitemaps/` folder structure
+- [x] Create `src/lib/sitemaps/README.md` - How URI-based sitemaps work
+- [x] Create `src/lib/sitemaps/index.ts` - Clean exports for all sitemap functionality
+- [x] Create `src/lib/sitemaps/config.ts` with SITEMAP_CONFIG
+- [x] Create `src/lib/sitemaps/generator.ts` - Universal sitemap generator
+- [x] Create `src/lib/sitemaps/route-factory.ts` - Dynamic route creation
+- [x] Create `src/lib/sitemaps/seo-filters.ts` - noIndex, canonical URL logic
 
-### Sitemap Configuration
+### Sitemap Configuration ✅ **COMPLETE**
 
-- [ ] Define collection-to-sitemap mappings in config
-- [ ] Add SEO filtering configuration
-- [ ] Include archive page detection logic
+- [x] Define collection-to-sitemap mappings in config
+- [x] Add SEO filtering configuration
+- [x] Include archive page detection logic _(handled by routing engine integration)_
 
-### Universal Sitemap Generator
+### Universal Sitemap Generator ✅ **COMPLETE**
 
-- [ ] Implement `generateSitemap()` using universal cache + URI engine
-- [ ] Add SEO-aware filtering (noIndex, canonical URLs)
-- [ ] Use URI field instead of slug concatenation
-- [ ] Add automatic new collection support
+- [x] Implement `generateSitemap()` using universal cache + URI engine
+- [x] Add SEO-aware filtering (noIndex, canonical URLs)
+- [x] Use URI field instead of slug concatenation
+- [x] Add automatic new collection support
 
-### Sitemap Route Factory
+### Sitemap Route Factory ✅ **COMPLETE**
 
-- [ ] Replace hardcoded sitemap routes with factory
-- [ ] Migrate `pages-sitemap.xml/route.ts` to use factory
-- [ ] Migrate `posts-sitemap.xml/route.ts` to use factory
-- [ ] Integrate with universal tag system
+- [x] Replace hardcoded sitemap routes with factory
+- [x] Migrate `pages-sitemap.xml/route.ts` to use factory
+- [x] Migrate `posts-sitemap.xml/route.ts` to use factory
+- [x] Integrate with universal tag system
 
-### SEO Compliance
+### SEO Compliance ✅ **COMPLETE**
 
-- [ ] Add `noIndex` and `canonicalUrl` fields to posts collection
-- [ ] Update sitemap field selection to include SEO fields
-- [ ] Implement canonical URL handling logic
-- [ ] Add external canonical URL detection and exclusion
+- [x] Add `noIndex` and `canonicalUrl` fields to posts collection
+- [x] Update sitemap field selection to include SEO fields
+- [x] Implement canonical URL handling logic
+- [x] Add external canonical URL detection and exclusion
 
 ## 🔧 **Phase 6: Collection Integration**
 

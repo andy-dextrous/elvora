@@ -190,6 +190,24 @@ export const Posts: CollectionConfig<"posts"> = {
               titlePath: "meta.title",
               descriptionPath: "meta.description",
             }),
+            {
+              name: "noIndex",
+              type: "checkbox",
+              label: "No Index",
+              admin: {
+                description:
+                  "Prevent this post from appearing in search engines and sitemaps",
+              },
+            },
+            {
+              name: "canonicalUrl",
+              type: "text",
+              label: "Canonical URL",
+              admin: {
+                description:
+                  "Optional canonical URL for this post (use for republished content)",
+              },
+            },
           ],
         },
       ],

@@ -627,6 +627,14 @@ export interface Post {
      */
     image?: (string | null) | Media;
     description?: string | null;
+    /**
+     * Prevent this post from appearing in search engines and sitemaps
+     */
+    noIndex?: boolean | null;
+    /**
+     * Optional canonical URL for this post (use for republished content)
+     */
+    canonicalUrl?: string | null;
   };
   publishedAt?: string | null;
   authors?: (string | User)[] | null;
@@ -2137,6 +2145,8 @@ export interface PostsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        noIndex?: T;
+        canonicalUrl?: T;
       };
   publishedAt?: T;
   authors?: T;

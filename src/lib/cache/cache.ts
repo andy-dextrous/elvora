@@ -21,6 +21,7 @@ export interface QueryOptions {
   draft?: boolean
   locale?: string
   overrideAccess?: boolean
+  select?: Record<string, boolean>
 }
 
 export interface ResolvedDocument {

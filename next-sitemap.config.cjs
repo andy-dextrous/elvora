@@ -1,24 +1,8 @@
-const SITE_URL =
-  process.env.NEXT_PUBLIC_URL ||
-  process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-  "https://example.com"
-
 /** @type {import('next-sitemap').IConfig} */
 
-module.exports = {
-  siteUrl: SITE_URL,
-  generateRobotsTxt: true,
-  exclude: ["/posts-sitemap.xml", "/pages-sitemap.xml", "/*", "/blog/*"],
-  robotsTxtOptions: {
-    policies: [
-      {
-        userAgent: "*",
-        disallow: "/admin/*",
-      },
-    ],
-    additionalSitemaps: [
-      `${SITE_URL}/pages-sitemap.xml`,
-      `${SITE_URL}/posts-sitemap.xml`,
-    ],
-  },
-}
+// Dynamic configuration generated from our SITEMAP_CONFIG
+const {
+  generateNextSitemapConfig,
+} = require("./src/lib/sitemaps/next-sitemap-integration.js")
+
+module.exports = generateNextSitemapConfig()
