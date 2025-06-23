@@ -1,5 +1,5 @@
 import LogoPrimaryLight from "@/components/logos/logo-light"
-import { getCachedGlobal, getSettings } from "@/lib/payload/globals"
+import { getGlobal, getSettings } from "@/lib/data/globals"
 import { CMSLink } from "@/payload/components/frontend/cms-link"
 import { SocialLinks } from "@/payload/components/frontend/social-links"
 import type { Footer as FooterType, Setting } from "@/payload/payload-types"
@@ -20,7 +20,7 @@ After
 
 export async function Footer() {
   const [footerData, settingsData] = await Promise.all([
-    getCachedGlobal("footer" as never, 1),
+    getGlobal("footer" as never, 1),
     getSettings(),
   ])
 

@@ -3,7 +3,7 @@ import type {
   CollectionAfterDeleteHook,
   GlobalAfterChangeHook,
 } from "payload"
-import { revalidate } from "@/lib/payload/cache/revalidation"
+import { revalidate } from "@/lib/cache/revalidation"
 
 /*************************************************************************/
 /*  COLLECTION HOOKS FACTORY

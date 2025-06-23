@@ -1,13 +1,13 @@
 import { RenderSections } from "@/components/sections/RenderSections"
-import { cache } from "@/lib/payload/cache"
-import { routingEngine } from "@/lib/payload/routing-engine"
+import { cache } from "@/lib/cache"
+import { getHomepage } from "@/lib/data/page"
+import { routingEngine } from "@/lib/routing-engine"
 import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { PayloadRedirects } from "@/payload/components/frontend/payload-redirects"
 import { generateMeta } from "@/utilities/generate-meta"
-import { notFound, redirect } from "next/navigation"
-import { getHomepage } from "@/lib/payload/page"
-import { draftMode } from "next/headers"
 import { Metadata } from "next"
+import { draftMode } from "next/headers"
+import { notFound, redirect } from "next/navigation"
 
 type Args = {
   params: Promise<{

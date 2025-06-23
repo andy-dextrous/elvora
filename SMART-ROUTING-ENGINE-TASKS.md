@@ -24,7 +24,15 @@
 - Tag mapping standardized: `global:*` naming convention, `sitemap:all` simplification
 - Hardcoded logic removed and replaced with scalable solutions
 
-**🔄 Next Up: Phase 4 - API Migration**
+**✅ Phase 4 - API Migration: COMPLETE**
+
+- Migrated all active legacy cache functions to universal cache API
+- Removed unused and redundant functions (getCachedDocument, testimonial functions)
+- Updated PayloadRedirects component to use universal cache directly
+- Cleaned up function naming (removed "cache" prefixes - caching is assumed)
+- Preserved complex functions for GraphQL phase (getRelatedPosts, getDefaultTemplate)
+
+**🔄 Next Up: Phase 5 - GraphQL Integration**
 
 ## 📋 Table of Contents - Logical Construction Process
 
@@ -177,20 +185,30 @@ The complete planning history and architecture details are in:
 
 ## 📊 **Phase 4: API Migration**
 
-### Replace Core Cache Functions
+### Replace Core Cache Functions ✅ **COMPLETE**
 
-- [ ] Migrate `getPageBySlug()` to `cache.getBySlug("pages", slug)`
-- [ ] Migrate `getPostBySlug()` to `cache.getBySlug("posts", slug)`
-- [ ] Migrate `getCachedDocument()` to universal cache API
-- [ ] Migrate `getCachedGlobal()` to `cache.getGlobal()`
-- [ ] Update all route handlers to use new API
+- [x] ~~Migrate `getPageBySlug()` to `cache.getBySlug("pages", slug)`~~ _(REMOVED: Unused)_
+- [x] ~~Migrate `getPostBySlug()` to `cache.getBySlug("posts", slug)`~~ _(REMOVED: Unused)_
+- [x] ~~Migrate `getCachedDocument()` to universal cache API~~ _(REMOVED: Unused, file deleted)_
+- [x] Migrate `getCachedGlobal()` to `cache.getGlobal()` → renamed to `getGlobal()`
+- [x] Update PayloadRedirects component to use universal cache API directly
 
-### Replace Specialized Caching
+### Replace Specialized Caching ✅ **COMPLETE**
 
-- [ ] Migrate `getRecentPosts()` to GraphQL query
-- [ ] Migrate `getDefaultTemplate()` to universal cache
-- [ ] Migrate `getTestimonials()` to universal cache
-- [ ] Update homepage data loading to use new system
+- [x] ~~Migrate `getRecentPosts()` to GraphQL query~~ _(KEPT: Migrated to universal cache, actively used)_
+- [x] ~~Migrate `getDefaultTemplate()` to universal cache~~ _(SAVED FOR GRAPHQL: Complex relationship logic)_
+- [x] ~~Migrate `getTestimonials()` to universal cache~~ _(REMOVED: Unused, file deleted)_
+- [x] Migrate `getHomepage()` to use universal cache _(KEPT: Actively used in main route)_
+- [x] Migrate `getSettings()` and `getGlobal()` to use universal cache _(KEPT: Actively used in layout/components)_
+
+### API Cleanup ✅ **COMPLETE**
+
+- [x] Remove "cache" from function names (caching is assumed)
+- [x] Delete unused files: `document.ts`, `testimonials.ts`
+- [x] Simplify `redirects.ts` - removed `getCachedRedirects` wrapper
+- [x] Clean up `page.ts` - kept only `getHomepage()`
+- [x] Clean up `post.ts` - kept only `getRelatedPosts()` (for GraphQL phase)
+- [x] Preserve complex functions for GraphQL phase: `getRelatedPosts()`, `getDefaultTemplate()`
 
 ## 🔗 **Phase 5: GraphQL Integration**
 
@@ -227,6 +245,13 @@ The complete planning history and architecture details are in:
 - [ ] Build global resolvers using `cache.getGlobal()`
 - [ ] Build collection resolvers using `cache.getCollection()`
 - [ ] Implement resolver-level caching
+
+### GraphQL Migration Tasks
+
+- [ ] Migrate `getRelatedPosts()` to GraphQL with complex relationship queries
+- [ ] Migrate `getDefaultTemplate()` to GraphQL with relationship lookups
+- [ ] Create GraphQL queries for multi-collection operations
+- [ ] Replace any remaining complex cache functions with GraphQL equivalents
 
 ## 🗺️ **Phase 6: URI-Based Sitemaps**
 

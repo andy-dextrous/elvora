@@ -5,7 +5,11 @@ import configPromise from "@payload-config"
 import { unstable_cache } from "next/cache"
 
 /*************************************************************************/
-/*  GET DEFAULT TEMPLATE FOR COLLECTION
+/*  GET DEFAULT TEMPLATE FOR COLLECTION - SAVE FOR GRAPHQL PHASE
+/*
+/*  Note: This function involves complex relationship lookups and multiple
+/*  dependent queries (settings -> template lookup). It should be migrated
+/*  to use GraphQL in Phase 5 for better relationship handling.
 /*************************************************************************/
 
 export async function getDefaultTemplate(collection: string) {
@@ -43,7 +47,10 @@ export async function getDefaultTemplate(collection: string) {
 }
 
 /*************************************************************************/
-/*  GET ALL TEMPLATES FOR COLLECTION
+/*  GET ALL TEMPLATES FOR COLLECTION - SAVE FOR GRAPHQL PHASE
+/*
+/*  Note: This function combines template collection queries with default
+/*  template lookups. Should be migrated to GraphQL for optimized queries.
 /*************************************************************************/
 
 export async function getTemplatesForCollection(collection: string) {

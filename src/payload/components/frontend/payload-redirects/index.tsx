@@ -1,7 +1,6 @@
 import type React from "react"
 
-import { getCachedDocument } from "@/lib/payload/document"
-import { getCachedRedirects } from "@/lib/payload/redirects"
+import { cache } from "@/lib/cache"
 import { notFound, redirect } from "next/navigation"
 
 interface Props {
@@ -11,7 +10,7 @@ interface Props {
 
 /* This component helps us with SSR based dynamic redirects */
 export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }) => {
-  const redirects = await getCachedRedirects()()
+  const redirects = await cache.getCollection("redirects")
 
   const redirectItem = redirects.find((redirect: any) => redirect.from === url)
 
@@ -24,9 +23,9 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
 
     if (typeof redirectItem.to?.reference?.value === "string") {
       const collection = redirectItem.to?.reference?.relationTo
-      const id = redirectItem.to?.reference?.value
+      const slug = redirectItem.to?.reference?.value
 
-      const document = (await getCachedDocument(collection, id)()) as any
+      const document = await cache.getBySlug(collection, slug)
       redirectUrl = `${redirectItem.to?.reference?.relationTo !== "pages" ? `/${redirectItem.to?.reference?.relationTo}` : ""}/${
         document?.slug
       }`
