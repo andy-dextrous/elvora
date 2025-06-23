@@ -1,12 +1,10 @@
 import { CollectionConfig } from "payload"
-import { createRevalidationHooks } from "@/payload/hooks/revalidateCollection"
+import { createHooks } from "@/payload/hooks/hooks"
 import { anyone } from "@/payload/access/anyone"
 import { canEditContent } from "@/payload/access/editor"
 import { slugField } from "../fields/slug"
 
-const { afterChange, afterDelete } = createRevalidationHooks({
-  collectionSlug: "team",
-})
+const { afterChange, afterDelete } = createHooks("team")
 
 export const Team: CollectionConfig = {
   slug: "team",
@@ -90,7 +88,7 @@ export const Team: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange: [afterChange],
-    afterDelete: [afterDelete],
+    afterChange,
+    afterDelete,
   },
 }

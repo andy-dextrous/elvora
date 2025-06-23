@@ -25,7 +25,7 @@ async function getSettingsInternal() {
 
 export const getSettings = () =>
   unstable_cache(async () => getSettingsInternal(), ["settings"], {
-    tags: ["global_settings"],
+    tags: ["global:settings"],
   })()
 
 /*******************************************************/

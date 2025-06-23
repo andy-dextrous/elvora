@@ -16,6 +16,14 @@
 
 **✅ Phase 2 - Routing Engine Integration: COMPLETE**
 
+**✅ Phase 3 - Smart Revalidation System: COMPLETE**
+
+- Configuration-driven dependency system implemented
+- Universal hooks for collections and globals
+- Cache system organized in `src/lib/payload/cache/` with comprehensive documentation
+- Tag mapping standardized: `global:*` naming convention, `sitemap:all` simplification
+- Hardcoded logic removed and replaced with scalable solutions
+
 **🔄 Next Up: Phase 4 - API Migration**
 
 ## 📋 Table of Contents - Logical Construction Process
@@ -34,21 +42,21 @@
    └── Replace scattered cache functions with universal API
 
 🔗 Phase 5: GraphQL Integration
-   └── Build GraphQL layer on top of universal cache for complex queries
+   └── Build organized GraphQL module with cache-powered resolvers
 
 🗺️ Phase 6: URI-Based Sitemaps
-   └── Generate sitemaps using universal routing URIs instead of hardcoded paths
+   └── Create organized sitemaps module with universal routing URIs
 
 🔧 Phase 7: Collection Integration
    └── Migrate all collections to use universal system, remove legacy code
 
+🛣️ Phase 7.5: Routing Module Organization
+   └── Organize routing system into clean, documented module structure
+
 🚀 Phase 8: Advanced Features
    └── Add cache warming, performance monitoring, and smart invalidation
 
-🧪 Phase 9: Testing & Validation
-   └── Comprehensive testing strategy for all system components
-
-🏁 Phase 10: Final Integration
+🏁 Phase 9: Final Integration
    └── Complete migration, cleanup, and production readiness
 ```
 
@@ -73,6 +81,13 @@ The complete planning history and architecture details are in:
 
 - `planning/smart-content-engine.md` - Complete architecture and implementation strategy
 - `planning/smart-content-overview.md` - System overview and current status
+
+### **Module Documentation**
+
+- `src/lib/payload/cache/README.md` - **Cache System** - Universal cache, configuration-driven dependencies, and smart revalidation
+- `src/lib/payload/graphql/README.md` - **GraphQL Integration** - Cache-powered resolvers, fragments, and complex queries _(to be created)_
+- `src/lib/payload/sitemaps/README.md` - **URI-Based Sitemaps** - Universal sitemap generation with SEO compliance _(to be created)_
+- `src/lib/payload/routing/README.md` - **URI Engine** - Unified URI creation, parsing, and conflict detection _(to be created)_
 
 ## 🏗️ **Phase 1: Foundation Layer**
 
@@ -126,27 +141,39 @@ The complete planning history and architecture details are in:
 
 ## 🔗 **Phase 3: Smart Revalidation System**
 
-### Universal Collection Hooks
+### Collection Hooks ✅ **COMPLETE**
 
-- [ ] Create `src/payload/hooks/universal-hooks.ts`
-- [ ] Build `createUniversalHooks(collection)` factory function
-- [ ] Implement smart `afterChange` hook using cache config
-- [ ] Implement smart `afterDelete` hook
-- [ ] Add support for related content invalidation
+- [x] Create `src/payload/hooks/hooks.ts`
+- [x] Build `createHooks(collection)` factory function
+- [x] Implement smart `afterChange` hook using cache config
+- [x] Implement smart `afterDelete` hook
+- [x] Add support for related content invalidation
 
-### Fix Sitemap Tag Mapping
+### Global Hooks ✅ **COMPLETE**
 
-- [ ] Update services collection to use `sitemap:pages` tag
-- [ ] Remove orphaned `services-sitemap`, `team-sitemap` tags
-- [ ] Update posts to use correct `sitemap:posts` tag
-- [ ] Fix `/next/revalidate` route with correct tag mappings
+- [x] Add `createGlobalHooks(globalSlug)` factory function
+- [x] Implement smart `afterChange` hook for globals using cache config
+- [x] Handle global dependency cascading (settings → collections)
+- [x] Integrate with universal revalidation system
 
-### URI-Aware Revalidation
+### Fix Tag Mapping (Collections + Globals) ✅ **COMPLETE**
 
-- [ ] Update URI generation hook to use universal revalidation
-- [ ] Implement old URI → new URI transition logic
-- [ ] Add support for hierarchical page URI changes
-- [ ] Handle archive page setting changes with cascade invalidation
+- [x] Update services collection to use `sitemap:pages` tag _(DONE: Now using `sitemap:all`)_
+- [x] Remove orphaned `services-sitemap`, `team-sitemap` tags _(DONE: Simplified to `sitemap:all`)_
+- [x] Update posts to use correct `sitemap:posts` tag _(DONE: Now using `sitemap:all`)_
+- [x] Fix global tag naming: `global_settings` → `global:settings`
+- [x] Fix global tag naming: `global_header` → `global:header`
+- [x] Fix global tag naming: `global_footer` → `global:footer`
+- [x] Fix `/api/revalidate` route with correct tag mappings
+
+### URI-Aware Revalidation + Global Dependencies ✅ **COMPLETE**
+
+- [x] Update URI generation hook to use universal revalidation _(already working)_
+- [x] Implement old URI → new URI transition logic _(already working)_
+- [x] Add support for hierarchical page URI changes _(already working)_
+- [x] **Configuration-driven cascade invalidation system** _(NEW: respects cache config dependencies)_
+- [x] Handle settings changes with cascade invalidation to all URI-dependent collections
+- [x] Handle archive page setting changes with cascade invalidation
 
 ## 📊 **Phase 4: API Migration**
 
@@ -167,13 +194,17 @@ The complete planning history and architecture details are in:
 
 ## 🔗 **Phase 5: GraphQL Integration**
 
-### GraphQL Organization
+### GraphQL Module Organization
 
+- [ ] Create `src/lib/payload/graphql/` folder structure
+- [ ] Create `src/lib/payload/graphql/README.md` - GraphQL integration guide
+- [ ] Create `src/lib/payload/graphql/index.ts` - Clean exports for all GraphQL functionality
 - [ ] Create `src/lib/payload/graphql/client.ts` for client-side setup
 - [ ] Create `src/lib/payload/graphql/resolvers.ts` using universal cache
 - [ ] Create `src/lib/payload/graphql/fragments/` folder structure
 - [ ] Create `src/lib/payload/graphql/queries/` folder structure
 - [ ] Create `src/lib/payload/graphql/mutations/` folder structure
+- [ ] Create `src/lib/payload/graphql/types/` folder structure
 - [ ] Set up GraphQL codegen for TypeScript type generation
 
 ### Fragment Development
@@ -199,16 +230,24 @@ The complete planning history and architecture details are in:
 
 ## 🗺️ **Phase 6: URI-Based Sitemaps**
 
+### Sitemaps Module Organization
+
+- [ ] Create `src/lib/payload/sitemaps/` folder structure
+- [ ] Create `src/lib/payload/sitemaps/README.md` - How URI-based sitemaps work
+- [ ] Create `src/lib/payload/sitemaps/index.ts` - Clean exports for all sitemap functionality
+- [ ] Create `src/lib/payload/sitemaps/config.ts` with SITEMAP_CONFIG
+- [ ] Create `src/lib/payload/sitemaps/generator.ts` - Universal sitemap generator
+- [ ] Create `src/lib/payload/sitemaps/route-factory.ts` - Dynamic route creation
+- [ ] Create `src/lib/payload/sitemaps/seo-filters.ts` - noIndex, canonical URL logic
+
 ### Sitemap Configuration
 
-- [ ] Create `src/lib/payload/sitemap-config.ts` with SITEMAP_CONFIG
-- [ ] Define collection-to-sitemap mappings
+- [ ] Define collection-to-sitemap mappings in config
 - [ ] Add SEO filtering configuration
 - [ ] Include archive page detection logic
 
 ### Universal Sitemap Generator
 
-- [ ] Create `src/lib/payload/sitemap-generator.ts`
 - [ ] Implement `generateSitemap()` using universal cache + URI engine
 - [ ] Add SEO-aware filtering (noIndex, canonical URLs)
 - [ ] Use URI field instead of slug concatenation
@@ -216,7 +255,6 @@ The complete planning history and architecture details are in:
 
 ### Sitemap Route Factory
 
-- [ ] Create `src/lib/payload/sitemap-route-factory.ts`
 - [ ] Replace hardcoded sitemap routes with factory
 - [ ] Migrate `pages-sitemap.xml/route.ts` to use factory
 - [ ] Migrate `posts-sitemap.xml/route.ts` to use factory
@@ -231,12 +269,14 @@ The complete planning history and architecture details are in:
 
 ## 🔧 **Phase 7: Collection Integration**
 
-### Universal Hook Migration
+### Hook Migration
 
-- [ ] Replace `revalidatePage.ts` with universal hooks
-- [ ] Replace `revalidatePost.ts` with universal hooks
-- [ ] Replace `createRevalidationHooks()` with universal hooks
-- [ ] Update all collection configurations to use universal hooks
+- [ ] Replace `revalidatePage.ts` with new hooks
+- [ ] Replace `revalidatePost.ts` with new hooks
+- [ ] Replace `createRevalidationHooks()` with new hooks
+- [ ] Replace `revalidateSettings.ts`, `revalidateHeader.ts`, `revalidateFooter.ts` with new global hooks
+- [ ] Update all collection configurations to use new hooks
+- [ ] Update all global configurations to use new global hooks
 
 ### Remove Legacy Revalidation
 
@@ -251,6 +291,18 @@ The complete planning history and architecture details are in:
 - [ ] Implement URI-first caching in resolver
 - [ ] Add cache warming for newly generated URIs
 - [ ] Optimize resolver performance with smart caching
+
+## 🛣️ **Phase 7.5: Routing Module Organization**
+
+### Routing Module Organization
+
+- [ ] Create `src/lib/payload/routing/` folder structure
+- [ ] Create `src/lib/payload/routing/README.md` - URI engine documentation
+- [ ] Create `src/lib/payload/routing/index.ts` - Clean exports for all routing functionality
+- [ ] Move `src/lib/payload/routing-engine.ts` to `src/lib/payload/routing/uri-engine.ts`
+- [ ] Move `src/lib/payload/routing.ts` to `src/lib/payload/routing/document-resolver.ts`
+- [ ] Create `src/lib/payload/routing/conflict-detection.ts` - Enhanced conflict detection
+- [ ] Update all imports to use new routing module structure
 
 ## 🚀 **Phase 8: Advanced Features**
 
@@ -282,37 +334,7 @@ The complete planning history and architecture details are in:
 - [ ] Create URI analytics and monitoring
 - [ ] Build advanced conflict resolution strategies
 
-## 🧪 **Phase 9: Testing & Validation**
-
-### Unit Testing
-
-- [ ] Test cache key generation functions
-- [ ] Test tag generation and validation
-- [ ] Test URI engine bidirectional validation
-- [ ] Test revalidation logic and change detection
-
-### Integration Testing
-
-- [ ] Test universal cache API with all collections
-- [ ] Test revalidation hooks with real Payload operations
-- [ ] Test URI generation + caching integration
-- [ ] Test sitemap generation with universal cache
-
-### Performance Testing
-
-- [ ] Measure cache hit rate and optimize
-- [ ] Compare response times (before/after migration)
-- [ ] Monitor memory usage and create alerts
-- [ ] Test bulk operation performance
-
-### End-to-End Testing
-
-- [ ] Test full content lifecycle (create → edit → publish → cache)
-- [ ] Test slug/URI changes properly update cache
-- [ ] Test hierarchical page changes cascade correctly
-- [ ] Test live preview works with universal caching
-
-## 🏁 **Phase 10: Final Integration**
+## 🏁 **Phase 9: Final Integration**
 
 ### Complete API Replacement
 

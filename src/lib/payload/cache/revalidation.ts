@@ -1,5 +1,6 @@
 import { revalidatePath, revalidateTag } from "next/cache"
 import { createCacheTags } from "./cache"
+import { getInvalidationTargets } from "./cache-config"
 
 /*************************************************************************/
 /*  UNIVERSAL REVALIDATION ENGINE - TYPES & INTERFACES
@@ -100,18 +101,26 @@ function generateRevalidationTags(
 ): string[] {
   const tags = new Set<string>()
 
-  if (doc.slug) {
-    const itemTags = createCacheTags({ collection, slug: doc.slug })
-    itemTags.forEach(tag => tags.add(tag))
-  }
+  // Handle globals differently from collections
+  if (collection.startsWith("global:")) {
+    const globalSlug = collection.replace("global:", "")
+    const globalTags = createCacheTags({ globalSlug })
+    globalTags.forEach(tag => tags.add(tag))
+  } else {
+    // Handle collections
+    if (doc.slug) {
+      const itemTags = createCacheTags({ collection, slug: doc.slug })
+      itemTags.forEach(tag => tags.add(tag))
+    }
 
-  if (changes.uriChanged && changes.oldUri && previousDoc?.slug) {
-    const oldItemTags = createCacheTags({ collection, slug: previousDoc.slug })
-    oldItemTags.forEach(tag => tags.add(tag))
-  }
+    if (changes.uriChanged && changes.oldUri && previousDoc?.slug) {
+      const oldItemTags = createCacheTags({ collection, slug: previousDoc.slug })
+      oldItemTags.forEach(tag => tags.add(tag))
+    }
 
-  const collectionTags = createCacheTags({ collection })
-  collectionTags.forEach(tag => tags.add(tag))
+    const collectionTags = createCacheTags({ collection })
+    collectionTags.forEach(tag => tags.add(tag))
+  }
 
   addCascadeInvalidation(collection, doc, previousDoc, changes, tags)
 
@@ -122,6 +131,13 @@ function generateRevalidationTags(
 /*  CASCADE INVALIDATION FOR HIERARCHICAL CONTENT
 /*************************************************************************/
 
+/**
+ * Check if a collection supports URIs (has slug field and appears in sitemaps)
+ */
+function hasURISupport(collection: string): boolean {
+  return ["pages", "posts", "services"].includes(collection)
+}
+
 function addCascadeInvalidation(
   collection: string,
   doc: any,
@@ -129,15 +145,38 @@ function addCascadeInvalidation(
   changes: ChangeDetection,
   tags: Set<string>
 ): void {
+  // Configuration-driven cascade invalidation
+  // This automatically handles all dependency relationships defined in CACHE_CONFIG
+  const dependentTargets = getInvalidationTargets(collection)
+  if (dependentTargets.length > 0) {
+    // Debug logging to show configuration-driven invalidation
+    console.log(
+      `🔄 Configuration-driven invalidation: ${collection} → [${dependentTargets.join(", ")}]`
+    )
+  }
+  dependentTargets.forEach(target => tags.add(target))
+
+  // Simple sitemap invalidation - forward compatible with planned SITEMAP_CONFIG
+  if (hasURISupport(collection)) {
+    // For now, just invalidate all sitemaps for any URI-enabled collection
+    // When we implement SITEMAP_CONFIG, this becomes configuration-driven too
+    tags.add("sitemap:all")
+  }
+
+  // Layout tags for globals - minimal hardcoded logic
+  if (collection === "global:header") {
+    tags.add("layout:header")
+  }
+  if (collection === "global:footer") {
+    tags.add("layout:footer")
+  }
+
+  // Hierarchical page relationships - collection-specific logic
   if (collection === "pages" && changes.uriChanged) {
     tags.add(`parent-page:${doc.slug}`)
     if (previousDoc?.slug) {
       tags.add(`parent-page:${previousDoc.slug}`)
     }
-  }
-
-  if (collection === "settings") {
-    tags.add("global:settings")
   }
 }
 

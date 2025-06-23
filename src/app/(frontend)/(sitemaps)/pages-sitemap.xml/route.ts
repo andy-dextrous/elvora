@@ -88,7 +88,7 @@ const getPagesSitemap = unstable_cache(
   },
   ["pages-sitemap"],
   {
-    tags: ["pages-sitemap"],
+    tags: ["sitemap:all", "pages-sitemap"], // Keep old tag for backward compatibility
   }
 )
 

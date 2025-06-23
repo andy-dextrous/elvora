@@ -4,13 +4,12 @@ export async function GET() {
   // Revalidate all paths
   revalidatePath("/")
 
-  // Revalidate all tags
-  revalidateTag("pages-sitemap")
-  revalidateTag("posts-sitemap")
+  // Revalidate all tags (updated to use correct naming convention)
+  revalidateTag("sitemap:all") // Simplified sitemap invalidation
   revalidateTag("redirects")
-  revalidateTag("global_header")
-  revalidateTag("global_footer")
-  revalidateTag("global_settings")
+  revalidateTag("global:header") // Fixed naming convention
+  revalidateTag("global:footer") // Fixed naming convention
+  revalidateTag("global:settings") // Fixed naming convention
 
   return new Response("All caches revalidated", { status: 200 })
 }
