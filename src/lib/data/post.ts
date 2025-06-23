@@ -2,6 +2,25 @@ import { getPayload } from "payload"
 import { unstable_cache } from "next/cache"
 import configPromise from "@payload-config"
 import { Post } from "@/payload/payload-types"
+import { cache } from "@/lib/cache"
+
+/*************************************************************************/
+/*  GET RECENT POSTS FOR LATEST ARTICLES - MIGRATED TO UNIVERSAL CACHE
+/*************************************************************************/
+
+export const getRecentPosts = async () => {
+  return cache.getCollection("posts", {
+    limit: 3,
+    sort: "-publishedAt",
+    where: {
+      _status: {
+        equals: "published",
+      },
+    },
+    depth: 1,
+    overrideAccess: false,
+  })
+}
 
 /*******************************************************/
 /* Get Related Posts by Categories - SAVE FOR GRAPHQL PHASE
