@@ -162,7 +162,7 @@
 
 ### **1. Single Cache API**
 
-Replace all scattered caching functions with **one unified API**:
+Replace all scattered caching functions with **unified cache + GraphQL system**:
 
 ```typescript
 // src/lib/payload/cache.ts - Universal Cache API
@@ -176,9 +176,13 @@ export const cache = {
 
   // Globals
   getGlobal: (slug: string) => Promise<Global>
+}
 
-  // Batch operations
-  getBatch: (requests: CacheRequest[]) => Promise<CacheResult[]>
+// GraphQL layer for complex queries (uses cache internally)
+query PageData($slug: String!) {
+  page(slug: $slug) { title, content, meta { title } }
+  header { nav { label, url } }
+  recentPosts(limit: 3) { title, slug }
 }
 ```
 
@@ -237,51 +241,29 @@ computed:{type}                   // e.g., computed:recent-posts
 export const CACHE_CONFIG = {
   // Default configuration for any collection not explicitly defined
   default: {
-    uriEnabled: false,
-    sitemap: null,
-    ttl: 3600, // 1 hour default
-    depth: 1,
-    dependencies: [],
-    cascadeInvalidation: false,
-    archivePage: false,
+    ttl: 3600, // 1 hour default cache duration
+    dependencies: [], // Tags that invalidate this collection's cache
   },
 
   // Collection-specific overrides
   pages: {
-    uriEnabled: true,
-    sitemap: "pages",
-    ttl: 3600,
-    depth: 5,
-    dependencies: ["global:settings"],
-    cascadeInvalidation: true, // Parent changes affect children
+    ttl: 3600, // 1 hour (pages change moderately)
+    dependencies: ["global:settings"], // Settings can change archive slugs → affects all URIs
   },
   posts: {
-    uriEnabled: true,
-    sitemap: "posts",
-    ttl: 1800,
-    depth: 2,
-    dependencies: ["global:settings", "collection:categories"],
-    archivePage: true, // Has archive functionality
+    ttl: 1800, // 30 minutes (posts change frequently)
+    dependencies: ["global:settings", "collection:categories"], // Categories affect post URIs
   },
   services: {
-    uriEnabled: true,
-    sitemap: "pages", // ✅ Correct mapping
-    ttl: 7200,
-    depth: 3,
+    ttl: 7200, // 2 hours (services change rarely)
     dependencies: ["global:settings"],
   },
   team: {
-    uriEnabled: false, // No public URIs
-    sitemap: null,
-    ttl: 86400, // Long cache (rarely changes)
-    depth: 1,
+    ttl: 86400, // 24 hours (team rarely changes)
     dependencies: [],
   },
   testimonials: {
-    uriEnabled: false,
-    sitemap: null,
-    ttl: 86400,
-    depth: 1,
+    ttl: 86400, // 24 hours (testimonials rarely change)
     dependencies: [],
   },
 }
@@ -294,14 +276,22 @@ export function getCacheConfig(collection: string): CacheConfig {
   }
 }
 
-// Helper function to check if collection has URI support
+// Helper function to check if collection has URI support (auto-detected)
 export function hasURISupport(collection: string): boolean {
-  return getCacheConfig(collection).uriEnabled
+  // Auto-detect from collection config - does it have a slug field?
+  const collectionConfig = getPayloadCollectionConfig(collection)
+  return collectionConfig.fields.some(field => field.name === "slug")
 }
 
-// Helper function to get sitemap for collection
+// Helper function to get sitemap for collection (derived from sitemap config)
 export function getSitemapForCollection(collection: string): string | null {
-  return getCacheConfig(collection).sitemap
+  // Look through sitemap configs to find which one includes this collection
+  for (const [sitemapName, config] of Object.entries(SITEMAP_CONFIG)) {
+    if (config.collections?.includes(collection)) {
+      return sitemapName
+    }
+  }
+  return null
 }
 ```
 
@@ -490,6 +480,92 @@ export const sitemapMetrics = {
 
 ---
 
+## 🔗 **GraphQL Integration Architecture**
+
+### **Layered Architecture**
+
+```typescript
+// Layer 1: Database (Payload)
+// Layer 2: Universal Cache (our system)
+// Layer 3: GraphQL Resolvers (using cache)
+// Layer 4: Application (using GraphQL or direct cache)
+
+┌─────────────────────┐
+│   Server Components │ ← Direct cache.getBySlug() (fastest)
+├─────────────────────┤
+│   Client Components │ ← GraphQL queries (network requests)
+├─────────────────────┤
+│   GraphQL Resolvers │ ← Use universal cache internally
+├─────────────────────┤
+│   Universal Cache   │ ← Smart invalidation + performance
+├─────────────────────┤
+│   Payload Database  │ ← Source of truth
+└─────────────────────┘
+```
+
+### **When to Use What**
+
+**Direct Cache API (Server Components):**
+
+```typescript
+// Simple, fast requests - no network overhead
+const page = await cache.getBySlug("pages", "about")
+const header = await cache.getGlobal("header")
+```
+
+**GraphQL (Complex Queries):**
+
+```typescript
+// Complex parallel requests - single network call
+const pageData = await graphql`
+  query PageData($slug: String!) {
+    page(slug: $slug) {
+      title
+      content
+      meta {
+        title
+      }
+    }
+    header {
+      nav {
+        label
+        url
+      }
+    }
+    recentPosts(limit: 3) {
+      title
+      slug
+    }
+  }
+`
+```
+
+### **GraphQL Resolver Implementation**
+
+```typescript
+// GraphQL resolvers powered by universal cache
+const resolvers = {
+  Query: {
+    page: async (_, { slug }) => {
+      return await cache.getBySlug("pages", slug) // Uses our cache system
+    },
+    recentPosts: async (_, { limit = 3 }) => {
+      return await cache.getCollection("posts", {
+        limit,
+        sort: "-publishedAt",
+      })
+    },
+  },
+}
+
+// Benefits:
+// ✅ GraphQL gets automatic cache performance
+// ✅ Cache invalidation works for GraphQL responses
+// ✅ Consistent data layer across all APIs
+```
+
+---
+
 ## 🚀 **Implementation Plan**
 
 ### **Phase 1: Foundation (Universal Cache Layer)**
@@ -531,7 +607,7 @@ export const sitemapMetrics = {
 
 #### **Task 2.1: Universal Collection Hooks**
 
-- [ ] **File**: `src/lib/payload/universal-hooks.ts`
+- [ ] **File**: `src/payload/hooks/universal-hooks.ts`
 - [ ] Create `createUniversalHooks(collection)` factory
 - [ ] Implement smart `afterChange` hook using cache config
 - [ ] Implement smart `afterDelete` hook
@@ -563,34 +639,48 @@ export const sitemapMetrics = {
 
 ### **Phase 3: API Migration**
 
-#### **Task 3.1: Replace Page Caching**
+#### **Task 3.1: Replace Core Cache Functions**
 
 - [ ] **Migrate**: `src/lib/payload/page.ts`
 - [ ] Replace `getPageBySlug()` with `cache.getBySlug("pages", slug)`
 - [ ] Replace `getAllPages()` with `cache.getCollection("pages")`
-- [ ] Update all page route handlers to use universal API
-- [ ] Add URI-based page lookup support
-
-#### **Task 3.2: Replace Post Caching**
-
 - [ ] **Migrate**: `src/lib/payload/post.ts`
-- [ ] Replace `getPostBySlug()` with universal API
-- [ ] Replace `getRelatedPosts()` with computed cache
-- [ ] Update blog route handlers
-- [ ] Add draft state support to posts (currently missing)
+- [ ] Replace `getPostBySlug()` with `cache.getBySlug("posts", slug)`
+- [ ] **Migrate**: `src/lib/payload/document.ts` and `src/lib/payload/globals.ts`
+- [ ] Replace `getCachedDocument()` and `getCachedGlobal()` with universal API
 
-#### **Task 3.3: Replace Document/Global Caching**
+#### **Task 3.2: Build GraphQL Layer & Organization**
 
-- [ ] **Migrate**: `src/lib/payload/document.ts`
-- [ ] Replace `getCachedDocument()` with universal API
-- [ ] **Migrate**: `src/lib/payload/globals.ts`
-- [ ] Replace `getCachedGlobal()` with universal API
-- [ ] Update all global usage across the app
+- [ ] **Create**: `src/lib/payload/graphql/` folder structure
+- [ ] **Create**: `src/lib/payload/graphql/client.ts` - Client-side GraphQL setup
+- [ ] **Create**: `src/lib/payload/graphql/resolvers.ts` - Cache-powered resolvers
+- [ ] **Create**: `src/lib/payload/graphql/fragments/` for reusable field sets
+  - [ ] `page-fields.ts` - Page field fragments
+  - [ ] `post-fields.ts` - Post field fragments
+  - [ ] `meta-fields.ts` - SEO meta fragments
+  - [ ] `media-fields.ts` - Media/image fragments
+- [ ] **Create**: `src/lib/payload/graphql/queries/` for complex queries
+  - [ ] `homepage-data.ts` - Multi-collection homepage query
+  - [ ] `page-data.ts` - Page with header/footer data
+  - [ ] `blog-archive.ts` - Blog listing with filters
+  - [ ] `search-results.ts` - Search functionality
+- [ ] **Create**: `src/lib/payload/graphql/mutations/` for form submissions
+  - [ ] `contact-form.ts` - Contact form mutation
+  - [ ] `newsletter.ts` - Newsletter signup
+- [ ] **Create**: `src/lib/payload/graphql/types/` for generated types
+- [ ] **Setup**: GraphQL codegen for TypeScript type generation
+- [ ] Build resolvers using universal cache (page, post, global resolvers)
+- [ ] Create enhanced GraphQL schema with optimized field selection
+
+#### **Task 3.3: Migrate Complex Queries to GraphQL**
+
+- [ ] **Migrate**: `src/lib/payload/recent-posts.ts` → GraphQL query
+- [ ] **Migrate**: Homepage data loading → GraphQL query
+- [ ] **Migrate**: Multi-collection queries → GraphQL
+- [ ] Update components to use GraphQL for complex parallel requests
 
 #### **Task 3.4: Replace Specialized Caching**
 
-- [ ] **Migrate**: `src/lib/payload/recent-posts.ts`
-- [ ] Replace with computed cache pattern
 - [ ] **Migrate**: `src/lib/payload/templates.ts`
 - [ ] **Migrate**: `src/lib/payload/redirects.ts`
 - [ ] **Migrate**: `src/lib/payload/testimonials.ts`
@@ -607,10 +697,10 @@ export const sitemapMetrics = {
 
 #### **Task 4.2: Remove Legacy Revalidation**
 
-- [ ] Delete `src/payload/hooks/revalidateCollection.ts`
+- [ ] Delete `src/payload/hooks/revalidateCollection.ts` (replaced by universal-hooks.ts)
 - [ ] Delete `src/payload/collections/pages/hooks/revalidatePage.ts`
 - [ ] Delete `src/payload/collections/posts/hooks/revalidatePost.ts`
-- [ ] Update all collection configurations
+- [ ] Update all collection configurations to use universal hooks
 
 #### **Task 4.3: Universal Routing Integration**
 
@@ -685,11 +775,208 @@ export const sitemapMetrics = {
 
 ---
 
+## 🔗 **URI Architecture & Coupling Strategy**
+
+### **Current URI System Analysis**
+
+**URI Creation Side** (`src/payload/fields/slug/create-uri.ts`):
+
+- **Process**: `createURIHook()` → Database queries → Settings lookup → URI generation
+- **Logic**: Hierarchical pages, archive page configuration, conflict detection
+- **Output**: Pre-computed URI stored in document's `uri` field
+
+**URI Parsing Side** (`src/lib/payload/routing.ts`):
+
+- **Process**: Request URI → Database lookup → Document match
+- **Logic**: Simple `where: { uri: { equals: normalizedURI } }` across collections
+- **Output**: `{ document, collection }` or `null`
+
+**Current Coupling Level**: **LOOSE**
+
+### **Problems with Current Architecture**
+
+**1. Logic Duplication & Drift Risk**
+
+```typescript
+// ❌ Creation logic doesn't match parsing expectations
+// Creation: Complex settings-based URI generation
+// Parsing: Simple database lookup (assumes generation was correct)
+```
+
+**2. Settings Dependency Scattered**
+
+```typescript
+// ❌ Both systems independently fetch and interpret routing settings
+// Creation: await payload.findGlobal({ slug: "settings" })
+// Parsing: No settings integration (relies on pre-computed URIs)
+```
+
+**3. Debugging Complexity**
+
+```typescript
+// ❌ Two separate systems to debug when URIs don't work
+// Hard to trace whether issue is in generation or resolution
+```
+
+### **Recommended Solution: Unified URI Engine**
+
+**Tighter Coupling Architecture**:
+
+```typescript
+// src/lib/payload/uri-engine.ts
+export const URIEngine = {
+  // Creation (used by hooks)
+  generate: (inputs: GenerateURIInputs) => Promise<string>
+
+  // Parsing (used by routing)
+  resolve: (uri: string) => Promise<DocumentMatch | null>
+
+  // Validation (used by both)
+  validate: (uri: string) => { isValid: boolean, errors: string[] }
+
+  // Settings integration (used by both)
+  getRoutingConfig: () => Promise<RoutingSettings>
+
+  // Conflict detection (used by creation)
+  checkConflicts: (uri: string, excludeId?: string) => Promise<Conflict[]>
+}
+```
+
+**Benefits of Unified Engine**:
+
+- ✅ **Single source of URI logic** prevents creation/parsing drift
+- ✅ **Shared settings caching** between creation and resolution
+- ✅ **Bidirectional validation** ensures generation matches parsing
+- ✅ **Better debugging** - one system to trace and test
+- ✅ **Performance optimization** - intelligent caching at engine level
+
+### **Integration with Universal Cache System**
+
+**URI Engine + Universal Cache Architecture**:
+
+```typescript
+// Layer 1: URI Engine (routing logic)
+URIEngine.resolve("/blog/hello-world") → { collection: "posts", slug: "hello-world" }
+
+// Layer 2: Universal Cache (performance)
+cache.getBySlug("posts", "hello-world") → Document
+
+// Layer 3: GraphQL/Direct API (application)
+GraphQL Query or Direct Cache Access
+```
+
+**Cache Integration Points**:
+
+```typescript
+// URI Engine uses universal cache for settings
+const settings = await cache.getGlobal("settings")
+
+// URI resolution caches routing decisions
+const resolveURI = unstable_cache(uri => URIEngine.resolve(uri), ["uri-resolve", uri], {
+  tags: [`uri:${uri}`, "routing-settings"],
+})
+
+// URI generation uses conflict detection cache
+const conflicts = await cache.checkURIConflicts(uri, excludeId)
+```
+
+### **URI Engine Implementation Tasks**
+
+#### **Phase 1: Create Unified Engine (Week 1)**
+
+**Task URI1: Extract Shared Logic**
+
+- [ ] **Create**: `src/lib/payload/uri-engine.ts`
+- [ ] Move URI generation logic from `create-uri.ts`
+- [ ] Move URI parsing logic from `routing.ts`
+- [ ] Create shared routing configuration cache
+- [ ] Add bidirectional validation utilities
+
+**Task URI2: Settings Integration**
+
+- [ ] **Create**: `URIEngine.getRoutingConfig()` with caching
+- [ ] Replace scattered settings queries with unified API
+- [ ] Add settings change detection and URI regeneration
+- [ ] Integrate with universal revalidation system
+
+**Task URI3: Maintain Backward Compatibility**
+
+- [ ] Keep existing `createURIHook()` and `getDocumentByURI()` APIs
+- [ ] Use facade pattern to redirect to URI Engine
+- [ ] Ensure no breaking changes to current functionality
+- [ ] Add deprecation warnings for direct API usage
+
+#### **Phase 2: Enhanced Features (Week 2)**
+
+**Task URI4: Advanced Conflict Detection**
+
+- [ ] **Create**: `URIEngine.checkConflicts()` with caching
+- [ ] Add conflict resolution strategies (warnings, auto-numbering)
+- [ ] Implement bulk conflict checking for collections
+- [ ] Add conflict resolution UI components
+
+**Task URI5: Performance Optimization**
+
+- [ ] Add intelligent caching at URI Engine level
+- [ ] Implement batch URI operations (generation, validation)
+- [ ] Cache routing settings with smart invalidation
+- [ ] Add URI resolution performance monitoring
+
+**Task URI6: Better Error Handling**
+
+- [ ] Create unified URI error types and handling
+- [ ] Add detailed error messages for debugging
+- [ ] Implement error recovery strategies
+- [ ] Create URI debugging utilities
+
+#### **Phase 3: Advanced URI Features (Week 3)**
+
+**Task URI7: URI Migration System**
+
+- [ ] **Create**: URI change detection and redirect creation
+- [ ] Implement bulk URI regeneration utilities
+- [ ] Add URI history tracking for redirects
+- [ ] Create URI migration dashboard
+
+**Task URI8: Analytics & Monitoring**
+
+- [ ] Add URI usage tracking and analytics
+- [ ] Create URI performance monitoring
+- [ ] Implement URI health checks
+- [ ] Add URI optimization suggestions
+
+### **URI Engine Success Criteria**
+
+**Must Have**:
+
+- [ ] Single unified system handles both URI creation and parsing
+- [ ] Backward compatibility maintained during migration
+- [ ] Settings integration shared between creation and resolution
+- [ ] Conflict detection improved with better error messages
+- [ ] Performance matches or exceeds current system
+
+**Should Have**:
+
+- [ ] Bidirectional validation prevents creation/parsing drift
+- [ ] Advanced conflict resolution with multiple strategies
+- [ ] URI migration system for handling URL changes
+- [ ] Enhanced debugging and error handling
+
+**Nice to Have**:
+
+- [ ] URI analytics and usage monitoring
+- [ ] Bulk URI operations and management tools
+- [ ] Predictive URI conflict detection
+- [ ] Advanced URI optimization features
+
+---
+
 ## 🔍 **Success Criteria**
 
 ### **Must Have**
 
 - [ ] Single universal cache API replaces all current scattered functions
+- [ ] GraphQL layer for complex queries built on top of cache
 - [ ] Consistent cache keys across all collections and operations
 - [ ] Correct sitemap tag mapping with no orphaned tags
 - [ ] URI changes properly invalidate old and new paths
@@ -781,7 +1068,7 @@ export const sitemapMetrics = {
 
 ## 📝 **File Structure**
 
-**New Universal Cache Files:**
+**New Universal Cache + GraphQL Files:**
 
 ```
 src/lib/payload/
@@ -789,25 +1076,49 @@ src/lib/payload/
 ├── cache-config.ts          # Configuration-driven behavior
 ├── cache-tags.ts           # Tag generation and management
 ├── revalidation.ts         # Smart revalidation engine
-├── universal-hooks.ts      # Universal collection hooks
 ├── cache-debug.ts          # Development debugging tools
+├── graphql/                # GraphQL organization
+│   ├── client.ts           # Client-side GraphQL setup
+│   ├── resolvers.ts        # Cache-powered GraphQL resolvers
+│   ├── queries/            # Complex, reusable queries
+│   │   ├── homepage-data.ts
+│   │   ├── page-data.ts
+│   │   ├── blog-archive.ts
+│   │   └── search-results.ts
+│   ├── fragments/          # Reusable field fragments
+│   │   ├── page-fields.ts
+│   │   ├── post-fields.ts
+│   │   ├── meta-fields.ts
+│   │   └── media-fields.ts
+│   ├── mutations/          # Form submissions, etc.
+│   │   ├── contact-form.ts
+│   │   └── newsletter.ts
+│   └── types/             # Generated TypeScript types
+│       └── generated.ts
 ├── sitemap-generator.ts    # Universal sitemap generator
 ├── sitemap-route-factory.ts # Sitemap route factory
 └── sitemap-config.ts       # Sitemap configuration
+
+src/payload/hooks/ (updated)
+├── universal-hooks.ts      # Universal collection hooks (replaces revalidateCollection.ts)
+├── form-submissions.ts     # Existing
+├── formatSlug.ts           # Existing
+├── populatePublishedAt.ts  # Existing
+└── revalidateFooter.ts     # Existing
 ```
 
 **Files to Migrate/Remove:**
 
 ```
 src/lib/payload/
-├── page.ts                 # ➜ Migrate to universal API
-├── post.ts                 # ➜ Migrate to universal API
-├── document.ts             # ➜ Migrate to universal API
-├── globals.ts              # ➜ Migrate to universal API
-├── recent-posts.ts         # ➜ Migrate to computed cache
-├── templates.ts            # ➜ Migrate to universal API
-├── redirects.ts            # ➜ Migrate to universal API
-└── testimonials.ts         # ➜ Migrate to universal API
+├── page.ts                 # ➜ Migrate to universal cache API
+├── post.ts                 # ➜ Migrate to universal cache API
+├── document.ts             # ➜ Migrate to universal cache API
+├── globals.ts              # ➜ Migrate to universal cache API
+├── recent-posts.ts         # ➜ Migrate to GraphQL query
+├── templates.ts            # ➜ Migrate to universal cache API
+├── redirects.ts            # ➜ Migrate to universal cache API
+└── testimonials.ts         # ➜ Migrate to universal cache API
 
 src/payload/hooks/
 └── revalidateCollection.ts # ❌ Remove (replaced by universal)
@@ -1272,3 +1583,294 @@ const validateSEOCompliance = async (collection: string) => {
 - [ ] Changing canonical URL updates sitemap entry
 - [ ] URI changes properly update sitemap URLs
 - [ ] SEO field changes trigger appropriate cache invalidation
+
+- A URI creation system for this site that is inspired by Wordpress.
+- It should operate as a "first match wins" hierarchy across the app in this order:
+
+🏠 1. HOMEPAGE
+├─ URI: "" (empty)
+└─ Source: Settings → homepage field
+
+📄 2. PAGES (Any Depth)
+├─ URI: /about -----> simple page
+├─ URI: /services/web-design -----> page with parent page
+├─ URI: /company/team/leadership -----> page with multiple parent pages
+
+📂 3. DESIGNATED COLLECTION ARCHIVES (Single Segment)
+├─ URI: /blog (posts collection, effectiveSlug = "blog")
+├─ URI: /services (services collection, effectiveSlug = "services")
+├─ URI: /articles (posts collection, effectiveSlug = "articles")
+
+📑 4. COLLECTION SINGLES (Two Segments)
+├─ URI: /posts/my-first-post -----> Matches a post where the post collection has no blog archive set
+├─ URI: /blog/my-first-post -----> Matches a post where the post collection has a designated page and its slug is "blog"
+├─ URI: /insights/my-first-post -----> Matches a post where the post collection has a designated page and its slug is "insights"
+├─ URI: /services/web-development
+
+## URI Segment Construction Logic
+
+### How settings work.
+
+- The app is made up of collections
+- Any collection that should be exposed to the front end via a URL needs to have a slug field in order to be matched
+- Pages are the top level, fundamental collection and are the only collection type that can have a single segment as the slug. All others must have at least one parent segment.
+- All other frontend collections (those with a slug), will calculate their URIs using the logic below.
+- The site has a payload global called settings. In settings, there is a tab called routing. Routing is dedicated to slug matching and template assignment.
+- At the top there is a Homepage select field and a Posts Page (like wordpress) select field.
+- The
+
+### For Collection Items (Non-Pages)
+
+```
+┌─ Collection Item URI Construction ─┐
+│                                    │
+├─ Does collection have archive page? ─┐
+│  ├─ YES → Use archive page slug      │
+│  └─ NO → Use original collection slug│
+│         └─ Final: /[determined-slug]/[item-slug]
+└────────────────────────────────────┘
+```
+
+### For Pages
+
+```
+┌─ Page URI Construction ─┐
+│                         │
+├─ Does page have parent? ─┐
+│  ├─ YES ─┐               │
+│  │       ├─ Does parent have parent? ─┐
+│  │       │  ├─ YES → /grandparent/parent/page
+│  │       │  └─ NO → /parent/page
+│  │       └─ (recursive for any depth)
+│  └─ NO → /page
+└─────────────────────────┘
+```
+
+### Complete URI Decision Matrix
+
+```
+REQUEST URI: /segment1/segment2/segment3/...
+
+🔍 SEGMENT ANALYSIS:
+├─ segment1 = "" (empty) → HOMEPAGE
+├─ segment1 only → PAGE
+│  ├─ Match page slug? → PAGE
+│  └─ Match collection archive? → COLLECTION ARCHIVE
+└─ segment1 + segment2+ → NESTED PAGE or COLLECTION ITEM
+   ├─ Does segment1/segment2/... build valid page path? → NESTED PAGE
+   └─ Does segment1 = collection + segment2 = item? → COLLECTION ITEM
+
+🏗️ CONSTRUCTION RULES:
+├─ PAGES: Inherit full parent chain
+│  └─ /parent/subparent/page
+├─ COLLECTION ARCHIVES: Use designated page slug or collection default
+│  └─ /[archive-page-slug OR collection-slug]
+└─ COLLECTION ITEMS: Collection prefix + item slug
+   └─ /[archive-page-slug OR collection-slug]/[item-slug]
+```
+
+### URI Segment Priority Chain
+
+**For determining segment1:**
+
+1. Archive page slug (if collection has designated archive page)
+2. Original collection slug (fallback)
+3. Page slug (for pages)
+4. Parent page slug (for nested pages)
+
+**For determining segment2+:**
+
+1. Item slug (for collection items)
+2. Child page slug (for nested pages)
+3. Grandchild page slug (for deeply nested pages)
+4. ...continues recursively
+
+## URI Construction Via Hooks
+
+- Eligible collections must have a hook that creates or updates the URI field.
+- Needs to be pre-computed at build time, not run time.
+- URI will live on the document itself as a hidden field.
+- logic for determining a URI will live in a server action
+
+## Rules
+
+- URIs can potentially be duplicated in different parts of a site. For instance a collection could be called team-members and have a member called nancy ----> team-members/nancy. But a page could also be created with a slug of nancy and a parent page of team-members.
+- For this reason we use a first-match-wins model. Priority order is determined by the order that collections are added to the payload config.
+- A warning should appear when duplicates are created
+- Optional redirects should be created when a slug/uri changes
+
+## How breadcrumbs relate
+
+- Breadcrumbs in the app will use the URI field to navigate up the tree
+- It is technically possible for a collection to have no archive. This should be detected and the archive slug should be removed from the breadcrumbs to avoid a broken link
+
+# Universal Routing Implementation Tasks
+
+## Phase 1: Enhanced Slug Field with URI Generation
+
+### Task 1.1: Enhance Slug Field Structure
+
+- [x] Add hidden `uri` field to the `slugField()` return array in `src/payload/fields/slug/index.ts`
+- [x] Create `src/payload/fields/slug/create-uri.ts` with universal URI generation logic
+- [x] Update `slugField()` to return `[slugField, uriField, checkBoxField]`
+- [x] Leverage existing `nestedDocsPlugin` breadcrumbs for parent hierarchy
+- [x] Update TypeScript types for enhanced slug field structure
+
+### Task 1.2: URI Generation Logic in Slug Field
+
+- [x] Implement collection detection within URI hook (using collection context)
+- [x] Add Pages-specific URI logic (use nestedDocsPlugin's `generateURL` for parent hierarchy)
+- [x] Add Collection items logic (archive page/custom slug/default slug + item slug)
+- [x] Create `getCollectionSettings()` function to read routing settings from global
+- [x] Add URI validation and conflict detection utilities
+
+### Task 1.3: URI Hook Integration
+
+- [x] Add URI generation hook to slug field's existing hooks array
+- [x] Ensure URI updates whenever slug or parent changes
+- [x] Handle URI generation on both create and update operations
+- [x] Add URI recalculation when routing settings change
+
+### Task 1.4: Automatic Collection Integration
+
+- [x] Verify all existing collections using `slugField()` automatically get URI functionality
+- [x] Test URI generation across Pages (hierarchical), Posts, Services, Team, Testimonials
+- [x] Confirm nestedDocsPlugin breadcrumbs work with new URI system
+- [x] Update payload-types.ts to reflect URI field in all slug-enabled collections
+
+## Phase 2: Universal Document Resolution
+
+### Task 2.1: Build Document Resolution System
+
+- [x] Create `src/lib/payload/universal-resolver.ts`
+- [x] Implement `getDocumentByURI()` function with first-match-wins logic
+- [x] Implement homepage resolution from settings
+- [x] Implement single-segment page resolution (using existing slug field)
+- [x] Implement single-segment collection archive resolution
+- [x] Implement multi-segment nested page resolution (leverage nestedDocsPlugin)
+- [x] Implement two-segment collection item resolution (using enhanced slug field URIs)
+
+## Phase 3: Dynamic Routing Updates
+
+### Task 3.1: Update Main Dynamic Route
+
+- [ ] Modify `src/app/(frontend)/[slug]/page.tsx` to handle single segments
+- [ ] Create `src/app/(frontend)/[...slug]/page.tsx` for multi-segment URIs (catch-all)
+- [ ] Implement universal document resolution in route handlers
+- [ ] Add proper TypeScript typing for resolved documents
+- [ ] Update generateStaticParams for all URI patterns
+
+### Task 3.2: Collection Archive Handling
+
+- [ ] Create collection archive page component
+- [ ] Update blog page to use universal resolution
+- [ ] Create generic archive template system
+- [ ] Implement pagination for archives
+- [ ] Add SEO metadata generation for archives
+
+### Task 3.3: Error Handling & Redirects
+
+- [ ] Update `PayloadRedirects` component for URI-based redirects
+- [ ] Add 404 handling for unresolved URIs
+- [ ] Implement redirect creation on URI changes
+- [ ] Add conflict resolution warnings in admin
+
+## Phase 4: Enhanced Features
+
+### Task 4.1: Smart Breadcrumbs
+
+- [ ] Update `PostBreadcrumbs` component to use enhanced slug field URIs
+- [ ] Leverage existing `nestedDocsPlugin` breadcrumbs for hierarchical pages
+- [ ] Create universal `Breadcrumbs` component for all collections using plugin data
+- [ ] Handle collection archives in breadcrumb chains
+- [ ] Add breadcrumb schema.org markup
+
+### Task 4.2: Link Generation Updates
+
+- [ ] Update `CMSLink` component to use enhanced slug field URIs
+- [ ] Modify rich text internal linking to use URIs from slug field
+- [ ] Update navigation components for URI-based links
+- [ ] Leverage existing `nestedDocsPlugin.generateURL` where possible
+- [ ] Create `generateDocumentURL()` utility function as wrapper
+
+### Task 4.3: Preview & Live Preview
+
+- [ ] Update preview path generation to use enhanced slug field URIs
+- [ ] Modify live preview listener for URI changes from slug field
+- [ ] Test preview functionality across all collections
+- [ ] Update admin bar links to use URIs from slug field
+
+## Phase 5: Performance & Polish
+
+### Task 5.1: Caching Strategy
+
+- [x] Implement URI-based caching for document resolution
+- [ ] Add cache invalidation on URI changes
+- [x] Create cached routing settings retrieval
+- [ ] Optimize database queries for URI lookups
+
+### Task 5.2: Validation & Admin UX
+
+- [ ] Add URI conflict detection in admin
+- [ ] Create URI preview in collection admin
+- [ ] Implement URI validation on save
+- [ ] Add bulk URI regeneration utility
+- [ ] Create migration script for existing content
+
+### Task 5.3: Testing & Documentation
+
+- [ ] Write unit tests for URI generation logic
+- [ ] Write integration tests for document resolution
+- [ ] Test all routing scenarios from the plan
+- [ ] Create documentation for URI system
+- [ ] Test SEO implications and sitemap generation
+
+## Phase 6: Migration & Deployment
+
+### Task 6.1: Data Migration
+
+- [ ] Create migration script to populate URI fields in enhanced slug field for existing documents
+- [ ] Update existing redirects to use URI-based paths
+- [ ] Verify all existing URLs still work with enhanced slug field
+- [ ] Create backup of current routing system
+
+### Task 6.2: Deployment Verification
+
+- [ ] Test static generation with new URI system
+- [ ] Verify all collection types render correctly
+- [ ] Test nested page hierarchies
+- [ ] Confirm breadcrumbs work across all templates
+- [ ] Validate SEO metadata generation
+
+## Success Criteria
+
+### Must Have
+
+- [ ] All URI patterns from the plan work correctly
+- [ ] First-match-wins priority system functions
+- [ ] Homepage, pages, archives, and singles all resolve
+- [ ] Nested pages work to any depth
+- [ ] Collection archives respect settings configuration
+- [ ] Breadcrumbs generate correctly from URI hierarchy
+
+### Should Have
+
+- [ ] URI conflicts are detected and warned
+- [ ] Performance matches or exceeds current system
+- [ ] Admin UX is intuitive for managing URIs
+- [ ] SEO metadata generates correctly for all patterns
+
+### Nice to Have
+
+- [ ] Automatic redirects on URI changes
+- [ ] Bulk URI management tools
+- [ ] Advanced URI customization options
+- [ ] URI analytics and reporting
+
+## Dependencies & Notes
+
+- Requires careful coordination with existing slug fields
+- Must maintain backwards compatibility during migration
+- Consider impact on existing SEO and indexed URLs
+- Test thoroughly with draft/published content states
+- Ensure live preview works throughout implementation
