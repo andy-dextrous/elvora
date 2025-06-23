@@ -7,7 +7,10 @@ import { slugField } from "@/payload/fields/slug"
 import { populatePublishedAt } from "@/payload/hooks/populatePublishedAt"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { applyDefaultTemplate } from "./hooks/applyDefaultTemplate"
-import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
+import {
+  afterCollectionChange,
+  afterCollectionDelete,
+} from "@/payload/hooks/revalidation"
 
 import {
   MetaDescriptionField,

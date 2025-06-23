@@ -12,7 +12,10 @@ import { authenticated } from "@/payload/access/authenticated"
 import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublished"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { populateAuthors } from "./hooks/populateAuthors"
-import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
+import {
+  afterCollectionChange,
+  afterCollectionDelete,
+} from "@/payload/hooks/revalidation"
 
 import {
   MetaDescriptionField,

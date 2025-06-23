@@ -47,6 +47,10 @@ export const CACHE_CONFIG: CacheConfig = {
     ttl: 7200,
     dependencies: [],
   },
+  templates: {
+    ttl: 86400, // Templates change infrequently
+    dependencies: ["global:settings"], // Templates depend on routing settings
+  },
 
   // Globals (using proper naming convention)
   "global:settings": {

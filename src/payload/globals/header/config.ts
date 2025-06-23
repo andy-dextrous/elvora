@@ -1,7 +1,7 @@
 import type { GlobalConfig } from "payload"
 
 import { link } from "@/payload/fields/link"
-import { afterGlobalChange } from "@/payload/hooks/hooks"
+import { afterGlobalChange } from "@/payload/hooks/revalidation"
 
 export const Header: GlobalConfig = {
   slug: "header",

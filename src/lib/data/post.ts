@@ -1,14 +1,11 @@
-import { getPayload } from "payload"
-import { unstable_cache } from "next/cache"
-import configPromise from "@payload-config"
-import { Post } from "@/payload/payload-types"
 import { cache } from "@/lib/cache"
+import type { Post } from "@/payload/payload-types"
 
 /*************************************************************************/
 /*  GET RECENT POSTS FOR LATEST ARTICLES - MIGRATED TO UNIVERSAL CACHE
 /*************************************************************************/
 
-export const getRecentPosts = async () => {
+export async function getRecentPosts(): Promise<Post[]> {
   return cache.getCollection("posts", {
     limit: 3,
     sort: "-publishedAt",
@@ -22,27 +19,20 @@ export const getRecentPosts = async () => {
   })
 }
 
-/*******************************************************/
-/* Get Related Posts by Categories - SAVE FOR GRAPHQL PHASE
-/*******************************************************/
+/*************************************************************************/
+/*  GET RELATED POSTS BY CATEGORIES - MIGRATED TO UNIVERSAL CACHE
+/*************************************************************************/
 
-async function getRelatedPostsInternal({
+export async function getRelatedPosts({
   categories,
   currentPostId,
 }: {
   categories: string[]
   currentPostId: string
-}) {
-  const payload = await getPayload({ config: configPromise })
-
+}): Promise<Post[]> {
   // First try to get posts in the same categories
-  let result = await payload.find({
-    collection: "posts",
-    draft: false,
-    depth: 1,
+  const categoryPosts = await cache.getCollection("posts", {
     limit: 3,
-    overrideAccess: false,
-    pagination: false,
     sort: "-publishedAt",
     where: {
       and: [
@@ -63,31 +53,17 @@ async function getRelatedPostsInternal({
         },
       ],
     },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      heroImage: true,
-      categories: true,
-      meta: {
-        description: true,
-      },
-      publishedAt: true,
-    },
+    depth: 1,
+    overrideAccess: false,
   })
 
   // If we don't have enough posts from same categories, fill with most recent
-  if (result.docs.length < 3) {
-    const remainingNeeded = 3 - result.docs.length
-    const existingIds = result.docs.map(doc => doc.id)
+  if (categoryPosts.length < 3) {
+    const remainingNeeded = 3 - categoryPosts.length
+    const existingIds = categoryPosts.map((doc: any) => doc.id)
 
-    const additionalResult = await payload.find({
-      collection: "posts",
-      draft: false,
-      depth: 1,
+    const additionalPosts = await cache.getCollection("posts", {
       limit: remainingNeeded,
-      overrideAccess: false,
-      pagination: false,
       sort: "-publishedAt",
       where: {
         and: [
@@ -103,36 +79,12 @@ async function getRelatedPostsInternal({
           },
         ],
       },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        heroImage: true,
-        categories: true,
-        meta: {
-          description: true,
-        },
-        publishedAt: true,
-      },
+      depth: 1,
+      overrideAccess: false,
     })
 
-    result.docs = [...result.docs, ...additionalResult.docs]
+    return [...categoryPosts, ...additionalPosts]
   }
 
-  return result.docs || ([] as Post[])
+  return categoryPosts
 }
-
-export const getRelatedPosts = ({
-  categories,
-  currentPostId,
-}: {
-  categories: string[]
-  currentPostId: string
-}) =>
-  unstable_cache(
-    async () => getRelatedPostsInternal({ categories, currentPostId }),
-    ["related-posts", currentPostId, ...categories.sort()],
-    {
-      tags: ["posts", "related-posts"],
-    }
-  )()

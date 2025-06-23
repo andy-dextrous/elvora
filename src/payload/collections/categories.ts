@@ -2,7 +2,10 @@ import type { CollectionConfig } from "payload"
 
 import { anyone } from "@/payload/access/anyone"
 import { authenticated } from "@/payload/access/authenticated"
-import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
+import {
+  afterCollectionChange,
+  afterCollectionDelete,
+} from "@/payload/hooks/revalidation"
 
 export const Categories: CollectionConfig = {
   slug: "categories",

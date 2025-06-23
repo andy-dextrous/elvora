@@ -221,6 +221,44 @@ export const cache = {
   },
 
   /**
+   * Get document by collection and ID
+   */
+  getByID: async (
+    collection: Collection,
+    id: string,
+    draft: boolean = false
+  ): Promise<any | null> => {
+    const cacheKey = generateCacheKey({ collection, params: [id], draft })
+    const tags = generateCacheTags({ collection })
+
+    const timestamp = new Date().toISOString()
+    await logCacheEvent({
+      operation: `getByID("${collection}", "${id}")`,
+      cacheKey,
+      tags,
+      timestamp,
+    })
+
+    return unstable_cache(
+      async () => {
+        const payload = await getPayload({ config: configPromise })
+
+        const result = await payload.findByID({
+          collection,
+          id,
+          draft,
+          depth: 5,
+          overrideAccess: true,
+        })
+
+        return result || null
+      },
+      cacheKey,
+      { tags }
+    )()
+  },
+
+  /**
    * Get document by collection and slug
    */
   getBySlug: async (

@@ -1,80 +1,45 @@
 "use server"
 
-import { getPayload } from "payload"
-import configPromise from "@payload-config"
-import { unstable_cache } from "next/cache"
+import { cache } from "@/lib/cache"
 
 /*************************************************************************/
-/*  GET DEFAULT TEMPLATE FOR COLLECTION - SAVE FOR GRAPHQL PHASE
-/*
-/*  Note: This function involves complex relationship lookups and multiple
-/*  dependent queries (settings -> template lookup). It should be migrated
-/*  to use GraphQL in Phase 5 for better relationship handling.
+/*  GET DEFAULT TEMPLATE FOR COLLECTION - MIGRATED TO UNIVERSAL CACHE
 /*************************************************************************/
 
 export async function getDefaultTemplate(collection: string) {
-  return unstable_cache(
-    async () => {
-      const payload = await getPayload({ config: configPromise })
+  const settings = await cache.getGlobal("settings", 1)
 
-      // Get routing settings to find assigned template
-      const settings = await payload.findGlobal({
-        slug: "settings",
-        depth: 1,
-      })
+  const templateField =
+    collection === "pages" ? "pagesDefaultTemplate" : `${collection}SingleTemplate`
+  const templateId = (settings?.routing as any)?.[templateField]
 
-      const templateField =
-        collection === "pages" ? "pagesDefaultTemplate" : `${collection}SingleTemplate`
-      const templateId = (settings?.routing as any)?.[templateField]
+  if (!templateId) {
+    return null
+  }
 
-      if (!templateId) {
-        return null
-      }
+  const template = await cache.getByID(
+    "templates",
+    typeof templateId === "object" ? templateId.id : templateId
+  )
 
-      const template = await payload.findByID({
-        collection: "templates",
-        id: typeof templateId === "object" ? templateId.id : templateId,
-        depth: 2,
-      })
-
-      return template || null
-    },
-    [`default-template-${collection}`],
-    {
-      tags: ["templates", `default-template-${collection}`, "settings"],
-    }
-  )()
+  return template || null
 }
 
 /*************************************************************************/
-/*  GET ALL TEMPLATES FOR COLLECTION - SAVE FOR GRAPHQL PHASE
-/*
-/*  Note: This function combines template collection queries with default
-/*  template lookups. Should be migrated to GraphQL for optimized queries.
+/*  GET ALL TEMPLATES FOR COLLECTION - MIGRATED TO UNIVERSAL CACHE
 /*************************************************************************/
 
 export async function getTemplatesForCollection(collection: string) {
-  return unstable_cache(
-    async () => {
-      const payload = await getPayload({ config: configPromise })
+  const templates = await cache.getCollection("templates", {
+    sort: "name",
+    limit: 100,
+    depth: 2,
+  })
 
-      const result = await payload.find({
-        collection: "templates",
-        depth: 2,
-        sort: "name",
-        limit: 100,
-      })
+  const defaultTemplate = await getDefaultTemplate(collection)
 
-      const defaultTemplate = await getDefaultTemplate(collection)
-
-      return {
-        templates: result.docs,
-        defaultTemplate,
-      }
-    },
-    [`templates-${collection}`],
-    {
-      tags: ["templates", `templates-${collection}`, "settings"],
-    }
-  )()
+  return {
+    templates,
+    defaultTemplate,
+  }
 }

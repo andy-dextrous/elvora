@@ -18,13 +18,12 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
   previousDoc,
   operation,
   req: { payload, context },
-  collection, // This is provided by Payload!
+  collection,
 }) => {
   if (context.disableRevalidate) {
     return doc
   }
 
-  // Use universal revalidation system
   try {
     await revalidate({
       collection: collection.slug,
@@ -47,13 +46,12 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
 export const afterCollectionDelete: CollectionAfterDeleteHook = async ({
   doc,
   req: { payload, context },
-  collection, // This is provided by Payload!
+  collection,
 }) => {
   if (context.disableRevalidate) {
     return doc
   }
 
-  // Use universal revalidation system
   try {
     await revalidate({
       collection: collection.slug,
@@ -83,16 +81,15 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
   doc,
   previousDoc,
   req: { payload, context },
-  global, // This is provided by Payload!
+  global,
 }) => {
   if (context.disableRevalidate) {
     return doc
   }
 
-  // Use universal revalidation system for globals
   try {
     await revalidate({
-      collection: `global:${global.slug}`, // Use proper global naming convention
+      collection: `global:${global.slug}`,
       doc,
       previousDoc,
       action: "update",

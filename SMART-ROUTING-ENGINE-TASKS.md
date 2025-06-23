@@ -32,7 +32,9 @@
 - Cleaned up function naming (removed "cache" prefixes - caching is assumed)
 - Preserved complex functions for GraphQL phase (getRelatedPosts, getDefaultTemplate)
 
-**🔄 Next Up: Phase 5 - GraphQL Integration**
+**✅ Phase 4 - API Migration: COMPLETE**
+
+**🔄 Next Up: Phase 5 - URI-Based Sitemaps**
 
 ## 📋 Table of Contents - Logical Construction Process
 
@@ -49,22 +51,19 @@
 📊 Phase 4: API Migration
    └── Replace scattered cache functions with universal API
 
-🔗 Phase 5: GraphQL Integration
-   └── Build organized GraphQL module with cache-powered resolvers
-
-🗺️ Phase 6: URI-Based Sitemaps
+🗺️ Phase 5: URI-Based Sitemaps
    └── Create organized sitemaps module with universal routing URIs
 
-🔧 Phase 7: Collection Integration
+🔧 Phase 6: Collection Integration
    └── Migrate all collections to use universal system, remove legacy code
 
-🛣️ Phase 7.5: Routing Module Organization
+🛣️ Phase 6.5: Routing Module Organization
    └── Organize routing system into clean, documented module structure
 
-🚀 Phase 8: Advanced Features
+🚀 Phase 7: Advanced Features
    └── Add cache warming, performance monitoring, and smart invalidation
 
-🏁 Phase 9: Final Integration
+🏁 Phase 8: Final Integration
    └── Complete migration, cleanup, and production readiness
 ```
 
@@ -76,12 +75,11 @@
 2. **URI Integration** - Unify the routing backbone
 3. **Smart Revalidation** - Intelligent cache invalidation
 4. **API Migration** - Replace old with new systematically
-5. **GraphQL Layer** - Advanced query capabilities
-6. **Sitemap Integration** - URI-aware sitemap generation
-7. **Collection Updates** - Apply universal system across all content
-8. **Advanced Features** - Performance and monitoring
-9. **Testing** - Validate entire system works correctly
-10. **Production** - Final cleanup and deployment readiness
+5. **Sitemap Integration** - URI-aware sitemap generation
+6. **Collection Updates** - Apply universal system across all content
+7. **Advanced Features** - Performance and monitoring
+8. **Testing** - Validate entire system works correctly
+9. **Production** - Final cleanup and deployment readiness
 
 ## 📚 Reference Documents
 
@@ -92,10 +90,9 @@ The complete planning history and architecture details are in:
 
 ### **Module Documentation**
 
-- `src/lib/payload/cache/README.md` - **Cache System** - Universal cache, configuration-driven dependencies, and smart revalidation
-- `src/lib/payload/graphql/README.md` - **GraphQL Integration** - Cache-powered resolvers, fragments, and complex queries _(to be created)_
-- `src/lib/payload/sitemaps/README.md` - **URI-Based Sitemaps** - Universal sitemap generation with SEO compliance _(to be created)_
-- `src/lib/payload/routing/README.md` - **URI Engine** - Unified URI creation, parsing, and conflict detection _(to be created)_
+- `src/lib/cache/README.md` - **Cache System** - Universal cache, configuration-driven dependencies, and smart revalidation
+- `src/lib/sitemaps/README.md` - **URI-Based Sitemaps** - Universal sitemap generation with SEO compliance _(to be created)_
+- `src/lib/routing/README.md` - **URI Engine** - Unified URI creation, parsing, and conflict detection _(to be created)_
 
 ## 🏗️ **Phase 1: Foundation Layer**
 
@@ -210,60 +207,25 @@ The complete planning history and architecture details are in:
 - [x] Clean up `post.ts` - kept only `getRelatedPosts()` (for GraphQL phase)
 - [x] Preserve complex functions for GraphQL phase: `getRelatedPosts()`, `getDefaultTemplate()`
 
-## 🔗 **Phase 5: GraphQL Integration**
+### Final API Migration Tasks ✅ **COMPLETE**
 
-### GraphQL Module Organization
+- [x] Migrate `getRelatedPosts()` to universal cache with relationship queries
+- [x] Migrate `getDefaultTemplate()` and `getTemplatesForCollection()` to universal cache
+- [x] Add `cache.getByID()` method to universal cache API
+- [x] Add templates collection to cache configuration with proper dependencies
+- [x] Complete migration of all complex cache functions to universal cache
 
-- [ ] Create `src/lib/payload/graphql/` folder structure
-- [ ] Create `src/lib/payload/graphql/README.md` - GraphQL integration guide
-- [ ] Create `src/lib/payload/graphql/index.ts` - Clean exports for all GraphQL functionality
-- [ ] Create `src/lib/payload/graphql/client.ts` for client-side setup
-- [ ] Create `src/lib/payload/graphql/resolvers.ts` using universal cache
-- [ ] Create `src/lib/payload/graphql/fragments/` folder structure
-- [ ] Create `src/lib/payload/graphql/queries/` folder structure
-- [ ] Create `src/lib/payload/graphql/mutations/` folder structure
-- [ ] Create `src/lib/payload/graphql/types/` folder structure
-- [ ] Set up GraphQL codegen for TypeScript type generation
-
-### Fragment Development
-
-- [ ] Create `page-fields.ts` fragment
-- [ ] Create `post-fields.ts` fragment
-- [ ] Create `meta-fields.ts` fragment for SEO
-- [ ] Create `media-fields.ts` fragment
-
-### Complex Query Examples
-
-- [ ] Create `homepage-data.ts` multi-collection query
-- [ ] Create `page-data.ts` page with header/footer query
-- [ ] Create `blog-archive.ts` blog listing with filters
-- [ ] Create `search-results.ts` search functionality
-
-### Cache-Powered Resolvers
-
-- [ ] Build page/post resolvers using `cache.getBySlug()`
-- [ ] Build global resolvers using `cache.getGlobal()`
-- [ ] Build collection resolvers using `cache.getCollection()`
-- [ ] Implement resolver-level caching
-
-### GraphQL Migration Tasks
-
-- [ ] Migrate `getRelatedPosts()` to GraphQL with complex relationship queries
-- [ ] Migrate `getDefaultTemplate()` to GraphQL with relationship lookups
-- [ ] Create GraphQL queries for multi-collection operations
-- [ ] Replace any remaining complex cache functions with GraphQL equivalents
-
-## 🗺️ **Phase 6: URI-Based Sitemaps**
+## 🗺️ **Phase 5: URI-Based Sitemaps**
 
 ### Sitemaps Module Organization
 
-- [ ] Create `src/lib/payload/sitemaps/` folder structure
-- [ ] Create `src/lib/payload/sitemaps/README.md` - How URI-based sitemaps work
-- [ ] Create `src/lib/payload/sitemaps/index.ts` - Clean exports for all sitemap functionality
-- [ ] Create `src/lib/payload/sitemaps/config.ts` with SITEMAP_CONFIG
-- [ ] Create `src/lib/payload/sitemaps/generator.ts` - Universal sitemap generator
-- [ ] Create `src/lib/payload/sitemaps/route-factory.ts` - Dynamic route creation
-- [ ] Create `src/lib/payload/sitemaps/seo-filters.ts` - noIndex, canonical URL logic
+- [ ] Create `src/lib/sitemaps/` folder structure
+- [ ] Create `src/lib/sitemaps/README.md` - How URI-based sitemaps work
+- [ ] Create `src/lib/sitemaps/index.ts` - Clean exports for all sitemap functionality
+- [ ] Create `src/lib/sitemaps/config.ts` with SITEMAP_CONFIG
+- [ ] Create `src/lib/sitemaps/generator.ts` - Universal sitemap generator
+- [ ] Create `src/lib/sitemaps/route-factory.ts` - Dynamic route creation
+- [ ] Create `src/lib/sitemaps/seo-filters.ts` - noIndex, canonical URL logic
 
 ### Sitemap Configuration
 
@@ -292,7 +254,7 @@ The complete planning history and architecture details are in:
 - [ ] Implement canonical URL handling logic
 - [ ] Add external canonical URL detection and exclusion
 
-## 🔧 **Phase 7: Collection Integration**
+## 🔧 **Phase 6: Collection Integration**
 
 ### Hook Migration
 
@@ -317,19 +279,18 @@ The complete planning history and architecture details are in:
 - [ ] Add cache warming for newly generated URIs
 - [ ] Optimize resolver performance with smart caching
 
-## 🛣️ **Phase 7.5: Routing Module Organization**
+## 🛣️ **Phase 6.5: Routing Module Organization**
 
 ### Routing Module Organization
 
-- [ ] Create `src/lib/payload/routing/` folder structure
-- [ ] Create `src/lib/payload/routing/README.md` - URI engine documentation
-- [ ] Create `src/lib/payload/routing/index.ts` - Clean exports for all routing functionality
-- [ ] Move `src/lib/payload/routing-engine.ts` to `src/lib/payload/routing/uri-engine.ts`
-- [ ] Move `src/lib/payload/routing.ts` to `src/lib/payload/routing/document-resolver.ts`
-- [ ] Create `src/lib/payload/routing/conflict-detection.ts` - Enhanced conflict detection
+- [ ] Create `src/lib/routing/` folder structure
+- [ ] Create `src/lib/routing/README.md` - URI engine documentation
+- [ ] Create `src/lib/routing/index.ts` - Clean exports for all routing functionality
+- [ ] Move `src/lib/routing-engine.ts` to `src/lib/routing/uri-engine.ts`
+- [ ] Create `src/lib/routing/conflict-detection.ts` - Enhanced conflict detection
 - [ ] Update all imports to use new routing module structure
 
-## 🚀 **Phase 8: Advanced Features**
+## 🚀 **Phase 7: Advanced Features**
 
 ### Cache Warming
 
@@ -359,12 +320,12 @@ The complete planning history and architecture details are in:
 - [ ] Create URI analytics and monitoring
 - [ ] Build advanced conflict resolution strategies
 
-## 🏁 **Phase 9: Final Integration**
+## 🏁 **Phase 8: Final Integration**
 
 ### Complete API Replacement
 
 - [ ] Remove all legacy cache functions
-- [ ] Update all components to use universal cache or GraphQL
+- [ ] Update all components to use universal cache
 - [ ] Clean up unused imports and dependencies
 - [ ] Verify no legacy cache calls remain
 

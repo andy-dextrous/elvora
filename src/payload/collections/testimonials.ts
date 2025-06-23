@@ -1,5 +1,8 @@
 import { CollectionConfig } from "payload"
-import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
+import {
+  afterCollectionChange,
+  afterCollectionDelete,
+} from "@/payload/hooks/revalidation"
 import { anyone } from "@/payload/access/anyone"
 import { canEditContent } from "@/payload/access/editor"
 import { slugField } from "../fields/slug"

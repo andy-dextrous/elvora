@@ -1,6 +1,6 @@
 import type { GlobalConfig } from "payload"
 import { socialLinks } from "@/payload/fields/social-links"
-import { afterGlobalChange } from "@/payload/hooks/hooks"
+import { afterGlobalChange } from "@/payload/hooks/revalidation"
 import { generateRoutingFields } from "@/utilities/routing"
 import { authenticated } from "@/payload/access/authenticated"
 import { anyone } from "@/payload/access/anyone"

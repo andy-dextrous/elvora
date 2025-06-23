@@ -6,7 +6,10 @@ import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublis
 import { createApplyDefaultTemplateHook } from "@/payload/collections/pages/hooks/applyDefaultTemplate"
 import { slugField } from "@/payload/fields/slug"
 import { populatePublishedAt } from "@/payload/hooks/populatePublishedAt"
-import { afterCollectionChange, afterCollectionDelete } from "@/payload/hooks/hooks"
+import {
+  afterCollectionChange,
+  afterCollectionDelete,
+} from "@/payload/hooks/revalidation"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 
 import {
