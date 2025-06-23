@@ -26,18 +26,15 @@ export interface DocumentForSEO {
  * Check if a document should be included in sitemaps based on SEO settings
  */
 export function shouldIncludeInSitemap(doc: DocumentForSEO): boolean {
-  // Only include published documents
   if (doc._status !== "published") {
     return false
   }
 
-  // Check for noIndex (check both top-level and meta fields for compatibility)
   const noIndex = doc.noIndex || doc.meta?.noIndex
   if (noIndex === true) {
     return false
   }
 
-  // Check for external canonical URLs (exclude from our sitemap)
   const canonicalUrl = doc.canonicalUrl || doc.meta?.canonicalUrl
   if (canonicalUrl && isExternalCanonical(canonicalUrl)) {
     return false
@@ -52,17 +49,14 @@ export function shouldIncludeInSitemap(doc: DocumentForSEO): boolean {
 export function isExternalCanonical(canonicalUrl: string): boolean {
   if (!canonicalUrl) return false
 
-  // If it starts with http:// or https://, it's external
   if (canonicalUrl.startsWith("http://") || canonicalUrl.startsWith("https://")) {
     return true
   }
 
-  // If it starts with //, it's protocol-relative external
   if (canonicalUrl.startsWith("//")) {
     return true
   }
 
-  // Otherwise it's internal (relative path or absolute path on our domain)
   return false
 }
 
@@ -72,17 +66,14 @@ export function isExternalCanonical(canonicalUrl: string): boolean {
 export function getCanonicalUrl(doc: DocumentForSEO, siteUrl: string): string {
   const canonicalUrl = doc.canonicalUrl || doc.meta?.canonicalUrl
 
-  // If external canonical is set, use it as-is
   if (canonicalUrl && isExternalCanonical(canonicalUrl)) {
     return canonicalUrl
   }
 
-  // If internal canonical is set, make it absolute
   if (canonicalUrl && canonicalUrl.startsWith("/")) {
     return `${siteUrl}${canonicalUrl}`
   }
 
-  // Default: use the document's URI
   return `${siteUrl}${doc.uri}`
 }
 
@@ -139,7 +130,6 @@ export function getSEOFieldSelection() {
     updatedAt: true,
     noIndex: true,
     canonicalUrl: true,
-    // Also include meta fields for backward compatibility
     "meta.noIndex": true,
     "meta.canonicalUrl": true,
   }

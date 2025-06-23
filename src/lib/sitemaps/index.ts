@@ -33,7 +33,7 @@ export {
   generateSitemap,
   generateAllSitemaps,
   validateSitemapResult,
-  toNextSitemapFormat,
+  toAppRouterFormat,
   type GenerateSitemapOptions,
   type SitemapGenerationResult,
 } from "./generator"
@@ -41,10 +41,11 @@ export {
 // Route Factory
 export {
   createSitemapRoute,
+  createAppRouterSitemapRoute,
   createPagesSitemapRoute,
   createPostsSitemapRoute,
   createCollectionSitemapRoute,
-  createSitemapIndexRoute,
+  createUniversalSitemapRoute,
   testSitemapRoute,
 } from "./route-factory"
 

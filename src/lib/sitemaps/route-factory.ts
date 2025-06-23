@@ -1,16 +1,15 @@
-import { getServerSideSitemap } from "next-sitemap"
 import { unstable_cache } from "next/cache"
-import { generateSitemap, toNextSitemapFormat } from "./generator"
+import { generateSitemap } from "./generator"
 import { getSitemapCacheTags, getSitemapCollections } from "./config"
 
 /*************************************************************************/
-/*  SITEMAP ROUTE FACTORY
+/*  APP ROUTER SITEMAP ROUTE FACTORY
 /*************************************************************************/
 
 /**
- * Create a cached sitemap generation function
+ * Create a cached sitemap generation function for App Router
  */
-function createCachedSitemapGenerator(sitemapName: string) {
+function createCachedAppRouterSitemapGenerator(sitemapName: string) {
   // Generate cache tags based on collections in this sitemap
   const collections = getSitemapCollections(sitemapName)
   const tags = new Set<string>()
@@ -33,7 +32,7 @@ function createCachedSitemapGenerator(sitemapName: string) {
         includeStatic: sitemapName === "pages-sitemap.xml",
       })
 
-      return toNextSitemapFormat(result)
+      return result.entries
     },
     [`sitemap-${sitemapName}`],
     {
@@ -44,22 +43,82 @@ function createCachedSitemapGenerator(sitemapName: string) {
 }
 
 /**
- * Factory function to create sitemap route handlers
+ * Generate XML sitemap content from entries
  */
-export function createSitemapRoute(sitemapName: string) {
-  const getCachedSitemap = createCachedSitemapGenerator(sitemapName)
+function generateSitemapXML(entries: any[]): string {
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_URL ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    "https://example.com"
+  ).replace(/\/$/, "")
 
-  return async function GET() {
+  const urlEntries = entries
+    .map(entry => {
+      const url = entry.loc || `${siteUrl}${entry.url || ""}`
+      const lastmod = entry.lastmod || new Date().toISOString()
+      const changefreq = entry.changefreq || "weekly"
+      const priority = entry.priority || 0.5
+
+      return `  <url>
+    <loc>${url}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`
+    })
+    .join("\n")
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urlEntries}
+</urlset>`
+}
+
+/**
+ * Factory function to create App Router sitemap route handlers
+ */
+export function createAppRouterSitemapRoute(sitemapName: string) {
+  const getCachedSitemap = createCachedAppRouterSitemapGenerator(sitemapName)
+
+  return async function GET(): Promise<Response> {
     try {
-      const sitemap = await getCachedSitemap()
-      return getServerSideSitemap(sitemap)
+      const entries = await getCachedSitemap()
+      const xml = generateSitemapXML(entries)
+
+      return new Response(xml, {
+        headers: {
+          "Content-Type": "application/xml",
+          "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+        },
+      })
     } catch (error) {
       console.error(`Failed to generate sitemap ${sitemapName}:`, error)
 
       // Return empty sitemap on error
-      return getServerSideSitemap([])
+      const emptyXml = generateSitemapXML([])
+      return new Response(emptyXml, {
+        headers: {
+          "Content-Type": "application/xml",
+          "Cache-Control": "public, max-age=300", // Shorter cache on error
+        },
+      })
     }
   }
+}
+
+/*************************************************************************/
+/*  BACKWARD COMPATIBILITY LAYER
+/*************************************************************************/
+
+/**
+ * Legacy factory function (for compatibility)
+ * @deprecated Use createAppRouterSitemapRoute instead
+ */
+export function createSitemapRoute(sitemapName: string) {
+  console.warn(
+    `createSitemapRoute is deprecated. Use createAppRouterSitemapRoute instead.`
+  )
+  return createAppRouterSitemapRoute(sitemapName)
 }
 
 /*************************************************************************/
@@ -70,52 +129,52 @@ export function createSitemapRoute(sitemapName: string) {
  * Create pages sitemap route (includes static entries)
  */
 export function createPagesSitemapRoute() {
-  return createSitemapRoute("pages-sitemap.xml")
+  return createAppRouterSitemapRoute("pages-sitemap.xml")
 }
 
 /**
  * Create posts sitemap route
  */
 export function createPostsSitemapRoute() {
-  return createSitemapRoute("posts-sitemap.xml")
+  return createAppRouterSitemapRoute("posts-sitemap.xml")
 }
 
 /**
  * Generic sitemap route creator for any collection
  */
 export function createCollectionSitemapRoute(collectionName: string) {
-  return createSitemapRoute(`${collectionName}-sitemap.xml`)
+  return createAppRouterSitemapRoute(`${collectionName}-sitemap.xml`)
 }
 
 /*************************************************************************/
-/*  SITEMAP INDEX GENERATOR (FUTURE ENHANCEMENT)
+/*  DYNAMIC SITEMAP ROUTE FACTORY
 /*************************************************************************/
 
 /**
- * Create a sitemap index that lists all available sitemaps
- * This can be used to create a main sitemap.xml that references all sub-sitemaps
+ * Create a universal sitemap route handler that can handle any sitemap
+ * dynamically based on configuration
  */
-export function createSitemapIndexRoute() {
-  return async function GET() {
-    try {
-      const { getActiveSitemaps } = await import("./config")
-      const activeSitemaps = getActiveSitemaps()
+export function createUniversalSitemapRoute() {
+  return async function GET(
+    request: Request,
+    { params }: { params: { sitemap: string } }
+  ): Promise<Response> {
+    const sitemapName = `${params.sitemap}.xml`
 
-      const siteUrl =
-        process.env.NEXT_PUBLIC_URL ||
-        process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-        "https://example.com"
+    // Verify this is a valid sitemap
+    const { getActiveSitemaps } = await import("./config")
+    const activeSitemaps = getActiveSitemaps()
 
-      const sitemapIndex = activeSitemaps.map(sitemapName => ({
-        loc: `${siteUrl}/${sitemapName}`,
-        lastmod: new Date().toISOString(),
-      }))
-
-      return getServerSideSitemap(sitemapIndex)
-    } catch (error) {
-      console.error("Failed to generate sitemap index:", error)
-      return getServerSideSitemap([])
+    if (!activeSitemaps.includes(sitemapName)) {
+      return new Response("Sitemap not found", {
+        status: 404,
+        headers: { "Content-Type": "text/plain" },
+      })
     }
+
+    // Create and execute the sitemap route handler
+    const handler = createAppRouterSitemapRoute(sitemapName)
+    return handler()
   }
 }
 

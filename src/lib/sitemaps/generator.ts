@@ -224,17 +224,29 @@ export function validateSitemapResult(result: SitemapGenerationResult): {
 }
 
 /*************************************************************************/
-/*  LEGACY COMPATIBILITY HELPER
+/*  APP ROUTER COMPATIBILITY FUNCTIONS
 /*************************************************************************/
 
 /**
- * Convert sitemap generation result to next-sitemap format
+ * Convert sitemap generation result to App Router MetadataRoute.Sitemap format
  */
-export function toNextSitemapFormat(result: SitemapGenerationResult): any[] {
+export function toAppRouterFormat(result: SitemapGenerationResult): {
+  url: string
+  lastModified?: Date
+  changeFrequency?:
+    | "always"
+    | "hourly"
+    | "daily"
+    | "weekly"
+    | "monthly"
+    | "yearly"
+    | "never"
+  priority?: number
+}[] {
   return result.entries.map(entry => ({
-    loc: entry.loc,
-    lastmod: entry.lastmod,
-    ...(entry.priority !== undefined && { priority: entry.priority }),
-    ...(entry.changefreq && { changefreq: entry.changefreq }),
+    url: entry.loc,
+    lastModified: new Date(entry.lastmod),
+    changeFrequency: entry.changefreq as any,
+    priority: entry.priority,
   }))
 }
