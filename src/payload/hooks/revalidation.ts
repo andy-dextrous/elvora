@@ -15,10 +15,9 @@ import { routingEngine } from "@/lib/routing"
  * Universal beforeChange hook for URI generation on publish events
  * Generates URI when content is published or when published content's slug changes
  */
-export const beforeCollectionChangeURIGeneration: CollectionBeforeChangeHook = async ({
+export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
   data,
   originalDoc,
-  operation,
   req: { payload },
   collection,
 }) => {

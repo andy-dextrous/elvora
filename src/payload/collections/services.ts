@@ -7,7 +7,7 @@ import { createApplyDefaultTemplateHook } from "@/payload/collections/pages/hook
 import { slugField } from "@/payload/fields/slug"
 import { populatePublishedAt } from "@/payload/hooks/populate-published-at"
 import {
-  beforeCollectionChangeURIGeneration,
+  beforeCollectionChange,
   afterCollectionChange,
   afterCollectionDelete,
 } from "@/payload/hooks/revalidation"
@@ -156,11 +156,7 @@ export const Services: CollectionConfig<"services"> = {
   ],
   hooks: {
     afterChange: [afterCollectionChange],
-    beforeChange: [
-      populatePublishedAt,
-      applyDefaultTemplate,
-      beforeCollectionChangeURIGeneration,
-    ],
+    beforeChange: [populatePublishedAt, applyDefaultTemplate, beforeCollectionChange],
     afterDelete: [afterCollectionDelete],
   },
   versions: {

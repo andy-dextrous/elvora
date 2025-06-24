@@ -8,7 +8,7 @@ import { populatePublishedAt } from "@/payload/hooks/populate-published-at"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { applyDefaultTemplate } from "./hooks/applyDefaultTemplate"
 import {
-  beforeCollectionChangeURIGeneration,
+  beforeCollectionChange,
   afterCollectionChange,
   afterCollectionDelete,
 } from "@/payload/hooks/revalidation"
@@ -159,11 +159,7 @@ export const Pages: CollectionConfig<"pages"> = {
   ],
   hooks: {
     afterChange: [afterCollectionChange],
-    beforeChange: [
-      populatePublishedAt,
-      applyDefaultTemplate,
-      beforeCollectionChangeURIGeneration,
-    ],
+    beforeChange: [populatePublishedAt, applyDefaultTemplate, beforeCollectionChange],
     afterDelete: [afterCollectionDelete],
     beforeOperation: [lockSlugAfterPublish],
   },

@@ -13,7 +13,7 @@ import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublis
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { populateAuthors } from "./hooks/populateAuthors"
 import {
-  beforeCollectionChangeURIGeneration,
+  beforeCollectionChange,
   afterCollectionChange,
   afterCollectionDelete,
 } from "@/payload/hooks/revalidation"
@@ -270,7 +270,7 @@ export const Posts: CollectionConfig<"posts"> = {
   ],
   hooks: {
     afterChange: [afterCollectionChange],
-    beforeChange: [beforeCollectionChangeURIGeneration],
+    beforeChange: [beforeCollectionChange],
     afterRead: [populateAuthors],
     afterDelete: [afterCollectionDelete],
     beforeOperation: [lockSlugAfterPublish],
