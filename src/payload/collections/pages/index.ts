@@ -4,7 +4,7 @@ import { sectionBlocks } from "@/components/sections/config"
 import { authenticated } from "@/payload/access/authenticated"
 import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublished"
 import { slugField } from "@/payload/fields/slug"
-import { populatePublishedAt } from "@/payload/hooks/populatePublishedAt"
+import { populatePublishedAt } from "@/payload/hooks/populate-published-at"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { applyDefaultTemplate } from "./hooks/applyDefaultTemplate"
 import {
