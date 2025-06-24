@@ -5,7 +5,7 @@ import { authenticated } from "@/payload/access/authenticated"
 import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublished"
 import { createApplyDefaultTemplateHook } from "@/payload/collections/pages/hooks/applyDefaultTemplate"
 import { slugField } from "@/payload/fields/slug"
-import { populatePublishedAt } from "@/payload/hooks/populatePublishedAt"
+import { populatePublishedAt } from "@/payload/hooks/populate-published-at"
 import {
   afterCollectionChange,
   afterCollectionDelete,
