@@ -13,7 +13,7 @@ type Slug = (
 ) => [TextField, TextField, CheckboxField]
 
 /*************************************************************************/
-/*  LOCK RESET HOOK (WORDPRESS-STYLE)
+/*  LOCK RESET HOOK
 /*************************************************************************/
 
 export const slugField: Slug = (fieldToUse = "title", overrides = {}) => {
@@ -73,9 +73,7 @@ export const slugField: Slug = (fieldToUse = "title", overrides = {}) => {
     index: true,
     label: "URI",
     ...(uriOverrides || {}),
-    hooks: {
-      // URI generation now handled by collection hooks on publish events
-    },
+
     admin: {
       position: "sidebar",
       readOnly: true,

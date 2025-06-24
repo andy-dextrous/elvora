@@ -1,8 +1,7 @@
-import { getPayload } from "payload"
-import { unstable_cache } from "next/cache"
-import configPromise from "@payload-config"
 import { frontendCollections } from "@/payload/collections/frontend"
-import type { CollectionSlug, FieldHook } from "payload"
+import configPromise from "@payload-config"
+import { unstable_cache } from "next/cache"
+import { getPayload } from "payload"
 
 /*************************************************************************/
 /*  CACHED ROUTING SETTINGS
@@ -43,17 +42,14 @@ async function generateURI({
   settings,
   payload,
 }: GenerateURIProps): Promise<string> {
-  // Homepage handling
   if (collection === "pages" && slug === "home") {
     return ""
   }
 
-  // Pages collection - handle hierarchy using parent field
   if (collection === "pages") {
     return await generatePageURI({ slug, data, originalDoc, payload })
   }
 
-  // Collection items - use archive page, custom slug, or collection slug
   return await generateCollectionItemURI({
     collection,
     slug,
@@ -405,49 +401,4 @@ export const routingEngine = {
     }
     return uri.split("/").filter(Boolean)
   },
-}
-
-/*************************************************************************/
-/*  PAYLOAD FIELD HOOK
-/*************************************************************************/
-
-export const createURIHook = (): FieldHook => {
-  return async ({ data, req, operation, originalDoc, collection }) => {
-    if (operation !== "create" && operation !== "update") {
-      return data?.uri || originalDoc?.uri
-    }
-
-    // Always regenerate URI when slug changes
-    if (data?.slug === originalDoc?.slug && originalDoc?.uri) {
-      return originalDoc.uri
-    }
-
-    const slug = data?.slug || originalDoc?.slug
-
-    if (!slug) {
-      return ""
-    }
-
-    const collectionSlug = collection?.slug
-
-    if (!collectionSlug) {
-      return `/${slug}`
-    }
-
-    try {
-      return await routingEngine.generate({
-        collection: collectionSlug,
-        slug,
-        data,
-        originalDoc,
-      })
-    } catch (error) {
-      req.payload.logger.warn(
-        `URI generation failed for ${collectionSlug}/${slug}:`,
-        error
-      )
-
-      return generateFallbackURI(collectionSlug, slug, data)
-    }
-  }
 }

@@ -80,10 +80,14 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
     return doc
   }
 
+  payload.logger.info(
+    `afterCollectionChange: ${collection.slug} - ${previousDoc?.slug} -> ${doc.slug}`
+  )
+
   try {
     await revalidate({
       collection: collection.slug,
-      doc, // This now has the correct URI from beforeChange
+      doc,
       previousDoc,
       action: operation === "create" ? "create" : "update",
       logger: payload.logger,

@@ -3,9 +3,4 @@
 /*************************************************************************/
 
 // URI Engine - Core routing functionality
-export {
-  routingEngine,
-  createURIHook,
-  validateURI,
-  type URIConflictResult,
-} from "./uri-engine"
+export { routingEngine, validateURI, type URIConflictResult } from "./uri-engine"
