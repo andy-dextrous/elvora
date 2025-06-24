@@ -1,6 +1,5 @@
 import type { CheckboxField, TextField } from "payload"
 import { formatSlugHook } from "./format-slug"
-import { createURIHook } from "@/lib/routing"
 
 type Overrides = {
   slugOverrides?: Partial<TextField>
@@ -30,7 +29,7 @@ export const slugField: Slug = (fieldToUse = "title", overrides = {}) => {
     },
     hooks: {
       beforeValidate: [
-        ({ data, operation, value }: any) => {
+        ({ data, operation, value }) => {
           // Reset lock to true (locked) after any publish operation
           if (operation === "update" && data?._status === "published") {
             return true
@@ -75,12 +74,12 @@ export const slugField: Slug = (fieldToUse = "title", overrides = {}) => {
     label: "URI",
     ...(uriOverrides || {}),
     hooks: {
-      beforeValidate: [createURIHook()],
+      // URI generation now handled by collection hooks on publish events
     },
     admin: {
       position: "sidebar",
       readOnly: true,
-      description: "Auto-generated based on slug and routing settings",
+      description: "Auto-generated on publish based on slug and routing settings",
       ...(uriOverrides?.admin || {}),
     },
   }

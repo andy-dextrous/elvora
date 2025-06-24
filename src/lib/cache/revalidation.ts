@@ -1,7 +1,7 @@
 import { cache } from "@/lib/cache"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { createCacheTags } from "./cache"
-import { getInvalidationTargets } from "./cache-config"
+import { getInvalidationTargets, getCacheConfig } from "./cache-config"
 import { shouldIncludeInSitemap } from "@/lib/sitemaps/config"
 
 /*************************************************************************/
@@ -127,23 +127,43 @@ async function generateRevalidationTags(
 ): Promise<string[]> {
   const tags = new Set<string>()
 
+  // NOTE: We deliberately exclude the 'all' tag from normal revalidation
+  // The 'all' tag should only be used as an emergency escape hatch
+
   if (collection.startsWith("global:")) {
     const globalSlug = collection.replace("global:", "")
-    const globalTags = createCacheTags({ globalSlug })
-    globalTags.forEach(tag => tags.add(tag))
+    tags.add(`global:${globalSlug}`)
   } else {
+    // Collection-level tag
+    tags.add(`collection:${collection}`)
+
+    // Item-specific tags
     if (doc.slug) {
-      const itemTags = createCacheTags({ collection, slug: doc.slug })
-      itemTags.forEach(tag => tags.add(tag))
+      tags.add(`item:${collection}:${doc.slug}`)
     }
 
+    // URI-specific tags
+    if (doc.uri !== undefined) {
+      const normalizedURI = doc.uri === "/" ? "" : doc.uri.replace(/\/+$/, "")
+      tags.add(`uri:${normalizedURI}`)
+    }
+
+    // Handle old URI if it changed
     if (changes.uriChanged && changes.oldUri && previousDoc?.slug) {
-      const oldItemTags = createCacheTags({ collection, slug: previousDoc.slug })
-      oldItemTags.forEach(tag => tags.add(tag))
+      tags.add(`item:${collection}:${previousDoc.slug}`)
+      const oldNormalizedURI =
+        changes.oldUri === "/" ? "" : changes.oldUri.replace(/\/+$/, "")
+      tags.add(`uri:${oldNormalizedURI}`)
     }
 
-    const collectionTags = createCacheTags({ collection })
-    collectionTags.forEach(tag => tags.add(tag))
+    // Add dependency tags from cache config
+    const config = getCacheConfig(collection)
+    config.dependencies.forEach(dependency => tags.add(dependency))
+
+    // Always revalidate header and footer when collections change
+    // This ensures navigation menus stay up to date
+    tags.add("global:header")
+    tags.add("global:footer")
   }
 
   await addCascadeInvalidation(collection, doc, previousDoc, changes, tags)
@@ -169,12 +189,10 @@ async function addCascadeInvalidation(
   changes: ChangeDetection,
   tags: Set<string>
 ): Promise<void> {
-  // Special handling for templates - use dynamic lookup for precise invalidation
   if (collection === "templates") {
     try {
       const affectedCollections = await getCollectionsUsingTemplate(doc.id)
       if (affectedCollections.length > 0) {
-        // Template-specific invalidation
         affectedCollections.forEach(collectionName => {
           tags.add(`collection:${collectionName}`)
         })

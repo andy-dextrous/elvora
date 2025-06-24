@@ -517,7 +517,7 @@ export interface Page {
   };
   slug?: string | null;
   /**
-   * Auto-generated based on slug and routing settings
+   * Auto-generated on publish based on slug and routing settings
    */
   uri?: string | null;
   slugLock?: boolean | null;
@@ -650,7 +650,7 @@ export interface Post {
     | null;
   slug?: string | null;
   /**
-   * Auto-generated based on slug and routing settings
+   * Auto-generated on publish based on slug and routing settings
    */
   uri?: string | null;
   slugLock?: boolean | null;
@@ -748,7 +748,7 @@ export interface Service {
   };
   slug?: string | null;
   /**
-   * Auto-generated based on slug and routing settings
+   * Auto-generated on publish based on slug and routing settings
    */
   uri?: string | null;
   slugLock?: boolean | null;
@@ -1033,7 +1033,7 @@ export interface Testimonial {
   quote: string;
   slug?: string | null;
   /**
-   * Auto-generated based on slug and routing settings
+   * Auto-generated on publish based on slug and routing settings
    */
   uri?: string | null;
   slugLock?: boolean | null;
@@ -1607,7 +1607,7 @@ export interface Team {
   id: string;
   slug?: string | null;
   /**
-   * Auto-generated based on slug and routing settings
+   * Auto-generated on publish based on slug and routing settings
    */
   uri?: string | null;
   slugLock?: boolean | null;

@@ -106,7 +106,20 @@ function generateCacheTags(
   const { collection, slug, uri, globalSlug, type, params = [] } = options
   const tags: string[] = []
 
-  // Universal tag that applies to ALL cached items - needed for clear cache button functionality
+  /*************************************************************************/
+  /*  UNIVERSAL "ALL" TAG FOR EMERGENCY CACHE CLEARING
+
+      This tag is added to EVERY cached item so that when revalidateTag("all")
+      is called, it will clear ALL cached content across the entire site.
+
+      Usage:
+      - Emergency cache clearing via revalidateAll() function
+      - Admin "Clear All Cache" buttons
+      - Manual cache clearing in API routes
+
+      NOTE: This tag should NEVER be used in normal revalidation operations.
+      It's only for emergency/manual clearing of the entire cache.
+  /*************************************************************************/
   tags.push("all")
 
   // Individual items by slug
