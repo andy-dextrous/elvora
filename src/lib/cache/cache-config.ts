@@ -25,44 +25,44 @@ export const CACHE_CONFIG: CacheConfig = {
   // Collections
   pages: {
     ttl: 3600,
-    dependencies: ["global:settings", "collection:templates"],
+    dependencies: ["global:settings"],
   },
   posts: {
     ttl: 1800,
-    dependencies: ["global:settings", "collection:categories", "collection:templates"],
+    dependencies: ["global:settings", "collection:categories"],
   },
   services: {
     ttl: 7200,
-    dependencies: ["global:settings", "collection:templates"],
+    dependencies: ["global:settings"],
   },
   team: {
     ttl: 86400,
-    dependencies: ["collection:templates"],
+    dependencies: [],
   },
   testimonials: {
     ttl: 86400,
-    dependencies: ["collection:templates"],
+    dependencies: [],
   },
   categories: {
     ttl: 7200,
     dependencies: [],
   },
   templates: {
-    ttl: 86400, // Templates change infrequently
-    dependencies: ["global:settings"], // Templates depend on routing settings
+    ttl: 86400,
+    dependencies: ["global:settings"],
   },
 
   // Globals (using proper naming convention)
   "global:settings": {
-    ttl: 7200, // Settings change less frequently
+    ttl: 7200,
     dependencies: [],
   },
   "global:header": {
-    ttl: 7200, // Header changes less frequently
+    ttl: 7200,
     dependencies: [],
   },
   "global:footer": {
-    ttl: 7200, // Footer changes less frequently
+    ttl: 7200,
     dependencies: [],
   },
 }
@@ -83,23 +83,19 @@ export function getCacheConfig(collection: string): CacheCollectionConfig {
 
 /**
  * Get all collections/globals that depend on a specific item
- * This enables configuration-driven cascade invalidation
  */
 export function getInvalidationTargets(changedItem: string): string[] {
   return Object.entries(CACHE_CONFIG)
     .filter(([collection, config]) => {
-      // Skip the default config entry
       if (collection === "default") return false
 
-      // Check if this collection/global has the changed item as a dependency
       return config.dependencies.includes(changedItem)
     })
     .map(([collection]) => {
-      // Convert collection names to proper tag format
       if (collection.startsWith("global:")) {
-        return collection // Already in global: format
+        return collection
       }
-      return `collection:${collection}` // Convert to collection: format
+      return `collection:${collection}`
     })
 }
 

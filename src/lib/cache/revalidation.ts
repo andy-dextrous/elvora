@@ -1,3 +1,4 @@
+import { cache } from "@/lib/cache"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { createCacheTags } from "./cache"
 import { getInvalidationTargets } from "./cache-config"
@@ -35,12 +36,11 @@ export async function revalidate(options: RevalidateOptions): Promise<void> {
   try {
     const changes = detectChanges(doc, previousDoc)
 
-    // Early exit for draft-only changes that don't affect public cache
     if (shouldSkipRevalidation(doc, changes, previousDoc)) {
       return
     }
 
-    const tagsToInvalidate = generateRevalidationTags(
+    const tagsToInvalidate = await generateRevalidationTags(
       collection,
       doc,
       previousDoc,
@@ -50,7 +50,7 @@ export async function revalidate(options: RevalidateOptions): Promise<void> {
     await revalidatePaths(doc, previousDoc, changes, logger)
     await revalidateTags(tagsToInvalidate, logger)
 
-    logger?.info(`Smart revalidation completed for ${collection}:${doc.slug || doc.id}`)
+    logger?.info(`Cache revalidated: ${collection}/${doc.slug || doc.id}`)
   } catch (error) {
     logger?.error(`Smart revalidation failed for ${collection}:`, error)
     throw error
@@ -63,53 +63,21 @@ export async function revalidate(options: RevalidateOptions): Promise<void> {
 
 /**
  * Determines if revalidation should be skipped for performance
- * Only revalidate when changes affect public-facing content
+ * Only revalidate when changes affect public-facing content (publish events)
  */
 function shouldSkipRevalidation(
   doc: any,
   changes: ChangeDetection,
   previousDoc?: any
 ): boolean {
-  // Always revalidate deletes
   if (!doc) {
     return false
   }
 
-  // Always revalidate globals (they're always "published")
-  if (!doc.hasOwnProperty("_status")) {
-    return false
-  }
+  // Only revalidate on publish events - same pattern as lockSlugAfterPublish
+  const isPublishEvent = doc._status === "published"
 
-  const currentStatus = doc._status
-  const previousStatus = previousDoc?._status
-
-  // Revalidate if status changed (draft ↔ published transitions)
-  if (changes.statusChanged) {
-    return false
-  }
-
-  // Revalidate if currently published (published content changes)
-  if (currentStatus === "published") {
-    return false
-  }
-
-  // Revalidate if URI changed (affects routing)
-  if (changes.uriChanged) {
-    return false
-  }
-
-  // Skip draft-only autosaves (most common case)
-  if (currentStatus === "draft" && previousStatus === "draft") {
-    return true
-  }
-
-  // Skip first-time draft creation
-  if (currentStatus === "draft" && !previousDoc) {
-    return true
-  }
-
-  // Default to revalidating for safety
-  return false
+  return !isPublishEvent
 }
 
 /*************************************************************************/
@@ -154,21 +122,19 @@ function detectChanges(doc: any, previousDoc?: any): ChangeDetection {
 /*  TAG GENERATION FOR REVALIDATION
 /*************************************************************************/
 
-function generateRevalidationTags(
+async function generateRevalidationTags(
   collection: string,
   doc: any,
   previousDoc: any,
   changes: ChangeDetection
-): string[] {
+): Promise<string[]> {
   const tags = new Set<string>()
 
-  // Handle globals differently from collections
   if (collection.startsWith("global:")) {
     const globalSlug = collection.replace("global:", "")
     const globalTags = createCacheTags({ globalSlug })
     globalTags.forEach(tag => tags.add(tag))
   } else {
-    // Handle collections
     if (doc.slug) {
       const itemTags = createCacheTags({ collection, slug: doc.slug })
       itemTags.forEach(tag => tags.add(tag))
@@ -183,7 +149,7 @@ function generateRevalidationTags(
     collectionTags.forEach(tag => tags.add(tag))
   }
 
-  addCascadeInvalidation(collection, doc, previousDoc, changes, tags)
+  await addCascadeInvalidation(collection, doc, previousDoc, changes, tags)
 
   return Array.from(tags)
 }
@@ -199,36 +165,42 @@ function hasURISupport(collection: string): boolean {
   return ["pages", "posts", "services"].includes(collection)
 }
 
-function addCascadeInvalidation(
+async function addCascadeInvalidation(
   collection: string,
   doc: any,
   previousDoc: any,
   changes: ChangeDetection,
   tags: Set<string>
-): void {
-  // Configuration-driven cascade invalidation
-  // This automatically handles all dependency relationships defined in CACHE_CONFIG
-  const collectionKey = collection.startsWith("global:")
-    ? collection
-    : `collection:${collection}`
+): Promise<void> {
+  // Special handling for templates - use dynamic lookup for precise invalidation
+  if (collection === "templates") {
+    try {
+      const affectedCollections = await getCollectionsUsingTemplate(doc.id)
+      if (affectedCollections.length > 0) {
+        // Template-specific invalidation
+        affectedCollections.forEach(collectionName => {
+          tags.add(`collection:${collectionName}`)
+        })
+      }
+    } catch (error) {
+      console.warn(`Template invalidation fallback for ${doc.id}:`, error)
+      const collectionKey = `collection:${collection}`
+      const dependentTargets = getInvalidationTargets(collectionKey)
+      dependentTargets.forEach(target => tags.add(target))
+    }
+  } else {
+    const collectionKey = collection.startsWith("global:")
+      ? collection
+      : `collection:${collection}`
 
-  const dependentTargets = getInvalidationTargets(collectionKey)
-  if (dependentTargets.length > 0) {
-    // Debug logging to show configuration-driven invalidation
-    console.log(
-      `🔄 Configuration-driven invalidation: ${collectionKey} → [${dependentTargets.join(", ")}]`
-    )
+    const dependentTargets = getInvalidationTargets(collectionKey)
+    dependentTargets.forEach(target => tags.add(target))
   }
-  dependentTargets.forEach(target => tags.add(target))
 
-  // Simple sitemap invalidation - forward compatible with planned SITEMAP_CONFIG
   if (hasURISupport(collection)) {
-    // For now, just invalidate all sitemaps for any URI-enabled collection
-    // When we implement SITEMAP_CONFIG, this becomes configuration-driven too
     tags.add("sitemap:all")
   }
 
-  // Layout tags for globals - minimal hardcoded logic
   if (collection === "global:header") {
     tags.add("layout:header")
   }
@@ -236,7 +208,6 @@ function addCascadeInvalidation(
     tags.add("layout:footer")
   }
 
-  // Hierarchical page relationships - collection-specific logic
   if (collection === "pages" && changes.uriChanged) {
     tags.add(`parent-page:${doc.slug}`)
     if (previousDoc?.slug) {
@@ -287,7 +258,7 @@ export interface BatchRevalidateOptions {
 }
 
 /**
- * Batch revalidation to handle multiple changes efficiently
+ * Batch revalidation to handle multiple changes efficiently.
  */
 export async function batchRevalidate(options: BatchRevalidateOptions): Promise<void> {
   const { operations, logger } = options
@@ -301,7 +272,7 @@ export async function batchRevalidate(options: BatchRevalidateOptions): Promise<
     const { collection, doc, previousDoc } = operation
     const changes = detectChanges(doc, previousDoc)
 
-    const tags = generateRevalidationTags(collection, doc, previousDoc, changes)
+    const tags = await generateRevalidationTags(collection, doc, previousDoc, changes)
     tags.forEach(tag => allTags.add(tag))
 
     if (changes.newUri && doc._status === "published") {
@@ -349,5 +320,54 @@ export async function revalidateAll(): Promise<{
       success: false,
       message: error instanceof Error ? error.message : "Unknown error occurred",
     }
+  }
+}
+
+/*************************************************************************/
+/*  DYNAMIC TEMPLATE DEPENDENCY RESOLUTION
+/*************************************************************************/
+
+/**
+ * Get collections that are actually using a specific template
+ * This enables precise invalidation instead of blanket invalidation
+ */
+async function getCollectionsUsingTemplate(
+  templateId: string,
+  fallbackToAll: boolean = true
+): Promise<string[]> {
+  try {
+    const settings = await cache.getGlobal("settings", 1)
+    const routing = settings?.routing
+
+    if (!routing) {
+      throw new Error("No routing settings found")
+    }
+
+    const assignments: string[] = []
+
+    // Check pagesDefaultTemplate
+    if (routing.pagesDefaultTemplate?.id === templateId) {
+      assignments.push("pages")
+    }
+
+    // Check all *SingleTemplate fields
+    Object.entries(routing).forEach(([key, value]) => {
+      if (key.endsWith("SingleTemplate") && (value as any)?.id === templateId) {
+        // Extract collection name from field name (e.g., "postsSingleTemplate" → "posts")
+        const collectionName = key.replace("SingleTemplate", "")
+        assignments.push(collectionName)
+      }
+    })
+
+    return assignments
+  } catch (error) {
+    console.warn(`Failed to lookup template assignments for ${templateId}:`, error)
+
+    if (fallbackToAll) {
+      // Fallback to all collections that could use templates
+      return ["pages", "posts", "services", "team", "testimonials"]
+    }
+
+    return []
   }
 }
