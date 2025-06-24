@@ -51,6 +51,10 @@ export const CACHE_CONFIG: CacheConfig = {
     ttl: 86400,
     dependencies: ["global:settings"],
   },
+  redirects: {
+    ttl: 3600,
+    dependencies: [],
+  },
 
   // Globals (using proper naming convention)
   "global:settings": {
@@ -117,4 +121,77 @@ export function getDependencyGraph(): Record<string, string[]> {
   })
 
   return graph
+}
+
+/**
+ * Validate cache configuration for orphaned tags and missing dependencies
+ */
+export function validateCacheConfig(): {
+  isValid: boolean
+  errors: string[]
+  warnings: string[]
+} {
+  const errors: string[] = []
+  const warnings: string[] = []
+
+  // Check for orphaned dependencies
+  Object.entries(CACHE_CONFIG).forEach(([collection, config]) => {
+    if (collection === "default") return
+
+    config.dependencies.forEach(dependency => {
+      if (dependency.startsWith("global:")) {
+        const globalSlug = dependency.replace("global:", "")
+        if (!CACHE_CONFIG[dependency]) {
+          warnings.push(
+            `Collection "${collection}" depends on "${dependency}" but it's not in cache config`
+          )
+        }
+      } else if (dependency.startsWith("collection:")) {
+        const collectionSlug = dependency.replace("collection:", "")
+        if (!CACHE_CONFIG[collectionSlug]) {
+          errors.push(
+            `Collection "${collection}" depends on "${dependency}" but collection "${collectionSlug}" is not in cache config`
+          )
+        }
+      }
+    })
+  })
+
+  // Check for circular dependencies
+  const visited = new Set<string>()
+  const visiting = new Set<string>()
+
+  function checkCircular(collection: string): boolean {
+    if (visiting.has(collection)) {
+      errors.push(`Circular dependency detected involving "${collection}"`)
+      return true
+    }
+    if (visited.has(collection)) return false
+
+    visiting.add(collection)
+    const config = CACHE_CONFIG[collection]
+
+    if (config) {
+      for (const dependency of config.dependencies) {
+        const depCollection = dependency.replace(/^(global:|collection:)/, "")
+        if (checkCircular(depCollection)) return true
+      }
+    }
+
+    visiting.delete(collection)
+    visited.add(collection)
+    return false
+  }
+
+  Object.keys(CACHE_CONFIG).forEach(collection => {
+    if (collection !== "default") {
+      checkCircular(collection)
+    }
+  })
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    warnings,
+  }
 }

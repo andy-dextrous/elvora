@@ -127,7 +127,7 @@ export function getSitemapCacheTags(collection: string): string[] {
 
   if (config.sitemap) {
     // Add sitemap-specific tag
-    const sitemapKey = config.sitemap.replace(".xml", "").replace("-", ":")
+    const sitemapKey = config.sitemap.replace("-sitemap.xml", "")
     tags.push(`sitemap:${sitemapKey}`)
 
     // Add general sitemap tag for universal invalidation

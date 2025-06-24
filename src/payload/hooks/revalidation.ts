@@ -20,7 +20,7 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
   req: { payload, context },
   collection,
 }) => {
-  if (context.disableRevalidate) {
+  if (context.disableRevalidate || doc._status !== "published") {
     return doc
   }
 
@@ -83,7 +83,7 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
   req: { payload, context },
   global,
 }) => {
-  if (context.disableRevalidate) {
+  if (context.disableRevalidate || doc._status !== "published") {
     return doc
   }
 

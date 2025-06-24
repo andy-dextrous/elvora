@@ -16,7 +16,7 @@ function createCachedAppRouterSitemapGenerator(sitemapName: string) {
 
   // Add sitemap-specific tags
   tags.add("sitemap:all")
-  const sitemapKey = sitemapName.replace(".xml", "").replace("-", ":")
+  const sitemapKey = sitemapName.replace("-sitemap.xml", "")
   tags.add(`sitemap:${sitemapKey}`)
 
   // Add collection-specific tags

@@ -2,7 +2,7 @@ import { getPayload } from "payload"
 import { unstable_cache } from "next/cache"
 import configPromise from "@payload-config"
 import { frontendCollections } from "@/payload/collections/frontend"
-import type { FieldHook } from "payload"
+import type { CollectionSlug, FieldHook } from "payload"
 
 /*************************************************************************/
 /*  CACHED ROUTING SETTINGS
@@ -18,7 +18,7 @@ const getRoutingSettings = () =>
       })
       return settings?.routing || {}
     },
-    ["routing-settings"],
+    ["global", "settings", "routing"],
     { tags: ["global:settings"], revalidate: 3600 }
   )()
 
@@ -336,7 +336,7 @@ export const routingEngine = {
         for (const collection of frontendCollections) {
           try {
             const result = await payload.find({
-              collection: collection.slug as any,
+              collection: collection.slug,
               where: {
                 uri: { exists: true },
                 _status: { equals: "published" },
@@ -408,34 +408,33 @@ export const routingEngine = {
 }
 
 /*************************************************************************/
-/*  PAYLOAD FIELD HOOK (REPLACES create-uri.ts)
+/*  PAYLOAD FIELD HOOK
 /*************************************************************************/
 
 export const createURIHook = (): FieldHook => {
   return async ({ data, req, operation, originalDoc, collection }) => {
-    // Only generate URI on create or when slug changes
     if (operation !== "create" && operation !== "update") {
       return data?.uri || originalDoc?.uri
     }
 
     // Always regenerate URI when slug changes
-    // Only skip regeneration if slug hasn't changed
     if (data?.slug === originalDoc?.slug && originalDoc?.uri) {
       return originalDoc.uri
     }
 
     const slug = data?.slug || originalDoc?.slug
+
     if (!slug) {
       return ""
     }
 
     const collectionSlug = collection?.slug
+
     if (!collectionSlug) {
       return `/${slug}`
     }
 
     try {
-      // Use the routing engine
       return await routingEngine.generate({
         collection: collectionSlug,
         slug,
@@ -447,7 +446,7 @@ export const createURIHook = (): FieldHook => {
         `URI generation failed for ${collectionSlug}/${slug}:`,
         error
       )
-      // Fallback to basic URI generation
+
       return generateFallbackURI(collectionSlug, slug, data)
     }
   }

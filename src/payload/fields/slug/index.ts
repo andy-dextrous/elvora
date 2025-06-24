@@ -17,14 +17,6 @@ type Slug = (
 /*  LOCK RESET HOOK (WORDPRESS-STYLE)
 /*************************************************************************/
 
-const resetLockAfterPublishHook = ({ data, operation, value }: any) => {
-  // Reset lock to true (locked) after any publish operation
-  if (operation === "update" && data?._status === "published") {
-    return true
-  }
-  return value
-}
-
 export const slugField: Slug = (fieldToUse = "title", overrides = {}) => {
   const { slugOverrides, uriOverrides, checkboxOverrides } = overrides
 
@@ -37,7 +29,15 @@ export const slugField: Slug = (fieldToUse = "title", overrides = {}) => {
       position: "sidebar",
     },
     hooks: {
-      beforeValidate: [resetLockAfterPublishHook],
+      beforeValidate: [
+        ({ data, operation, value }: any) => {
+          // Reset lock to true (locked) after any publish operation
+          if (operation === "update" && data?._status === "published") {
+            return true
+          }
+          return value
+        },
+      ],
     },
     ...checkboxOverrides,
   }

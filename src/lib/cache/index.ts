@@ -6,3 +6,4 @@ export * from "./revalidation"
 // Convenience exports for commonly used functions
 export { cache } from "./cache"
 export { revalidateAll } from "./revalidation"
+export { validateCacheConfig } from "./cache-config"

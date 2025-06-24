@@ -24,24 +24,14 @@ export default async function sitemap({
 }: {
   id: number
 }): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = (
-    process.env.NEXT_PUBLIC_URL ||
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-    "https://example.com"
-  ).replace(/\/$/, "")
-
   try {
-    // Get all active sitemaps from configuration
     const activeSitemaps = getActiveSitemaps()
-
-    // Get the specific sitemap for this ID
     const currentSitemapFile = activeSitemaps[id]
 
     if (!currentSitemapFile) {
       return []
     }
 
-    // Generate sitemap entries for this specific sitemap
     const getSitemapEntries = unstable_cache(
       async (sitemapFile: string) => {
         const { generateSitemap } = await import("@/lib/sitemaps/generator")
@@ -58,10 +48,10 @@ export default async function sitemap({
       [`sitemap-${currentSitemapFile}`, "sitemap-generation"],
       {
         tags: [
-          `sitemap:${currentSitemapFile.replace(".xml", "").replace("-", ":")}`,
+          `sitemap:${currentSitemapFile.replace("-sitemap.xml", "")}`,
           "sitemap:all",
         ],
-        revalidate: 3600, // 1 hour
+        revalidate: 3600,
       }
     )
 

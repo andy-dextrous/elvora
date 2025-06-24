@@ -106,17 +106,15 @@ function generateCacheTags(
   const { collection, slug, uri, globalSlug, type, params = [] } = options
   const tags: string[] = []
 
-  // Universal tag that applies to ALL cached items - only for caching, not invalidation
-  if (includeDependencies) {
-    tags.push("all")
-  }
+  // Universal tag that applies to ALL cached items - needed for clear cache button functionality
+  tags.push("all")
 
   // Individual items by slug
   if (collection && slug) {
     tags.push(`collection:${collection}`)
     tags.push(`item:${collection}:${slug}`)
 
-    // Add dependencies from cache config - only for caching, not invalidation
+    // Add dependencies from cache config
     if (includeDependencies) {
       const config = getCacheConfig(collection)
       tags.push(...config.dependencies)
@@ -128,7 +126,7 @@ function generateCacheTags(
     tags.push(`collection:${collection}`)
     tags.push(`item:${collection}:${params[0]}`)
 
-    // Add dependencies from cache config - only for caching, not invalidation
+    // Add dependencies from cache config
     if (includeDependencies) {
       const config = getCacheConfig(collection)
       tags.push(...config.dependencies)
@@ -145,7 +143,7 @@ function generateCacheTags(
   if (collection && !slug && params.length === 0) {
     tags.push(`collection:${collection}`)
 
-    // Add dependencies from cache config - only for caching, not invalidation
+    // Add dependencies from cache config
     if (includeDependencies) {
       const config = getCacheConfig(collection)
       tags.push(...config.dependencies)
@@ -184,21 +182,12 @@ function logCacheEvent(event: CacheEvent) {
 
     // Use non-blocking logging to prevent circular dependencies
     setImmediate(async () => {
-      try {
-        const payload = await getPayload({ config: configPromise })
-        payload.logger.info(
-          {
-            cache_operation: operation,
-            cache_key: cacheKey,
-            cache_tags: tags,
-            cache_status: status,
-            timestamp,
-          },
-          `🗄️ [CACHE ${status}] ${operation}`
-        )
-      } catch (error) {
-        console.error("Cache logging error:", error)
-      }
+      const payload = await getPayload({ config: configPromise })
+      payload.logger.info(
+        `🗄️ [CACHE ${status}] ${operation} - tags: ${tags.join(", ")} - key: ${cacheKey.join(
+          ","
+        )}`
+      )
     })
   }
 }

@@ -2,6 +2,7 @@ import { cache } from "@/lib/cache"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { createCacheTags } from "./cache"
 import { getInvalidationTargets } from "./cache-config"
+import { shouldIncludeInSitemap } from "@/lib/sitemaps/config"
 
 /*************************************************************************/
 /*  UNIVERSAL REVALIDATION ENGINE - TYPES & INTERFACES
@@ -36,7 +37,7 @@ export async function revalidate(options: RevalidateOptions): Promise<void> {
   try {
     const changes = detectChanges(doc, previousDoc)
 
-    if (shouldSkipRevalidation(doc, changes, previousDoc)) {
+    if (shouldSkipRevalidation(doc)) {
       return
     }
 
@@ -65,11 +66,7 @@ export async function revalidate(options: RevalidateOptions): Promise<void> {
  * Determines if revalidation should be skipped for performance
  * Only revalidate when changes affect public-facing content (publish events)
  */
-function shouldSkipRevalidation(
-  doc: any,
-  changes: ChangeDetection,
-  previousDoc?: any
-): boolean {
+function shouldSkipRevalidation(doc: any): boolean {
   if (!doc) {
     return false
   }
@@ -159,10 +156,10 @@ async function generateRevalidationTags(
 /*************************************************************************/
 
 /**
- * Check if a collection supports URIs (has slug field and appears in sitemaps)
+ * Check if a collection supports URIs (auto-discovered from sitemap configuration)
  */
 function hasURISupport(collection: string): boolean {
-  return ["pages", "posts", "services"].includes(collection)
+  return shouldIncludeInSitemap(collection)
 }
 
 async function addCascadeInvalidation(
@@ -309,6 +306,7 @@ export async function revalidateAll(): Promise<{
 }> {
   try {
     revalidateTag("all")
+    revalidateTag("sitemap:all")
     revalidatePath("/", "layout")
 
     return {
@@ -331,10 +329,7 @@ export async function revalidateAll(): Promise<{
  * Get collections that are actually using a specific template
  * This enables precise invalidation instead of blanket invalidation
  */
-async function getCollectionsUsingTemplate(
-  templateId: string,
-  fallbackToAll: boolean = true
-): Promise<string[]> {
+async function getCollectionsUsingTemplate(templateId: string): Promise<string[]> {
   try {
     const settings = await cache.getGlobal("settings", 1)
     const routing = settings?.routing
@@ -350,10 +345,8 @@ async function getCollectionsUsingTemplate(
       assignments.push("pages")
     }
 
-    // Check all *SingleTemplate fields
     Object.entries(routing).forEach(([key, value]) => {
       if (key.endsWith("SingleTemplate") && (value as any)?.id === templateId) {
-        // Extract collection name from field name (e.g., "postsSingleTemplate" → "posts")
         const collectionName = key.replace("SingleTemplate", "")
         assignments.push(collectionName)
       }
@@ -362,11 +355,6 @@ async function getCollectionsUsingTemplate(
     return assignments
   } catch (error) {
     console.warn(`Failed to lookup template assignments for ${templateId}:`, error)
-
-    if (fallbackToAll) {
-      // Fallback to all collections that could use templates
-      return ["pages", "posts", "services", "team", "testimonials"]
-    }
 
     return []
   }
