@@ -41,23 +41,9 @@ export function createApplyDefaultTemplateHook(
   collectionName: string
 ): CollectionBeforeChangeHook {
   return async ({ data, req, operation }) => {
-    console.log(
-      `🎯 Template Hook - Collection: ${collectionName}, Operation: ${operation}`
-    )
-    console.log(
-      `🎯 Template Hook - Sections exist:`,
-      !!data.sections,
-      `Length:`,
-      data.sections?.length || 0
-    )
-
     // Only apply on create operations when no sections exist
     if (operation === "create" && (!data.sections || data.sections.length === 0)) {
       try {
-        console.log(
-          `🎯 Template Hook - Looking for default template for ${collectionName}`
-        )
-
         // Get template directly from routing settings to avoid circular dependency
         const settings = await req.payload.findGlobal({
           slug: "settings",
@@ -83,33 +69,21 @@ export function createApplyDefaultTemplateHook(
           }
         }
 
-        console.log(
-          `🎯 Template Hook - Found template:`,
-          !!defaultTemplate,
-          `Sections:`,
-          defaultTemplate?.sections?.length || 0
-        )
-
         if (defaultTemplate?.sections) {
           // Extract IDs from populated relationships for server-side operation
           const sectionsWithIds = extractIds(defaultTemplate.sections)
           data.sections = sectionsWithIds
-          console.log(
-            `🎯 Template Hook - Applied ${defaultTemplate.sections.length} sections with extracted IDs`
-          )
-        } else {
-          console.log(
-            `🎯 Template Hook - No default template found for ${collectionName}`
+          req.payload.logger.info(
+            `Applied template: ${defaultTemplate.sections.length} sections to ${collectionName}`
           )
         }
       } catch (error) {
-        console.error(`❌ Error applying default template for ${collectionName}:`, error)
+        req.payload.logger.error(
+          `Error applying default template for ${collectionName}:`,
+          error
+        )
         // Continue without template - don't block content creation
       }
-    } else {
-      console.log(
-        `🎯 Template Hook - Skipping: operation=${operation}, sections=${data.sections?.length || 0}`
-      )
     }
 
     return data
