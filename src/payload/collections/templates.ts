@@ -3,6 +3,10 @@ import type { CollectionConfig } from "payload"
 import { sectionBlocks } from "@/components/sections/config"
 import { authenticated } from "@/payload/access/authenticated"
 import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublished"
+import {
+  afterCollectionChange,
+  afterCollectionDelete,
+} from "@/payload/hooks/revalidation"
 
 export const Templates: CollectionConfig<"templates"> = {
   slug: "templates",
@@ -15,6 +19,10 @@ export const Templates: CollectionConfig<"templates"> = {
   admin: {
     useAsTitle: "name",
     defaultColumns: ["name", "description", "updatedAt"],
+  },
+  hooks: {
+    afterChange: [afterCollectionChange],
+    afterDelete: [afterCollectionDelete],
   },
   fields: [
     {

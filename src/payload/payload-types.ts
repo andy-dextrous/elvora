@@ -500,6 +500,10 @@ export interface Page {
     | CtaFormBlock
     | HeadingLeftContentBlock
     | SimpleTextBlock
+    | PostHeroBlock
+    | PostContentBlock
+    | PostsArchiveBlock
+    | RelatedPostsBlock
   )[];
   meta?: {
     title?: string | null;
@@ -727,6 +731,10 @@ export interface Service {
     | CtaFormBlock
     | HeadingLeftContentBlock
     | SimpleTextBlock
+    | PostHeroBlock
+    | PostContentBlock
+    | PostsArchiveBlock
+    | RelatedPostsBlock
   )[];
   meta?: {
     title?: string | null;
@@ -1450,6 +1458,146 @@ export interface SimpleTextBlock {
   blockType: 'simple-text';
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PostHeroBlock".
+ */
+export interface PostHeroBlock {
+  /**
+   * Show author information
+   */
+  showAuthor?: boolean | null;
+  /**
+   * Show publish date
+   */
+  showPublishDate?: boolean | null;
+  /**
+   * Show post categories
+   */
+  showCategories?: boolean | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'post-hero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PostContentBlock".
+ */
+export interface PostContentBlock {
+  /**
+   * Show breadcrumb navigation
+   */
+  showBreadcrumbs?: boolean | null;
+  /**
+   * Show author information at the end of the post
+   */
+  showAuthorInfo?: boolean | null;
+  /**
+   * Control the size of the post content text
+   */
+  proseSize?: ('base' | 'lg' | 'xl' | '2xl') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'post-content';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PostsArchiveBlock".
+ */
+export interface PostsArchiveBlock {
+  /**
+   * Main heading for the blog archive. Use <span> tags for gradient text: 'Latest <span>Articles</span>'
+   */
+  heading: string;
+  /**
+   * Brief description that appears below the heading
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Number of posts to display per page
+   */
+  postsPerPage?: number | null;
+  /**
+   * Choose how posts are displayed
+   */
+  layout?: ('grid' | 'list') | null;
+  /**
+   * Number of columns for grid layout
+   */
+  columns?: ('two' | 'three' | 'four') | null;
+  /**
+   * Show pagination controls
+   */
+  showPagination?: boolean | null;
+  /**
+   * Show page range information (e.g., 'Showing 1-12 of 24 posts')
+   */
+  showPageRange?: boolean | null;
+  /**
+   * Filter posts by specific categories (leave empty to show all)
+   */
+  categoryFilter?: (string | Category)[] | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'posts-archive';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RelatedPostsBlock".
+ */
+export interface RelatedPostsBlock {
+  /**
+   * Heading for related posts section. Use <span> tags for gradient text: '<span>Related</span> Posts'
+   */
+  heading: string;
+  /**
+   * Optional description that appears below the heading
+   */
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Maximum number of related posts to display
+   */
+  maxPosts?: number | null;
+  /**
+   * Choose how related posts are displayed
+   */
+  layout?: ('grid' | 'list') | null;
+  /**
+   * Number of columns for grid layout
+   */
+  columns?: ('two' | 'three' | 'four') | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'related-posts';
+}
+/**
  * Team members are used to display the team on the website. They are different to users, which are used for the admin panel.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1515,6 +1663,10 @@ export interface Template {
     | CtaFormBlock
     | HeadingLeftContentBlock
     | SimpleTextBlock
+    | PostHeroBlock
+    | PostContentBlock
+    | PostsArchiveBlock
+    | RelatedPostsBlock
   )[];
   updatedAt: string;
   createdAt: string;
@@ -1820,6 +1972,10 @@ export interface PagesSelect<T extends boolean = true> {
         'cta-form'?: T | CtaFormBlockSelect<T>;
         'heading-left-content'?: T | HeadingLeftContentBlockSelect<T>;
         'simple-text'?: T | SimpleTextBlockSelect<T>;
+        'post-hero'?: T | PostHeroBlockSelect<T>;
+        'post-content'?: T | PostContentBlockSelect<T>;
+        'posts-archive'?: T | PostsArchiveBlockSelect<T>;
+        'related-posts'?: T | RelatedPostsBlockSelect<T>;
       };
   meta?:
     | T
@@ -2131,6 +2287,57 @@ export interface SimpleTextBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PostHeroBlock_select".
+ */
+export interface PostHeroBlockSelect<T extends boolean = true> {
+  showAuthor?: T;
+  showPublishDate?: T;
+  showCategories?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PostContentBlock_select".
+ */
+export interface PostContentBlockSelect<T extends boolean = true> {
+  showBreadcrumbs?: T;
+  showAuthorInfo?: T;
+  proseSize?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PostsArchiveBlock_select".
+ */
+export interface PostsArchiveBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  postsPerPage?: T;
+  layout?: T;
+  columns?: T;
+  showPagination?: T;
+  showPageRange?: T;
+  categoryFilter?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RelatedPostsBlock_select".
+ */
+export interface RelatedPostsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  description?: T;
+  maxPosts?: T;
+  layout?: T;
+  columns?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
@@ -2212,6 +2419,10 @@ export interface ServicesSelect<T extends boolean = true> {
         'cta-form'?: T | CtaFormBlockSelect<T>;
         'heading-left-content'?: T | HeadingLeftContentBlockSelect<T>;
         'simple-text'?: T | SimpleTextBlockSelect<T>;
+        'post-hero'?: T | PostHeroBlockSelect<T>;
+        'post-content'?: T | PostContentBlockSelect<T>;
+        'posts-archive'?: T | PostsArchiveBlockSelect<T>;
+        'related-posts'?: T | RelatedPostsBlockSelect<T>;
       };
   meta?:
     | T
@@ -2270,6 +2481,10 @@ export interface TemplatesSelect<T extends boolean = true> {
         'cta-form'?: T | CtaFormBlockSelect<T>;
         'heading-left-content'?: T | HeadingLeftContentBlockSelect<T>;
         'simple-text'?: T | SimpleTextBlockSelect<T>;
+        'post-hero'?: T | PostHeroBlockSelect<T>;
+        'post-content'?: T | PostContentBlockSelect<T>;
+        'posts-archive'?: T | PostsArchiveBlockSelect<T>;
+        'related-posts'?: T | RelatedPostsBlockSelect<T>;
       };
   updatedAt?: T;
   createdAt?: T;

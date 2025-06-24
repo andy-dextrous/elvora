@@ -1,6 +1,6 @@
 import { SectionIntro } from "@/components/layout/section-intro"
 import { RelatedPosts as RelatedPostsBlock } from "@/payload/blocks/related-posts/Component"
-import { getRelatedPostsByIds } from "@/lib/data/post"
+import { getRelatedPostsByIds } from "@/lib/data/posts"
 import type { RelatedPostsBlock as RelatedPostsBlockType } from "@/payload/payload-types"
 
 /*************************************************************************/

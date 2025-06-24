@@ -34,6 +34,12 @@ export async function revalidate(options: RevalidateOptions): Promise<void> {
 
   try {
     const changes = detectChanges(doc, previousDoc)
+
+    // Early exit for draft-only changes that don't affect public cache
+    if (shouldSkipRevalidation(doc, changes, previousDoc)) {
+      return
+    }
+
     const tagsToInvalidate = generateRevalidationTags(
       collection,
       doc,
@@ -49,6 +55,61 @@ export async function revalidate(options: RevalidateOptions): Promise<void> {
     logger?.error(`Smart revalidation failed for ${collection}:`, error)
     throw error
   }
+}
+
+/*************************************************************************/
+/*  REVALIDATION DECISION LOGIC
+/*************************************************************************/
+
+/**
+ * Determines if revalidation should be skipped for performance
+ * Only revalidate when changes affect public-facing content
+ */
+function shouldSkipRevalidation(
+  doc: any,
+  changes: ChangeDetection,
+  previousDoc?: any
+): boolean {
+  // Always revalidate deletes
+  if (!doc) {
+    return false
+  }
+
+  // Always revalidate globals (they're always "published")
+  if (!doc.hasOwnProperty("_status")) {
+    return false
+  }
+
+  const currentStatus = doc._status
+  const previousStatus = previousDoc?._status
+
+  // Revalidate if status changed (draft ↔ published transitions)
+  if (changes.statusChanged) {
+    return false
+  }
+
+  // Revalidate if currently published (published content changes)
+  if (currentStatus === "published") {
+    return false
+  }
+
+  // Revalidate if URI changed (affects routing)
+  if (changes.uriChanged) {
+    return false
+  }
+
+  // Skip draft-only autosaves (most common case)
+  if (currentStatus === "draft" && previousStatus === "draft") {
+    return true
+  }
+
+  // Skip first-time draft creation
+  if (currentStatus === "draft" && !previousDoc) {
+    return true
+  }
+
+  // Default to revalidating for safety
+  return false
 }
 
 /*************************************************************************/
@@ -147,11 +208,15 @@ function addCascadeInvalidation(
 ): void {
   // Configuration-driven cascade invalidation
   // This automatically handles all dependency relationships defined in CACHE_CONFIG
-  const dependentTargets = getInvalidationTargets(collection)
+  const collectionKey = collection.startsWith("global:")
+    ? collection
+    : `collection:${collection}`
+
+  const dependentTargets = getInvalidationTargets(collectionKey)
   if (dependentTargets.length > 0) {
     // Debug logging to show configuration-driven invalidation
     console.log(
-      `🔄 Configuration-driven invalidation: ${collection} → [${dependentTargets.join(", ")}]`
+      `🔄 Configuration-driven invalidation: ${collectionKey} → [${dependentTargets.join(", ")}]`
     )
   }
   dependentTargets.forEach(target => tags.add(target))
@@ -258,4 +323,31 @@ export async function batchRevalidate(options: BatchRevalidateOptions): Promise<
   }
 
   logger?.info(`Batch revalidation completed`)
+}
+
+/*************************************************************************/
+/*  UNIVERSAL CACHE CLEARING - SCALABLE & DYNAMIC
+/*************************************************************************/
+
+/**
+ * Revalidate all cached data with a single universal tag
+ */
+export async function revalidateAll(): Promise<{
+  success: boolean
+  message: string
+}> {
+  try {
+    revalidateTag("all")
+    revalidatePath("/", "layout")
+
+    return {
+      success: true,
+      message: "All cache cleared successfully using universal 'all' tag",
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Unknown error occurred",
+    }
+  }
 }

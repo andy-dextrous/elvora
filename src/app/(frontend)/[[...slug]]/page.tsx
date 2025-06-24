@@ -41,7 +41,11 @@ export default async function Page({ params: paramsPromise }: Args) {
     <main data-collection={collection} data-id={document.id}>
       <PayloadRedirects disableNotFound url={URI} />
       {draft && <LivePreviewListener />}
-      <RenderSections sections={document.sections} />
+      <RenderSections
+        sections={document.sections}
+        document={document}
+        collection={collection}
+      />
     </main>
   )
 }

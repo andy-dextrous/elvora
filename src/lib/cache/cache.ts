@@ -66,6 +66,11 @@ function generateCacheKey(options: CacheKeyOptions): string[] {
     return [collection, "item", slug, draft ? "draft" : "published"]
   }
 
+  // Individual items by ID (when params contains the ID)
+  if (collection && params.length > 0 && !queryHash && !type) {
+    return [collection, "item", params[0], draft ? "draft" : "published"]
+  }
+
   // URI-based lookups
   if (uri !== undefined) {
     const normalizedURI = uri === "/" ? "" : uri.replace(/\/+$/, "")
@@ -94,18 +99,40 @@ function generateCacheKey(options: CacheKeyOptions): string[] {
 /*  CACHE TAGS GENERATION
 /*************************************************************************/
 
-function generateCacheTags(options: CacheKeyOptions): string[] {
-  const { collection, slug, uri, globalSlug, type } = options
+function generateCacheTags(
+  options: CacheKeyOptions,
+  includeDependencies: boolean = true
+): string[] {
+  const { collection, slug, uri, globalSlug, type, params = [] } = options
   const tags: string[] = []
 
-  // Individual items
+  // Universal tag that applies to ALL cached items - only for caching, not invalidation
+  if (includeDependencies) {
+    tags.push("all")
+  }
+
+  // Individual items by slug
   if (collection && slug) {
     tags.push(`collection:${collection}`)
     tags.push(`item:${collection}:${slug}`)
 
-    // Add dependencies from cache config
-    const config = getCacheConfig(collection)
-    tags.push(...config.dependencies)
+    // Add dependencies from cache config - only for caching, not invalidation
+    if (includeDependencies) {
+      const config = getCacheConfig(collection)
+      tags.push(...config.dependencies)
+    }
+  }
+
+  // Individual items by ID (when params contains the ID)
+  if (collection && params.length > 0 && !slug && !type) {
+    tags.push(`collection:${collection}`)
+    tags.push(`item:${collection}:${params[0]}`)
+
+    // Add dependencies from cache config - only for caching, not invalidation
+    if (includeDependencies) {
+      const config = getCacheConfig(collection)
+      tags.push(...config.dependencies)
+    }
   }
 
   // URI-based lookups
@@ -115,12 +142,14 @@ function generateCacheTags(options: CacheKeyOptions): string[] {
   }
 
   // Collection queries
-  if (collection && !slug) {
+  if (collection && !slug && params.length === 0) {
     tags.push(`collection:${collection}`)
 
-    // Add dependencies from cache config for collection queries too
-    const config = getCacheConfig(collection)
-    tags.push(...config.dependencies)
+    // Add dependencies from cache config - only for caching, not invalidation
+    if (includeDependencies) {
+      const config = getCacheConfig(collection)
+      tags.push(...config.dependencies)
+    }
   }
 
   // Globals
@@ -148,22 +177,29 @@ interface CacheEvent {
   hit?: boolean
 }
 
-async function logCacheEvent(event: CacheEvent) {
+function logCacheEvent(event: CacheEvent) {
   if (process.env.CACHE_DEBUG === "true") {
     const { operation, cacheKey, tags, timestamp, hit } = event
     const status = hit !== undefined ? (hit ? "HIT" : "MISS") : "EXEC"
 
-    const payload = await getPayload({ config: configPromise })
-    payload.logger.info(
-      {
-        cache_operation: operation,
-        cache_key: cacheKey,
-        cache_tags: tags,
-        cache_status: status,
-        timestamp,
-      },
-      `🗄️ [CACHE ${status}] ${operation}`
-    )
+    // Use non-blocking logging to prevent circular dependencies
+    setImmediate(async () => {
+      try {
+        const payload = await getPayload({ config: configPromise })
+        payload.logger.info(
+          {
+            cache_operation: operation,
+            cache_key: cacheKey,
+            cache_tags: tags,
+            cache_status: status,
+            timestamp,
+          },
+          `🗄️ [CACHE ${status}] ${operation}`
+        )
+      } catch (error) {
+        console.error("Cache logging error:", error)
+      }
+    })
   }
 }
 
@@ -180,10 +216,10 @@ export const cache = {
     draft: boolean = false
   ): Promise<ResolvedDocument | null> => {
     const cacheKey = generateCacheKey({ uri, draft })
-    const tags = generateCacheTags({ uri })
+    const tags = generateCacheTags({ uri }, true)
 
     const timestamp = new Date().toISOString()
-    await logCacheEvent({ operation: `getByURI("${uri}")`, cacheKey, tags, timestamp })
+    logCacheEvent({ operation: `getByURI("${uri}")`, cacheKey, tags, timestamp })
 
     return unstable_cache(
       async () => {
@@ -204,8 +240,25 @@ export const cache = {
             })
 
             if (result.docs?.[0]) {
+              const document = result.docs[0]
+
+              // If document doesn't have sections, apply template sections
+              if (!document.sections || document.sections.length === 0) {
+                try {
+                  const { getDefaultTemplate } = await import("@/lib/data/templates")
+                  const template = await getDefaultTemplate(collection.slug)
+
+                  if (template?.sections) {
+                    document.sections = template.sections
+                  }
+                } catch (templateError) {
+                  // Silently continue without template if loading fails
+                  // This ensures the page still loads even if template system has issues
+                }
+              }
+
               return {
-                document: result.docs[0],
+                document,
                 collection: collection.slug,
               }
             }
@@ -230,10 +283,10 @@ export const cache = {
     draft: boolean = false
   ): Promise<any | null> => {
     const cacheKey = generateCacheKey({ collection, params: [id], draft })
-    const tags = generateCacheTags({ collection })
+    const tags = generateCacheTags({ collection }, true)
 
     const timestamp = new Date().toISOString()
-    await logCacheEvent({
+    logCacheEvent({
       operation: `getByID("${collection}", "${id}")`,
       cacheKey,
       tags,
@@ -268,10 +321,10 @@ export const cache = {
     draft: boolean = false
   ): Promise<any | null> => {
     const cacheKey = generateCacheKey({ collection, slug, draft })
-    const tags = generateCacheTags({ collection, slug })
+    const tags = generateCacheTags({ collection, slug }, true)
 
     const timestamp = new Date().toISOString()
-    await logCacheEvent({
+    logCacheEvent({
       operation: `getBySlug("${collection}", "${slug}")`,
       cacheKey,
       tags,
@@ -313,10 +366,10 @@ export const cache = {
   ): Promise<any[]> => {
     const queryHash = JSON.stringify(options)
     const cacheKey = generateCacheKey({ collection, queryHash, draft })
-    const tags = generateCacheTags({ collection })
+    const tags = generateCacheTags({ collection }, true)
 
     const timestamp = new Date().toISOString()
-    await logCacheEvent({
+    logCacheEvent({
       operation: `getCollection("${collection}")`,
       cacheKey,
       tags,
@@ -364,10 +417,10 @@ export const cache = {
    */
   getGlobal: async (globalSlug: Global, depth: number = 0): Promise<any> => {
     const cacheKey = generateCacheKey({ globalSlug })
-    const tags = generateCacheTags({ globalSlug })
+    const tags = generateCacheTags({ globalSlug }, true)
 
     const timestamp = new Date().toISOString()
-    await logCacheEvent({
+    logCacheEvent({
       operation: `getGlobal("${globalSlug}")`,
       cacheKey,
       tags,
@@ -405,8 +458,11 @@ export function createCacheKey(options: CacheKeyOptions): string[] {
 /**
  * Generate standardized cache tags for any cache operation
  */
-export function createCacheTags(options: CacheKeyOptions): string[] {
-  return generateCacheTags(options)
+export function createCacheTags(
+  options: CacheKeyOptions,
+  includeDependencies: boolean = false
+): string[] {
+  return generateCacheTags(options, includeDependencies)
 }
 
 /**

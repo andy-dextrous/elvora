@@ -25,23 +25,23 @@ export const CACHE_CONFIG: CacheConfig = {
   // Collections
   pages: {
     ttl: 3600,
-    dependencies: ["global:settings"],
+    dependencies: ["global:settings", "collection:templates"],
   },
   posts: {
     ttl: 1800,
-    dependencies: ["global:settings", "collection:categories"],
+    dependencies: ["global:settings", "collection:categories", "collection:templates"],
   },
   services: {
     ttl: 7200,
-    dependencies: ["global:settings"],
+    dependencies: ["global:settings", "collection:templates"],
   },
   team: {
     ttl: 86400,
-    dependencies: [],
+    dependencies: ["collection:templates"],
   },
   testimonials: {
     ttl: 86400,
-    dependencies: [],
+    dependencies: ["collection:templates"],
   },
   categories: {
     ttl: 7200,

@@ -11,16 +11,13 @@ export async function getDefaultTemplate(collection: string) {
 
   const templateField =
     collection === "pages" ? "pagesDefaultTemplate" : `${collection}SingleTemplate`
-  const templateId = (settings?.routing as any)?.[templateField]
+  const templateId = (settings?.routing as any)?.[templateField]?.id
 
   if (!templateId) {
     return null
   }
 
-  const template = await cache.getByID(
-    "templates",
-    typeof templateId === "object" ? templateId.id : templateId
-  )
+  const template = await cache.getByID("templates", templateId)
 
   return template || null
 }

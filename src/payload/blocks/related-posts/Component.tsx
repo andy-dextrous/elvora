@@ -1,5 +1,4 @@
 import { PostCard } from "@/components/posts/post-card"
-import RichText from "@/payload/components/frontend/rich-text"
 import type { Post } from "@/payload/payload-types"
 import { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical"
 import clsx from "clsx"
@@ -16,7 +15,7 @@ export type RelatedPostsProps = {
 }
 
 export const RelatedPosts: React.FC<RelatedPostsProps> = props => {
-  const { className, docs, introContent } = props
+  const { className, docs } = props
 
   return (
     <div className={clsx("container-md", className)}>

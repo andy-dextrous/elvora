@@ -32,11 +32,13 @@ export const PostContentComponent: React.FC<
   }
 
   // Use fixed prose classes to match original
-  const proseClasses =
-    "prose prose-xl lg:prose-2xl prose-white gradient-headings !max-w-none"
+  const proseClasses = cn(
+    "prose prose-xl prose-white gradient-headings !max-w-none",
+    `lg:prose-${proseSize}`
+  )
 
   return (
-    <section className="bg-dark border-light-border side-border-light z-50 translate-y-[-3px] border-t">
+    <section className="bg-dark border-light-border side-border-light z-50 border-t">
       <div className="container-sm">
         {/* Breadcrumbs */}
         {showBreadcrumbs && <PostBreadcrumbs post={postData} />}

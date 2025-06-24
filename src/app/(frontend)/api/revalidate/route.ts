@@ -1,15 +1,18 @@
-import { revalidatePath, revalidateTag } from "next/cache"
+import { revalidateAll } from "@/lib/cache/revalidation"
 
 export async function GET() {
-  // Revalidate all paths
-  revalidatePath("/")
+  const result = await revalidateAll()
 
-  // Revalidate all tags (updated to use correct naming convention)
-  revalidateTag("sitemap:all") // Simplified sitemap invalidation
-  revalidateTag("redirects")
-  revalidateTag("global:header") // Fixed naming convention
-  revalidateTag("global:footer") // Fixed naming convention
-  revalidateTag("global:settings") // Fixed naming convention
-
-  return new Response("All caches revalidated", { status: 200 })
+  return new Response(
+    JSON.stringify({
+      success: result.success,
+      message: result.message,
+    }),
+    {
+      status: result.success ? 200 : 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
 }
