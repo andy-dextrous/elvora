@@ -1,0 +1,1097 @@
+# 🚀 **URI Index Collection - Implementation Plan**
+
+## 🎯 **System Architecture Overview**
+
+### **Current Performance Bottleneck**
+
+The current smart routing engine uses a "loop through collections" approach:
+
+```typescript
+// Current approach in cache.getByURI() - PERFORMANCE BOTTLENECK
+for (const collection of frontendCollections) {
+  try {
+    const result = await payload.find({
+      collection: collection.slug,
+      where: { uri: { equals: normalizedURI } },
+      limit: 1,
+      // ... multiple database queries per request
+    })
+  } catch (error) {
+    continue // Silent failures hide issues
+  }
+}
+```
+
+**Problems:**
+
+- **N+1 Query Problem**: Each URI resolution triggers multiple database queries
+- **Linear Scaling**: Performance degrades with more collections
+- **Silent Failures**: Try/catch masks potential issues
+- **Cache Fragmentation**: Each collection cached separately
+
+### **URI Index Collection Solution**
+
+Replace with a **centralized URI index** that provides **O(1) lookup performance**.
+
+### **URI Index Collection Structure**
+
+```typescript
+interface URIIndexDocument {
+  id: string
+  uri: string // Primary index field - unique
+  collection: string // Source collection name
+  documentId: string // Reference to actual document
+  document: Relationship // Direct relationship to source
+
+  // Metadata for optimization
+  lastUpdated: Date
+  priority: number // For conflict resolution
+  status: "published" | "draft"
+
+  // Redirect history for SEO
+  previousURIs?: string[] // Automatic redirect generation
+
+  // Performance optimization fields
+  sitemapInclude: boolean
+  searchInclude: boolean
+
+  // Template system integration
+  templateId?: string
+  templateApplied?: boolean
+}
+```
+
+---
+
+## 📋 **Comprehensive Implementation Tasklist**
+
+### **🏗️ Phase 1: URI Index Collection Foundation**
+
+#### **Task 1.1: Create URI Index Collection**
+
+- [ ] Create `src/payload/collections/uri-index.ts`
+- [ ] Define collection schema with optimized fields
+- [ ] Add database indexes for `uri`, `collection`, `documentId`
+- [ ] Configure admin UI (hidden from main nav, admin-only access)
+- [ ] Add validation for URI uniqueness and format
+- [ ] Add TypeScript types to `payload-types.ts`
+
+#### **Task 1.2: Index Population System**
+
+- [ ] Create `src/lib/routing/index-manager.ts`
+- [ ] Implement `populateURIIndex()` for initial data migration
+- [ ] Add `updateURIIndex()` for real-time updates
+- [ ] Create `validateURIIndex()` for integrity checking
+- [ ] Add batch operations for bulk updates
+- [ ] Create migration script for existing URI data
+
+#### **Task 1.3: Hook Integration**
+
+- [ ] Update `src/payload/hooks/revalidation.ts`
+- [ ] Add URI index updates to `afterChange` hooks
+- [ ] Add URI index cleanup to `afterDelete` hooks
+- [ ] Handle URI changes with automatic redirect creation
+- [ ] Add conflict resolution with priority-based rules
+- [ ] Integrate with existing smart revalidation system
+
+### **🔄 Phase 2: Cache System Optimization**
+
+#### **Task 2.1: Single-Query URI Resolution**
+
+- [ ] Refactor `cache.getByURI()` in `src/lib/cache/cache.ts`
+- [ ] Replace collection loop with single URI index query
+- [ ] Implement relationship population for source document
+- [ ] Add fallback handling for missing index entries
+- [ ] Optimize cache keys for URI index patterns
+
+#### **Task 2.2: Enhanced Cache Tagging**
+
+- [ ] Update `generateCacheTags()` to include URI index tags
+- [ ] Add `uri-index:*` tags for index-specific invalidation
+- [ ] Implement cross-collection cache invalidation
+- [ ] Add dependency tracking for URI index changes
+- [ ] Update cache configuration for URI index collection
+
+#### **Task 2.3: Performance Monitoring**
+
+- [ ] Add performance metrics for URI resolution
+- [ ] Create debug logging for URI index operations
+- [ ] Implement cache hit/miss tracking for URI lookups
+- [ ] Add query performance monitoring
+- [ ] Create performance comparison reports
+
+### **🛣️ Phase 3: Routing Engine Integration**
+
+#### **Task 3.1: URI Engine Updates**
+
+- [ ] Update `src/lib/routing/uri-engine.ts`
+- [ ] Modify `checkURIConflict()` to use URI index
+- [ ] Update `getAllURIs()` to use URI index
+- [ ] Add URI index maintenance to routing operations
+- [ ] Implement conflict resolution with URI index
+
+#### **Task 3.2: Static Generation Optimization**
+
+- [ ] Update `generateStaticParams()` to use URI index
+- [ ] Optimize static generation for large sites
+- [ ] Add incremental static regeneration support
+- [ ] Create bulk URI export functionality
+- [ ] Add static generation performance metrics
+
+#### **Task 3.3: Redirect System Enhancement**
+
+- [ ] Create automatic redirect generation on URI changes
+- [ ] Update `PayloadRedirects` component to use URI index
+- [ ] Add redirect conflict detection
+- [ ] Implement redirect chain optimization
+- [ ] Add redirect analytics and reporting
+
+### **🗺️ Phase 4: Sitemap System Enhancement**
+
+#### **Task 4.1: Sitemap Generator Updates**
+
+- [ ] Update `src/lib/sitemaps/generator.ts`
+- [ ] Use URI index for sitemap generation
+- [ ] Add sitemap optimization flags to URI index
+- [ ] Implement filtered sitemap generation
+- [ ] Add sitemap performance monitoring
+
+#### **Task 4.2: SEO Integration**
+
+- [ ] Add SEO metadata to URI index documents
+- [ ] Implement canonical URL management
+- [ ] Add hreflang support for multi-language sites
+- [ ] Create SEO validation for URI index entries
+- [ ] Add structured data integration
+
+### **🔧 Phase 5: Advanced Features**
+
+#### **Task 5.1: Conflict Resolution System**
+
+- [ ] Implement priority-based conflict resolution
+- [ ] Add conflict detection UI in admin
+- [ ] Create conflict resolution workflows
+- [ ] Add conflict notification system
+- [ ] Implement conflict resolution logging
+
+#### **Task 5.2: Template System Integration**
+
+- [ ] Update template system to work with URI index
+- [ ] Add template caching to URI index
+- [ ] Implement template-based URI patterns
+- [ ] Add template performance optimization
+- [ ] Create template conflict detection
+
+#### **Task 5.3: Search Integration**
+
+- [ ] Add URI index to search indexing
+- [ ] Implement URI-based search results
+- [ ] Add search result URL optimization
+- [ ] Create search performance monitoring
+- [ ] Add search result analytics
+
+### **📊 Phase 6: Data Migration & Validation**
+
+#### **Task 6.1: Migration Scripts**
+
+- [ ] Create comprehensive data migration script
+- [ ] Add validation for migrated data
+- [ ] Implement rollback procedures
+- [ ] Add migration progress tracking
+- [ ] Create migration testing framework
+
+#### **Task 6.2: Validation System**
+
+- [ ] Create URI index integrity checking
+- [ ] Add automated validation tests
+- [ ] Implement data consistency monitoring
+- [ ] Add validation reporting
+- [ ] Create validation scheduling system
+
+#### **Task 6.3: Testing Framework**
+
+- [ ] Create unit tests for URI index operations
+- [ ] Add integration tests for routing system
+- [ ] Implement performance benchmarking
+- [ ] Add load testing for URI resolution
+- [ ] Create regression testing suite
+
+### **🚀 Phase 7: Production Deployment**
+
+#### **Task 7.1: Performance Optimization**
+
+- [ ] Implement database query optimization
+- [ ] Add connection pooling for URI index
+- [ ] Create caching strategies for URI index
+- [ ] Add performance monitoring dashboards
+- [ ] Implement auto-scaling for high load
+
+#### **Task 7.2: Monitoring & Alerting**
+
+- [ ] Add URI index health monitoring
+- [ ] Create performance alert system
+- [ ] Implement error tracking and reporting
+- [ ] Add usage analytics and insights
+- [ ] Create operational dashboards
+
+#### **Task 7.3: Documentation & Training**
+
+- [ ] Update system documentation
+- [ ] Create URI index administration guide
+- [ ] Add troubleshooting documentation
+- [ ] Create performance tuning guide
+- [ ] Add developer API documentation
+
+---
+
+## 🎯 **Expected Performance Improvements**
+
+### **Current System vs URI Index Collection**
+
+| Metric                 | Current System   | URI Index System  | Improvement              |
+| ---------------------- | ---------------- | ----------------- | ------------------------ |
+| **URI Resolution**     | O(n) collections | O(1) index lookup | **10-100x faster**       |
+| **Database Queries**   | 3-8 per request  | 1-2 per request   | **3-4x reduction**       |
+| **Cache Efficiency**   | Fragmented       | Unified           | **Improved hit rates**   |
+| **Conflict Detection** | Real-time loops  | Index-based       | **Near-instant**         |
+| **Static Generation**  | Multiple queries | Single query      | **Significant speedup**  |
+| **Sitemap Generation** | Collection loops | Index scan        | **Dramatic improvement** |
+
+### **Architectural Benefits**
+
+1. **🚀 Performance**: O(1) URI lookups instead of O(n) collection searches
+2. **🔧 Maintainability**: Centralized URI management and conflict resolution
+3. **📈 Scalability**: Performance doesn't degrade with more collections
+4. **🛡️ Reliability**: Eliminates silent failures and improves error handling
+5. **🎯 SEO**: Automatic redirect generation and improved sitemap performance
+6. **📊 Analytics**: Comprehensive URI usage tracking and performance monitoring
+
+---
+
+## 🎯 **Current URI Dependency System Assessment**
+
+### **Current Dependency Architecture Analysis**
+
+Based on analysis of the existing codebase, the current URI generation system has **three primary dependency types** that create cascading URI changes, but **lacks proper cascade management**:
+
+#### **1. Hierarchical Page Dependencies**
+
+```typescript
+// Current implementation in src/lib/routing/uri-engine.ts
+async function generatePageURI({
+  slug,
+  data,
+  originalDoc,
+  payload,
+}: {
+  slug: string
+  data?: any
+  originalDoc?: any
+  payload: any
+}): Promise<string> {
+  const parent = data?.parent || originalDoc?.parent
+
+  if (!parent) {
+    return `/${slug}`
+  }
+
+  try {
+    // Get parent document
+    const parentDoc = await payload.findByID({
+      collection: "pages",
+      id: typeof parent === "object" ? parent.id : parent,
+      depth: 0,
+    })
+
+    if (!parentDoc?.uri) {
+      // If parent doesn't have URI yet, generate it recursively
+      const parentURI = await generatePageURI({
+        slug: parentDoc.slug,
+        data: parentDoc,
+        payload,
+      })
+      return `${parentURI}/${slug}`
+    }
+
+    return `${parentDoc.uri}/${slug}`
+  } catch (error) {
+    payload.logger.warn("Failed to generate hierarchical page URI:", error)
+    return `/${slug}`
+  }
+}
+```
+
+**Issues**: Recursive URI generation is inefficient and doesn't update existing child pages when parent URIs change.
+
+#### **2. Archive Page Dependencies**
+
+```typescript
+// Current implementation in src/lib/routing/uri-engine.ts
+async function generateCollectionItemURI({
+  collection,
+  slug,
+  settings,
+  payload,
+}: {
+  collection: string
+  slug: string
+  settings: any
+  payload: any
+}): Promise<string> {
+  // Use the actual settings field names: postsArchivePage, servicesArchivePage, etc.
+  const archivePageField = `${collection}ArchivePage`
+
+  // Priority 1: Archive page slug (if collection has designated archive page)
+  if (settings[archivePageField]) {
+    try {
+      const archivePage = await payload.findByID({
+        collection: "pages",
+        id:
+          typeof settings[archivePageField] === "object"
+            ? settings[archivePageField].id
+            : settings[archivePageField],
+        depth: 0,
+      })
+
+      if (archivePage?.slug) {
+        return `/${archivePage.slug}/${slug}`
+      }
+    } catch (error) {
+      payload.logger.warn(`Failed to fetch archive page for ${collection}:`, error)
+    }
+  }
+
+  // Priority 2: Original collection slug (fallback)
+  return `/${collection}/${slug}`
+}
+```
+
+**Issues**: Collection items reference archive pages, but changes to archive page slugs don't trigger updates to collection item URIs.
+
+#### **3. Settings-Level Dependencies**
+
+```typescript
+// Current settings configuration in src/utilities/routing.ts
+export function generateCollectionRoutingFields(): Field[] {
+  const fields: Field[] = frontendCollections
+    .filter(collection => collection.slug !== "pages")
+    .map(collection => {
+      return {
+        type: "group",
+        label: collection.label,
+        fields: [
+          {
+            name: `${collection.slug}ArchivePage`,
+            type: "relationship",
+            relationTo: "pages" as const,
+            label: "Archive Page",
+          },
+          // ... other fields
+        ],
+      }
+    })
+}
+```
+
+**Issues**: Changes to routing settings don't cascade to affected collection items.
+
+### **❌ Current Problems with Cascade Management**
+
+#### **Missing Cascade Detection in Hooks**
+
+The current hooks **DO NOT** handle cascading updates:
+
+```typescript
+// Current implementation in src/payload/hooks/revalidation.ts
+export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
+  data,
+  originalDoc,
+  req: { payload },
+  collection,
+}) => {
+  if (!data?.slug) {
+    return data
+  }
+
+  const isPublishing =
+    data._status === "published" && originalDoc?._status !== "published"
+  const isPublishedSlugChange =
+    data._status === "published" &&
+    originalDoc?._status === "published" &&
+    data.slug !== originalDoc?.slug
+
+  if (isPublishing || isPublishedSlugChange) {
+    try {
+      const newURI = await routingEngine.generate({
+        collection: collection.slug,
+        slug: data.slug,
+        data,
+        originalDoc,
+      })
+
+      data.uri = newURI
+    } catch (error) {
+      payload.logger.error(
+        `URI generation failed for ${collection.slug}/${data.slug}:`,
+        error
+      )
+    }
+  }
+
+  return data
+}
+```
+
+**Critical Missing Features:**
+
+- ❌ **No parent change detection**: When a page's parent changes, child URIs aren't updated
+- ❌ **No archive page cascade**: When archive page slug changes, collection item URIs aren't updated
+- ❌ **No settings cascade**: When routing settings change, affected URIs aren't updated
+- ❌ **No automatic redirects**: Old URIs become broken links instead of redirecting
+- ❌ **No batch operations**: Each URI update requires individual database calls
+- ❌ **No dependency tracking**: No system to identify what needs updating
+
+#### **Performance Issues**
+
+The current cache system uses collection loops for URI resolution:
+
+```typescript
+// Current inefficient approach in src/lib/cache/cache.ts
+for (const collection of frontendCollections) {
+  try {
+    const result = await payload.find({
+      collection: collection.slug as any,
+      where: { uri: { equals: normalizedURI } },
+      limit: 1,
+      depth: 5,
+      draft,
+      overrideAccess: true,
+    })
+    // Multiple database queries per request
+  } catch (error) {
+    continue // Silent failures hide issues
+  }
+}
+```
+
+**Problems:**
+
+- **N+1 Query Problem**: Each URI resolution triggers multiple database queries
+- **Linear Scaling**: Performance degrades with more collections
+- **Silent Failures**: Try/catch masks potential issues
+- **Cache Fragmentation**: Each collection cached separately
+
+### **🔄 URI Index Collection Solution Benefits**
+
+The URI Index Collection approach addresses all these issues:
+
+#### **Dependency Impact Analysis After Implementation**
+
+**Parent Page Change Cascade:**
+
+```
+/company (parent changes to /about-us)
+├── /company/team → /about-us/team ✅ Auto-updated via URI index
+├── /company/services → /about-us/services ✅ Auto-updated via URI index
+└── /company/services/web-design → /about-us/services/web-design ✅ Auto-updated via URI index
+```
+
+**Archive Page Change Cascade:**
+
+```
+Settings: postsArchivePage = "blog" → "articles"
+├── /blog/my-post → /articles/my-post ✅ Auto-updated via batch operation
+├── /blog/news → /articles/news ✅ Auto-updated via batch operation
+└── /blog/updates → /articles/updates ✅ Auto-updated via batch operation
+```
+
+**Settings Change Cascade:**
+
+```
+Global routing settings change affects:
+├── All collection items using archive pages ✅ Batch updated via URI index
+├── Homepage detection logic ✅ Updated via cache invalidation
+└── URL pattern generation rules ✅ Applied via dependency tracking
+```
+
+### **💡 Immediate Recommendations for Collection Hooks**
+
+While implementing the full URI Index Collection, these enhancements can be added to existing hooks:
+
+#### **1. Enhanced Parent Change Detection**
+
+```typescript
+// Enhanced beforeCollectionChange hook
+export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
+  data,
+  originalDoc,
+  req: { payload },
+  collection,
+}) => {
+  // ... existing URI generation logic ...
+
+  // NEW: Cascade detection for pages
+  if (collection.slug === "pages") {
+    // Parent change detection
+    if (data.parent !== originalDoc?.parent) {
+      await scheduleDescendantUpdates(data.id, data.parent, originalDoc?.parent, payload)
+    }
+
+    // Archive page usage detection
+    if (
+      data.slug !== originalDoc?.slug &&
+      (await isUsedAsArchivePage(data.id, payload))
+    ) {
+      await scheduleArchivePageUpdates(data.id, data.slug, originalDoc?.slug, payload)
+    }
+  }
+
+  return data
+}
+```
+
+#### **2. Settings Change Cascade Detection**
+
+```typescript
+// Enhanced afterGlobalChange hook
+export const afterGlobalChange: GlobalAfterChangeHook = async ({
+  doc,
+  previousDoc,
+  req: { payload },
+  global,
+}) => {
+  // ... existing revalidation logic ...
+
+  // NEW: Routing settings cascade
+  if (global.slug === "settings" && hasRoutingChanges(doc, previousDoc)) {
+    await scheduleSettingsBasedCascade(doc.routing, previousDoc?.routing, payload)
+  }
+
+  return doc
+}
+```
+
+#### **3. Cascade Helper Functions**
+
+```typescript
+// src/lib/routing/cascade-helpers.ts
+async function scheduleDescendantUpdates(
+  pageId: string,
+  newParent: string,
+  oldParent: string,
+  payload: any
+) {
+  // Find all descendant pages recursively
+  const descendants = await findAllDescendantPages(pageId, payload)
+
+  // Update their URIs in batch
+  const updates = []
+  for (const descendant of descendants) {
+    const newURI = await routingEngine.generate({
+      collection: "pages",
+      slug: descendant.slug,
+      data: { ...descendant, parent: newParent },
+    })
+
+    updates.push({
+      id: descendant.id,
+      oldURI: descendant.uri,
+      newURI: newURI,
+    })
+  }
+
+  // Execute batch updates
+  await Promise.all(
+    updates.map(async update => {
+      // Update the document
+      await payload.update({
+        collection: "pages",
+        id: update.id,
+        data: { uri: update.newURI },
+      })
+
+      // Create redirect from old URI
+      if (update.oldURI && update.oldURI !== update.newURI) {
+        await createRedirect(update.oldURI, update.newURI, payload)
+      }
+    })
+  )
+}
+
+async function findAllDescendantPages(
+  pageId: string,
+  payload: any,
+  depth = 0
+): Promise<any[]> {
+  if (depth > 10) return [] // Prevent infinite recursion
+
+  const directChildren = await payload.find({
+    collection: "pages",
+    where: { parent: { equals: pageId } },
+    depth: 0,
+    limit: 1000,
+  })
+
+  const allDescendants = [...directChildren.docs]
+
+  // Recursively find grandchildren
+  for (const child of directChildren.docs) {
+    const grandchildren = await findAllDescendantPages(child.id, payload, depth + 1)
+    allDescendants.push(...grandchildren)
+  }
+
+  return allDescendants
+}
+
+async function isUsedAsArchivePage(pageId: string, payload: any): Promise<boolean> {
+  const settings = await payload.findGlobal({ slug: "settings" })
+  const routing = settings?.routing || {}
+
+  // Check if this page is used as an archive for any collection
+  for (const [key, value] of Object.entries(routing)) {
+    if (key.endsWith("ArchivePage")) {
+      const archivePageId = typeof value === "object" ? value?.id : value
+      if (archivePageId === pageId) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
+async function createRedirect(
+  fromURI: string,
+  toURI: string,
+  payload: any
+): Promise<void> {
+  try {
+    await payload.create({
+      collection: "redirects",
+      data: {
+        from: fromURI,
+        to: {
+          type: "custom",
+          url: toURI,
+        },
+        type: "301",
+        createdBy: "cascade-update",
+      },
+    })
+  } catch (error) {
+    // Log but don't fail the main operation
+    console.warn(`Failed to create redirect from ${fromURI} to ${toURI}:`, error)
+  }
+}
+```
+
+---
+
+## 🔄 **Cascading URI Updates Strategy**
+
+### **Understanding URI Dependencies**
+
+Building on the current system analysis, the URI generation system has complex dependency relationships that require cascading updates:
+
+#### **Hierarchical Page Dependencies**
+
+```typescript
+// Parent page URI change affects all descendants
+/company (parent changes to /about-us)
+├── /company/team → /about-us/team
+├── /company/services → /about-us/services
+└── /company/services/web-design → /about-us/services/web-design
+```
+
+#### **Archive Page Dependencies**
+
+```typescript
+// Archive page change affects all collection items
+Settings: postsArchivePage = "blog" → "articles"
+├── /blog/my-post → /articles/my-post
+├── /blog/news → /articles/news
+└── /blog/updates → /articles/updates
+```
+
+#### **Settings-Level Dependencies**
+
+```typescript
+// Global routing settings changes affect multiple collections
+Settings routing change affects:
+├── All collection items using archive pages
+├── Homepage detection logic
+└── URL pattern generation rules
+```
+
+### **Cascading Update Implementation**
+
+#### **Phase 2.4: Cascading Update System**
+
+- [ ] Create `src/lib/routing/cascade-manager.ts`
+- [ ] Implement dependency tree analysis
+- [ ] Add batch URI update operations
+- [ ] Create update conflict detection
+- [ ] Add update progress tracking and rollback
+
+#### **Enhanced Revalidation Hook Integration**
+
+##### **1. Parent Page Change Detection**
+
+```typescript
+// In beforeCollectionChange hook
+export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
+  data,
+  originalDoc,
+  req: { payload },
+  collection,
+}) => {
+  // Existing URI generation logic...
+
+  // NEW: Detect parent changes that require cascading updates
+  if (collection.slug === "pages" && data.parent !== originalDoc?.parent) {
+    await cascadeManager.schedulePageHierarchyUpdate({
+      pageId: data.id,
+      newParent: data.parent,
+      oldParent: originalDoc?.parent,
+      payload,
+    })
+  }
+
+  // NEW: Detect archive page slug changes
+  if (collection.slug === "pages" && isUsedAsArchivePage(data.id)) {
+    await cascadeManager.scheduleArchivePageUpdate({
+      archivePageId: data.id,
+      newSlug: data.slug,
+      oldSlug: originalDoc?.slug,
+      payload,
+    })
+  }
+
+  return data
+}
+```
+
+##### **2. Settings Change Detection**
+
+```typescript
+// In afterGlobalChange hook
+export const afterGlobalChange: GlobalAfterChangeHook = async ({
+  doc,
+  previousDoc,
+  req: { payload },
+  global,
+}) => {
+  // Existing revalidation logic...
+
+  // NEW: Detect routing settings changes
+  if (global.slug === "settings" && hasRoutingChanges(doc, previousDoc)) {
+    await cascadeManager.scheduleSettingsBasedUpdate({
+      newSettings: doc.routing,
+      oldSettings: previousDoc?.routing,
+      payload,
+    })
+  }
+
+  return doc
+}
+```
+
+### **Cascade Manager Implementation**
+
+#### **Core Cascade Operations**
+
+```typescript
+// src/lib/routing/cascade-manager.ts
+export const cascadeManager = {
+  // Handle page hierarchy changes
+  async schedulePageHierarchyUpdate({
+    pageId,
+    newParent,
+    oldParent,
+    payload,
+  }: PageHierarchyUpdateOptions) {
+    // 1. Find all descendant pages
+    const descendants = await findDescendantPages(pageId, payload)
+
+    // 2. Batch update URI index entries
+    const updates = descendants.map(async descendant => {
+      const newURI = await routingEngine.generate({
+        collection: "pages",
+        slug: descendant.slug,
+        data: { ...descendant, parent: newParent },
+      })
+
+      return {
+        documentId: descendant.id,
+        oldURI: descendant.uri,
+        newURI,
+        collection: "pages",
+      }
+    })
+
+    // 3. Execute batch URI index updates
+    await batchUpdateURIIndex(await Promise.all(updates), payload)
+
+    // 4. Create automatic redirects
+    await createCascadeRedirects(await Promise.all(updates), payload)
+  },
+
+  // Handle archive page changes
+  async scheduleArchivePageUpdate({
+    archivePageId,
+    newSlug,
+    oldSlug,
+    payload,
+  }: ArchivePageUpdateOptions) {
+    // 1. Find collections using this archive page
+    const affectedCollections = await findCollectionsUsingArchive(archivePageId, payload)
+
+    // 2. Update all collection items
+    for (const collection of affectedCollections) {
+      const items = await payload.find({
+        collection: collection.slug,
+        where: { _status: { equals: "published" } },
+        limit: 1000,
+      })
+
+      const updates = items.docs.map(async item => {
+        const newURI = await routingEngine.generate({
+          collection: collection.slug,
+          slug: item.slug,
+          data: item,
+        })
+
+        return {
+          documentId: item.id,
+          oldURI: item.uri,
+          newURI,
+          collection: collection.slug,
+        }
+      })
+
+      await batchUpdateURIIndex(await Promise.all(updates), payload)
+      await createCascadeRedirects(await Promise.all(updates), payload)
+    }
+  },
+
+  // Handle settings-based changes
+  async scheduleSettingsBasedUpdate({
+    newSettings,
+    oldSettings,
+    payload,
+  }: SettingsUpdateOptions) {
+    // 1. Detect which archive pages changed
+    const changedArchives = detectArchivePageChanges(newSettings, oldSettings)
+
+    // 2. Process each changed archive
+    for (const { collection, newArchiveId, oldArchiveId } of changedArchives) {
+      const items = await payload.find({
+        collection,
+        where: { _status: { equals: "published" } },
+        limit: 1000,
+      })
+
+      const updates = items.docs.map(async item => {
+        const newURI = await routingEngine.generate({
+          collection,
+          slug: item.slug,
+          data: item,
+        })
+
+        return {
+          documentId: item.id,
+          oldURI: item.uri,
+          newURI,
+          collection,
+        }
+      })
+
+      await batchUpdateURIIndex(await Promise.all(updates), payload)
+      await createCascadeRedirects(await Promise.all(updates), payload)
+    }
+  },
+}
+```
+
+### **URI Index Batch Operations**
+
+#### **Batch Update System**
+
+```typescript
+// Efficient batch updates for URI index
+async function batchUpdateURIIndex(updates: URIUpdateOperation[], payload: Payload) {
+  // 1. Group updates by operation type
+  const creates: any[] = []
+  const modifications: any[] = []
+  const deletes: string[] = []
+
+  for (const update of updates) {
+    const existing = await payload.find({
+      collection: "uri-index",
+      where: {
+        documentId: { equals: update.documentId },
+        collection: { equals: update.collection },
+      },
+      limit: 1,
+    })
+
+    if (existing.docs.length > 0) {
+      modifications.push({
+        id: existing.docs[0].id,
+        uri: update.newURI,
+        lastUpdated: new Date(),
+        previousURIs: [...(existing.docs[0].previousURIs || []), update.oldURI].filter(
+          Boolean
+        ),
+      })
+    } else {
+      creates.push({
+        uri: update.newURI,
+        collection: update.collection,
+        documentId: update.documentId,
+        document: update.documentId, // Relationship
+        lastUpdated: new Date(),
+        status: "published",
+        sitemapInclude: true,
+        searchInclude: true,
+      })
+    }
+  }
+
+  // 2. Execute batch operations
+  await Promise.all([
+    ...creates.map(data => payload.create({ collection: "uri-index", data })),
+    ...modifications.map(({ id, ...data }) =>
+      payload.update({ collection: "uri-index", id, data })
+    ),
+  ])
+
+  // 3. Invalidate related caches
+  await invalidateCascadeCache(updates, payload)
+}
+```
+
+### **Automatic Redirect Generation**
+
+#### **Cascade Redirect Creation**
+
+```typescript
+async function createCascadeRedirects(updates: URIUpdateOperation[], payload: Payload) {
+  const redirects = updates
+    .filter(update => update.oldURI && update.newURI !== update.oldURI)
+    .map(update => ({
+      from: update.oldURI,
+      to: {
+        type: "reference",
+        reference: {
+          relationTo: update.collection,
+          value: update.documentId,
+        },
+      },
+      type: "301", // Permanent redirect for SEO
+      createdBy: "cascade-update", // Track automatic creation
+    }))
+
+  // Batch create redirects
+  await Promise.all(
+    redirects.map(redirect => payload.create({ collection: "redirects", data: redirect }))
+  )
+}
+```
+
+### **Performance Optimizations**
+
+#### **Intelligent Update Batching**
+
+- **Dependency Analysis**: Only update affected documents
+- **Batch Operations**: Group similar updates for efficiency
+- **Progress Tracking**: Monitor large cascade operations
+- **Rollback Support**: Undo failed cascade operations
+
+#### **Cache Integration**
+
+```typescript
+async function invalidateCascadeCache(updates: URIUpdateOperation[], payload: Payload) {
+  // 1. Collect all affected cache tags
+  const tags = new Set<string>()
+
+  for (const update of updates) {
+    tags.add(`collection:${update.collection}`)
+    tags.add(`item:${update.collection}:${update.documentId}`)
+    tags.add(`uri:${update.oldURI}`)
+    tags.add(`uri:${update.newURI}`)
+    tags.add("sitemap:all")
+    tags.add("uri-index:all")
+  }
+
+  // 2. Batch invalidate all affected tags
+  await Promise.all(Array.from(tags).map(tag => revalidateTag(tag)))
+}
+```
+
+### **Integration with Existing Hooks**
+
+The cascading update system integrates seamlessly with the existing revalidation hooks:
+
+1. **beforeCollectionChange**: Detects changes that require cascading
+2. **afterCollectionChange**: Executes cascade operations
+3. **afterGlobalChange**: Handles settings-based cascades
+4. **URI Index Hooks**: Maintain index integrity during cascades
+
+### **Monitoring & Safety**
+
+#### **Cascade Operation Monitoring**
+
+- **Progress Tracking**: Real-time updates on cascade progress
+- **Error Handling**: Graceful handling of partial failures
+- **Rollback Capability**: Undo failed cascade operations
+- **Performance Metrics**: Track cascade operation performance
+
+#### **Safety Measures**
+
+- **Dry Run Mode**: Preview cascade effects before execution
+- **Batch Size Limits**: Prevent overwhelming the system
+- **Timeout Protection**: Prevent runaway cascade operations
+- **Conflict Resolution**: Handle URI conflicts during cascades
+
+---
+
+## 🔄 **Implementation Strategy**
+
+### **Phase-by-Phase Approach**
+
+1. **Foundation First** (Phase 1-2): Build URI index collection and optimize core cache
+2. **Integration** (Phase 3-4): Update routing and sitemap systems
+3. **Enhancement** (Phase 5): Add advanced features and optimizations
+4. **Migration** (Phase 6): Safely migrate existing data
+5. **Production** (Phase 7): Deploy with monitoring and optimization
+
+### **Risk Mitigation**
+
+- **Gradual rollout** with feature flags
+- **Comprehensive testing** at each phase
+- **Rollback procedures** for each migration step
+- **Performance monitoring** throughout implementation
+- **Data validation** at every step
+
+### **Success Metrics**
+
+- **Performance**: 10x improvement in URI resolution speed
+- **Reliability**: Eliminate silent failures and improve error handling
+- **Scalability**: Support for 100k+ documents without performance degradation
+- **Maintainability**: Reduced complexity and improved debugging
+- **SEO**: Improved sitemap generation and automatic redirect management
+
+---
+
+## 🏁 **Conclusion**
+
+The URI Index Collection approach transforms the smart routing engine from a collection-loop pattern to a high-performance, centralized URI management system. This implementation provides:
+
+- **Massive performance improvements** through O(1) lookups
+- **Enterprise-grade scalability** for large content sites
+- **Improved reliability** with centralized conflict resolution
+- **Enhanced SEO capabilities** with automatic redirects and optimized sitemaps
+- **Future-proof architecture** that scales with content growth
+
+This approach maintains all existing functionality while dramatically improving performance and adding powerful new capabilities for large-scale content management.

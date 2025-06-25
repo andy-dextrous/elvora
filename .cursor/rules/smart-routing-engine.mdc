@@ -1,11 +1,11 @@
 ---
-description: When asked to work on the smart routing engine plan. Or even if the user asks to work on the next phase of "the build" or "the tasklist" they mean this.
+description: When asked to work on the uri-index plan. Or even if the user asks to work on the next phase of "the build" or "the tasklist" they mean this.
 globs:
 alwaysApply: false
 ---
 Iterate with me in a back and forth manner, acting as my developer assistant. We will build this plan together but I'd like you to consult with me before undertaking any new tasks. The plan is solid but still needs work as we move through it.
 
-You should know that the tasklist you are looking at is the tip of an iceberg of planning. There are two primary docs that spell out the entire smart routing engine and all of its modules. When you start a task you should read both docs FULLY and especially focus on how the current module you are working on itegrates with the whole. This is especially important because the system is designed to work together.
+You should know that the tasklist you are looking at is the tip of an iceberg of planning. There are two primary docs that spell out the entire smart routing engine and all of its modules plus another doc that illustrates this next phase, the uri-index. When you start a task you should read both docs FULLY and especially focus on how the current module you are working on itegrates with the whole. This is especially important because the system is designed to work together.
 
 ## Doc 1
 [smart-content-engine.md](mdc:planning/smart-content-engine.md)
@@ -14,6 +14,10 @@ This is a long form, comprehensive look at the smart system in its entirety. You
 ## Doc 2
 [smart-content-overview.md](mdc:planning/smart-content-overview.md)
 This is a shorter, overview doc to be used for quick reference.
+
+## Doc 3 - THE MODULE WE ARE NOW WORKING ON
+[URI-INDEX-COLLECTION-IMPLEMENTATION.md](mdc:URI-INDEX-COLLECTION-IMPLEMENTATION.md)
+This describes the next phase of the plan we will be building now. Everything before now is complete and is used to provide context about how the uri index fits in.
 
 ## Rules
 - Work part by part. Each phase is broken into parts with a title and tasklist. Consult me on the parts and be sure to mark the document with its status.

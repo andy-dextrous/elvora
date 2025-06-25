@@ -14,6 +14,8 @@
 - autopopulation of SEO fields
 - tie users to team members
 - Wordpress auto migrate feature! Site Uplift Engine
+- Full metadata & LD JSON
+- Yoast features
 
 ## AI components (mastra)
 

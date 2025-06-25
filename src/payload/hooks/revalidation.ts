@@ -1,32 +1,33 @@
+import { revalidate } from "@/lib/cache/revalidation"
+import { routingEngine } from "@/lib/routing"
 import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
   CollectionBeforeChangeHook,
   GlobalAfterChangeHook,
 } from "payload"
-import { revalidate } from "@/lib/cache/revalidation"
-import { routingEngine } from "@/lib/routing"
 
 /*************************************************************************/
-/*  URI GENERATION ON PUBLISH
+/*  UNIVERSAL COLLECTION HOOKS
 /*************************************************************************/
 
 /**
- * Universal beforeChange hook for URI generation on publish events
- * Generates URI when content is published or when published content's slug changes
+ *    BEFORE COLLECTION CHANGE
+ *
+ *    Universal beforeChange hook for URI generation on publish events
+ *    Generates URI when content is published or when published content's slug changes
  */
+
 export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
   data,
   originalDoc,
   req: { payload },
   collection,
 }) => {
-  // Only generate URI for collections that have slug fields
   if (!data?.slug) {
     return data
   }
 
-  // Check if this is a publish event or published content with slug change
   const isPublishing =
     data._status === "published" && originalDoc?._status !== "published"
   const isPublishedSlugChange =
@@ -43,31 +44,25 @@ export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
         originalDoc,
       })
 
-      // Set the URI in the data being saved
       data.uri = newURI
-
-      payload.logger.info(`Generated URI for ${collection.slug}/${data.slug}: ${newURI}`)
     } catch (error) {
       payload.logger.error(
         `URI generation failed for ${collection.slug}/${data.slug}:`,
         error
       )
-      // Don't block the save operation, just log the error
     }
   }
 
   return data
 }
 
-/*************************************************************************/
-/*  UNIVERSAL COLLECTION HOOKS
-/*************************************************************************/
-
 /**
- * Universal afterChange hook that works for any collection
- * Automatically detects the collection from Payload's context
- * Now handles revalidation AFTER URI has been properly set
+ *    AFTER COLLECTION CHANGE
+ *
+ *    Universal afterChange hook that works for any collection by revalidating the document
+ *    and any of its dependents as per the smart routing engine.
  */
+
 export const afterCollectionChange: CollectionAfterChangeHook = async ({
   doc,
   previousDoc,
@@ -99,9 +94,12 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
 }
 
 /**
- * Universal afterDelete hook that works for any collection
- * Automatically detects the collection from Payload's context
+ *    AFTER COLLECTION DELETE
+ *
+ *    Universal afterDelete hook that works for any collection by revalidating the document
+ *    and any of its dependents as per the smart routing engine.
  */
+
 export const afterCollectionDelete: CollectionAfterDeleteHook = async ({
   doc,
   req: { payload, context },
@@ -133,9 +131,12 @@ export const afterCollectionDelete: CollectionAfterDeleteHook = async ({
 /*************************************************************************/
 
 /**
- * Universal afterChange hook for globals
- * Automatically detects the global from Payload's context
+ *    AFTER GLOBAL CHANGE
+ *
+ *    Universal afterChange hook for globals by revalidating the document
+ *    and any of its dependents as per the smart routing engine.
  */
+
 export const afterGlobalChange: GlobalAfterChangeHook = async ({
   doc,
   previousDoc,
@@ -155,7 +156,7 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
       logger: payload.logger,
     })
   } catch (error) {
-    payload.logger.error(`Smart revalidation failed for global ${global.slug}:`, error)
+    payload.logger.error(`Revalidation failed for global ${global.slug}:`, error)
   }
 
   return doc

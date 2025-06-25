@@ -13,11 +13,15 @@ type Slug = (
 ) => [TextField, TextField, CheckboxField]
 
 /*************************************************************************/
-/*  LOCK RESET HOOK
+/*  SLUG FIELD
 /*************************************************************************/
 
 export const slugField: Slug = (fieldToUse = "title", overrides = {}) => {
   const { slugOverrides, uriOverrides, checkboxOverrides } = overrides
+
+  /**
+   *  CHECKBOX FIELD
+   */
 
   const checkBoxField: CheckboxField = {
     name: "slugLock",
@@ -40,6 +44,10 @@ export const slugField: Slug = (fieldToUse = "title", overrides = {}) => {
     },
     ...checkboxOverrides,
   }
+
+  /**
+   *  SLUG FIELD
+   */
 
   // @ts-expect-error - ts mismatch Partial<TextField> with TextField
   const slugField: TextField = {
@@ -65,6 +73,11 @@ export const slugField: Slug = (fieldToUse = "title", overrides = {}) => {
       },
     },
   }
+
+  /**
+   *  URI FIELD
+   * Read-only field used by the smart routing engine
+   */
 
   // @ts-expect-error - ts mismatch Partial<TextField> with TextField
   const uriField: TextField = {
