@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache"
 import configPromise from "@payload-config"
 import type { Config } from "@/payload/payload-types"
 import { getCacheConfig } from "./cache-config"
+import { isFrontendCollection } from "@/payload/collections/frontend"
 
 /*************************************************************************/
 /*  UNIVERSAL CACHE API - TYPES & INTERFACES
@@ -249,6 +250,12 @@ function generateCacheTags(
     tags.push(`collection:${collection}`)
     tags.push(`item:${collection}:${slug}`)
 
+    // Add URI index tags for frontend collections
+    if (isFrontendCollection(collection)) {
+      tags.push(`uri-index:${collection}`) // Specific collection in URI index
+      tags.push("uri-index:item") // Individual item in URI index
+    }
+
     // Add dependencies from cache config
     if (includeDependencies) {
       const config = getCacheConfig(collection)
@@ -261,6 +268,12 @@ function generateCacheTags(
     tags.push(`collection:${collection}`)
     tags.push(`item:${collection}:${params[0]}`)
 
+    // Add URI index tags for frontend collections
+    if (isFrontendCollection(collection)) {
+      tags.push(`uri-index:${collection}`) // Specific collection in URI index
+      tags.push("uri-index:item") // Individual item in URI index
+    }
+
     // Add dependencies from cache config
     if (includeDependencies) {
       const config = getCacheConfig(collection)
@@ -272,11 +285,21 @@ function generateCacheTags(
   if (uri !== undefined) {
     const normalizedURI = uri === "/" ? "" : uri.replace(/\/+$/, "")
     tags.push(`uri:${normalizedURI}`)
+
+    // Add URI index specific tags
+    tags.push("uri-index:lookup") // For URI resolution caches
+    tags.push("uri-index:dependent") // For anything that depends on URI resolution
   }
 
   // Collection queries
   if (collection && !slug && params.length === 0) {
     tags.push(`collection:${collection}`)
+
+    // Add URI index tags for frontend collections
+    if (isFrontendCollection(collection)) {
+      tags.push(`uri-index:${collection}`) // Specific collection in URI index
+      tags.push("uri-index:all") // General URI index tag
+    }
 
     // Add dependencies from cache config
     if (includeDependencies) {

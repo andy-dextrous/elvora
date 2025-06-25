@@ -25,23 +25,23 @@ export const CACHE_CONFIG: CacheConfig = {
   // Collections
   pages: {
     ttl: 3600,
-    dependencies: ["global:settings"],
+    dependencies: ["global:settings", "collection:uri-index"],
   },
   posts: {
     ttl: 1800,
-    dependencies: ["global:settings", "collection:categories"],
+    dependencies: ["global:settings", "collection:categories", "collection:uri-index"],
   },
   services: {
     ttl: 7200,
-    dependencies: ["global:settings"],
+    dependencies: ["global:settings", "collection:uri-index"],
   },
   team: {
     ttl: 86400,
-    dependencies: [],
+    dependencies: ["collection:uri-index"],
   },
   testimonials: {
     ttl: 86400,
-    dependencies: [],
+    dependencies: ["collection:uri-index"],
   },
   categories: {
     ttl: 7200,
@@ -53,6 +53,12 @@ export const CACHE_CONFIG: CacheConfig = {
   },
   redirects: {
     ttl: 3600,
+    dependencies: [],
+  },
+
+  // URI Index Collection - core infrastructure
+  "uri-index": {
+    ttl: 1800, // 30 minutes - frequent updates
     dependencies: [],
   },
 

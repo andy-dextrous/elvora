@@ -10,6 +10,7 @@ export interface SEOFieldsCheck {
 export interface DocumentForSEO {
   uri: string
   _status: string
+  collection?: string // Added for sitemap collection-specific config
   noIndex?: boolean
   canonicalUrl?: string
   meta?: {

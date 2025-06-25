@@ -2,6 +2,8 @@ import { frontendCollections } from "@/payload/collections/frontend"
 import configPromise from "@payload-config"
 import { unstable_cache } from "next/cache"
 import { getPayload } from "payload"
+import { checkURIConflict as checkURIConflictWithIndex } from "@/lib/routing/index-manager"
+import { cache } from "@/lib/cache/cache"
 
 /*************************************************************************/
 /*  CACHED ROUTING SETTINGS
@@ -18,7 +20,7 @@ const getRoutingSettings = () =>
       return settings?.routing || {}
     },
     ["global", "settings", "routing"],
-    { tags: ["global:settings"], revalidate: 3600 }
+    { tags: ["global:settings", "uri-index:dependent"], revalidate: 3600 }
   )()
 
 /*************************************************************************/
@@ -184,44 +186,28 @@ async function checkURIConflict({
 }): Promise<URIConflictResult | null> {
   if (!uri || uri === "") return null
 
-  // Check all frontend collections for URI conflicts
-  for (const collectionConfig of frontendCollections) {
-    if (collectionConfig.slug === collection && documentId) {
-      // Skip checking the same document being updated
-      continue
-    }
+  // Use URI index for O(1) conflict detection
+  const indexResult = await checkURIConflictWithIndex(uri, collection, documentId)
 
+  if (!indexResult || !indexResult.hasConflict) {
+    return null
+  }
+
+  // Get the actual document details via the unified cache system
+  if (indexResult.conflictingCollection) {
     try {
-      const result = await payload.find({
-        collection: collectionConfig.slug,
-        where: {
-          uri: {
-            equals: uri,
-          },
-        },
-        limit: 1,
-        depth: 0,
-      })
+      const conflictDoc = await cache.getByURI(uri)
 
-      if (result.docs.length > 0) {
-        const conflictDoc = result.docs[0]
-
-        // If it's the same document being updated, not a conflict
-        if (documentId && conflictDoc.id === documentId) {
-          continue
-        }
-
+      if (conflictDoc?.document) {
         return {
-          collection: collectionConfig.slug,
-          slug: conflictDoc.slug,
-          id: conflictDoc.id,
-          title: conflictDoc.title,
+          collection: indexResult.conflictingCollection,
+          slug: conflictDoc.document.slug,
+          id: conflictDoc.document.id,
+          title: conflictDoc.document.title,
         }
       }
     } catch (error) {
-      // Collection might not have URI field yet, skip
-      console.debug(`Skipping URI conflict check for ${collectionConfig.slug}:`, error)
-      continue
+      payload.logger.error(`Failed to get conflict document details:`, error)
     }
   }
 
@@ -318,42 +304,30 @@ export const routingEngine = {
   },
 
   /**
-   * Get all URIs for static generation
+   * Get all URIs for static generation (O(1) via URI index)
    */
   getAllURIs: async (draft: boolean = false): Promise<string[]> => {
     const cacheKey = ["all-uris", draft ? "draft" : "published"]
-    const tags = ["routes"]
+    const tags = ["routes", "uri-index:all"]
 
     return unstable_cache(
       async () => {
         const payload = await getPayload({ config: configPromise })
-        const uris: string[] = []
 
-        for (const collection of frontendCollections) {
-          try {
-            const result = await payload.find({
-              collection: collection.slug,
-              where: {
-                uri: { exists: true },
-                _status: { equals: "published" },
-              },
-              limit: 1000,
-              depth: 0,
-              draft,
-              select: { uri: true },
-            })
+        // Single query to URI index instead of looping collections
+        const result = await payload.find({
+          collection: "uri-index",
+          where: {
+            status: { equals: draft ? "draft" : "published" },
+          },
+          limit: 2000, // Increased limit for larger sites
+          depth: 0,
+          select: { uri: true },
+        })
 
-            result.docs.forEach((doc: any) => {
-              if (doc.uri) {
-                uris.push(doc.uri)
-              }
-            })
-          } catch (error) {
-            continue
-          }
-        }
+        const uris = result.docs.map((doc: any) => doc.uri).filter(Boolean) // Remove any null/undefined URIs
 
-        return [...new Set(uris)]
+        return [...new Set(uris)] // Remove duplicates
       },
       cacheKey,
       { tags }
@@ -361,7 +335,7 @@ export const routingEngine = {
   },
 
   /**
-   * Check conflicts (used during generation)
+   * Check conflicts (used during generation) - O(1) via URI index
    */
   checkConflicts: async (
     uri: string,

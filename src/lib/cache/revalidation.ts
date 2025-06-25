@@ -3,6 +3,7 @@ import { revalidatePath, revalidateTag } from "next/cache"
 import { createCacheTags } from "./cache"
 import { getInvalidationTargets, getCacheConfig } from "./cache-config"
 import { shouldIncludeInSitemap } from "@/lib/sitemaps/config"
+import { isFrontendCollection } from "@/payload/collections/frontend"
 
 /*************************************************************************/
 /*  UNIVERSAL REVALIDATION ENGINE - TYPES & INTERFACES
@@ -137,6 +138,12 @@ async function generateRevalidationTags(
     // Collection-level tag
     tags.add(`collection:${collection}`)
 
+    // Add URI index tags for frontend collections
+    if (isFrontendCollection(collection)) {
+      tags.add(`uri-index:${collection}`) // Collection-specific URI index
+      tags.add("uri-index:all") // General URI index tag
+    }
+
     // Item-specific tags
     if (doc.slug) {
       tags.add(`item:${collection}:${doc.slug}`)
@@ -146,6 +153,13 @@ async function generateRevalidationTags(
     if (doc.uri !== undefined) {
       const normalizedURI = doc.uri === "/" ? "" : doc.uri.replace(/\/+$/, "")
       tags.add(`uri:${normalizedURI}`)
+
+      // Add URI index tags for frontend collections
+      if (isFrontendCollection(collection)) {
+        tags.add(`uri-index:${collection}`) // Collection-specific URI index
+        tags.add("uri-index:lookup") // URI resolution dependent caches
+        tags.add("uri-index:item") // Individual item in URI index
+      }
     }
 
     // Handle old URI if it changed
@@ -154,6 +168,12 @@ async function generateRevalidationTags(
       const oldNormalizedURI =
         changes.oldUri === "/" ? "" : changes.oldUri.replace(/\/+$/, "")
       tags.add(`uri:${oldNormalizedURI}`)
+
+      // Add URI index tags for old URI
+      if (isFrontendCollection(collection)) {
+        tags.add(`uri-index:${collection}`) // Collection-specific URI index
+        tags.add("uri-index:lookup") // URI resolution dependent caches
+      }
     }
 
     // Add dependency tags from cache config

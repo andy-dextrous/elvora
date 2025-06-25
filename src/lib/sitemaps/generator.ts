@@ -8,6 +8,8 @@ import {
   type SitemapEntry,
   type DocumentForSEO,
 } from "./seo-filters"
+import { getPayload } from "payload"
+import configPromise from "@payload-config"
 
 /*************************************************************************/
 /*  UNIVERSAL SITEMAP GENERATOR - TYPES & INTERFACES
@@ -64,8 +66,66 @@ function getStaticSitemapEntries(siteUrl: string): SitemapEntry[] {
 }
 
 /*************************************************************************/
-/*  COLLECTION DOCUMENT FETCHING
+/*  COLLECTION DOCUMENT FETCHING - URI INDEX OPTIMIZED
 /*************************************************************************/
+
+async function fetchAllDocumentsViaIndex(
+  collections: string[]
+): Promise<DocumentForSEO[]> {
+  try {
+    const payload = await getPayload({ config: configPromise })
+
+    // Get all published URIs from collections in a single query
+    const uriDocs = await payload.find({
+      collection: "uri-index",
+      where: {
+        status: { equals: "published" },
+        sourceCollection: { in: collections },
+      },
+      limit: 10000,
+      depth: 0,
+      select: { uri: true, sourceCollection: true, documentId: true },
+    })
+
+    // Fetch all documents via cache system
+    const allDocuments: DocumentForSEO[] = []
+
+    for (const uriDoc of uriDocs.docs) {
+      try {
+        const doc = await cache.getByID(uriDoc.sourceCollection as any, uriDoc.documentId)
+        if (doc && validateSEOFields(doc) && doc.uri) {
+          // Add collection info from URI index
+          const docWithCollection = { ...doc, collection: uriDoc.sourceCollection }
+          allDocuments.push(docWithCollection)
+        }
+      } catch (error) {
+        // Skip failed documents
+        continue
+      }
+    }
+
+    return allDocuments
+  } catch (error) {
+    console.warn(
+      "Failed to fetch documents via URI index, falling back to collection method:",
+      error
+    )
+    return await fetchAllDocumentsViaCollections(collections)
+  }
+}
+
+async function fetchAllDocumentsViaCollections(
+  collections: string[]
+): Promise<DocumentForSEO[]> {
+  const allDocuments: DocumentForSEO[] = []
+
+  for (const collection of collections) {
+    const documents = await fetchCollectionDocuments(collection)
+    allDocuments.push(...documents)
+  }
+
+  return allDocuments
+}
 
 async function fetchCollectionDocuments(collection: string): Promise<DocumentForSEO[]> {
   try {
@@ -109,24 +169,23 @@ export async function generateSitemap(
     allEntries.push(...staticEntries)
   }
 
-  // Process each collection
-  for (const collection of collections) {
+  // O(1) URI index approach: Single query for all collections
+  const allDocuments = await fetchAllDocumentsViaIndex(collections)
+  totalCount = allDocuments.length
+
+  // Apply SEO filtering
+  const seoFilteredDocs = filterDocumentsForSitemap(allDocuments)
+  filteredCount = seoFilteredDocs.length
+
+  // Create sitemap entries with collection-specific configs
+  const entries = seoFilteredDocs.map(doc => {
+    // Determine collection from document or default config
+    const collection = doc.collection || collections[0] || "pages"
     const config = getSitemapConfig(collection)
-    const documents = await fetchCollectionDocuments(collection)
+    return createSitemapEntry(doc, siteUrl, config.priority, config.changeFreq)
+  })
 
-    totalCount += documents.length
-
-    // Apply SEO filtering
-    const seoFilteredDocs = filterDocumentsForSitemap(documents)
-    filteredCount += seoFilteredDocs.length
-
-    // Create sitemap entries
-    const entries = seoFilteredDocs.map(doc =>
-      createSitemapEntry(doc, siteUrl, config.priority, config.changeFreq)
-    )
-
-    allEntries.push(...entries)
-  }
+  allEntries.push(...entries)
 
   // Sort by priority (highest first), then by lastmod (newest first)
   allEntries.sort((a, b) => {
