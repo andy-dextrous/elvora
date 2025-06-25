@@ -80,6 +80,7 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    'uri-index': UriIndex;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -100,6 +101,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    'uri-index': UriIndexSelect<false> | UriIndexSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1673,6 +1675,64 @@ export interface Template {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "uri-index".
+ */
+export interface UriIndex {
+  id: string;
+  /**
+   * The URI path for this document (e.g., /about, /blog/post-title)
+   */
+  uri: string;
+  /**
+   * The collection slug that contains the source document
+   */
+  sourceCollection: string;
+  /**
+   * The ID of the source document in the collection
+   */
+  documentId: string;
+  /**
+   * Reference to the actual document
+   */
+  document:
+    | {
+        relationTo: 'pages';
+        value: string | Page;
+      }
+    | {
+        relationTo: 'posts';
+        value: string | Post;
+      }
+    | {
+        relationTo: 'team';
+        value: string | Team;
+      }
+    | {
+        relationTo: 'services';
+        value: string | Service;
+      }
+    | {
+        relationTo: 'testimonials';
+        value: string | Testimonial;
+      };
+  /**
+   * Publication status of the source document
+   */
+  status: 'published' | 'draft';
+  /**
+   * Previous URI paths for automatic redirect generation
+   */
+  previousURIs?:
+    | {
+        uri: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1884,6 +1944,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: string | User;
+      } | null)
+    | ({
+        relationTo: 'uri-index';
+        value: string | UriIndex;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2636,6 +2700,25 @@ export interface UsersSelect<T extends boolean = true> {
   hash?: T;
   loginAttempts?: T;
   lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "uri-index_select".
+ */
+export interface UriIndexSelect<T extends boolean = true> {
+  uri?: T;
+  sourceCollection?: T;
+  documentId?: T;
+  document?: T;
+  status?: T;
+  previousURIs?:
+    | T
+    | {
+        uri?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

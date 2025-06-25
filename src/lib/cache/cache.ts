@@ -361,48 +361,56 @@ export const cache = {
         const payload = await getPayload({ config: configPromise })
         const normalizedURI = uri === "/" ? "" : uri.replace(/\/+$/, "")
 
-        const { frontendCollections } = await import("@/payload/collections/frontend")
+        // Query 1: Fast URI index lookup (indexed, very fast)
+        const indexResult = await payload.find({
+          collection: "uri-index",
+          where: {
+            and: [
+              { uri: { equals: normalizedURI } },
+              { status: { equals: draft ? "draft" : "published" } },
+            ],
+          },
+          limit: 1,
+        })
 
-        for (const collection of frontendCollections) {
+        if (indexResult.docs.length === 0) {
+          return null
+        }
+
+        const indexDoc = indexResult.docs[0]
+
+        // Query 2: Get full document with precise control over draft/depth/access
+        const document = await payload.findByID({
+          collection: indexDoc.sourceCollection as any,
+          id: indexDoc.documentId,
+          draft,
+          depth: 5,
+          overrideAccess: true,
+        })
+
+        if (!document) {
+          return null
+        }
+
+        // If document doesn't have sections, apply template sections
+        if (!document.sections || document.sections.length === 0) {
           try {
-            const result = await payload.find({
-              collection: collection.slug as any,
-              where: { uri: { equals: normalizedURI } },
-              limit: 1,
-              depth: 5,
-              draft,
-              overrideAccess: true,
-            })
+            const { getDefaultTemplate } = await import("@/lib/data/templates")
+            const template = await getDefaultTemplate(indexDoc.sourceCollection)
 
-            if (result.docs?.[0]) {
-              const document = result.docs[0]
-
-              // If document doesn't have sections, apply template sections
-              if (!document.sections || document.sections.length === 0) {
-                try {
-                  const { getDefaultTemplate } = await import("@/lib/data/templates")
-                  const template = await getDefaultTemplate(collection.slug)
-
-                  if (template?.sections) {
-                    document.sections = template.sections
-                  }
-                } catch (templateError) {
-                  // Silently continue without template if loading fails
-                  // This ensures the page still loads even if template system has issues
-                }
-              }
-
-              return {
-                document,
-                collection: collection.slug,
-              }
+            if (template?.sections) {
+              document.sections = template.sections
             }
-          } catch (error) {
-            continue
+          } catch (templateError) {
+            // Silently continue without template if loading fails
+            // This ensures the page still loads even if template system has issues
           }
         }
 
-        return null
+        return {
+          document,
+          collection: indexDoc.sourceCollection,
+        }
       },
       cacheKey,
       { tags }

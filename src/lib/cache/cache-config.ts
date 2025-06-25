@@ -140,7 +140,6 @@ export function validateCacheConfig(): {
 
     config.dependencies.forEach(dependency => {
       if (dependency.startsWith("global:")) {
-        const globalSlug = dependency.replace("global:", "")
         if (!CACHE_CONFIG[dependency]) {
           warnings.push(
             `Collection "${collection}" depends on "${dependency}" but it's not in cache config`

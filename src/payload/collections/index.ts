@@ -7,6 +7,7 @@ import { Team } from "@/payload/collections/team"
 import { Services } from "@/payload/collections/services"
 import { Testimonials } from "@/payload/collections/testimonials"
 import { Templates } from "@/payload/collections/templates"
+import { URIIndex } from "@/payload/collections/uri-index"
 import { CollectionConfig } from "payload"
 
 /*************************************************************************/
@@ -23,6 +24,7 @@ const collections: CollectionConfig[] = [
   Media,
   Categories,
   Users,
+  URIIndex,
 ]
 
 export default collections

@@ -1,5 +1,7 @@
 import { revalidate } from "@/lib/cache/revalidation"
 import { routingEngine } from "@/lib/routing"
+import { updateURIIndex, deleteFromURIIndex } from "@/lib/routing/index-manager"
+import { isFrontendCollection } from "@/payload/collections/frontend"
 import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
@@ -70,7 +72,48 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
   req: { payload, context },
   collection,
 }) => {
-  if (context.disableRevalidate || doc._status !== "published") {
+  const isPublished = doc._status === "published"
+  const wasPreviouslyPublished = previousDoc?._status === "published"
+
+  // URI Index Maintenance for Frontend Collections
+  if (isFrontendCollection(collection.slug) && doc.uri) {
+    try {
+      if (isPublished) {
+        // Update index entry for published documents
+        await updateURIIndex({
+          uri: doc.uri,
+          collection: collection.slug,
+          documentId: doc.id,
+          status: "published",
+          previousURI:
+            previousDoc?.uri && previousDoc.uri !== doc.uri ? previousDoc.uri : undefined,
+        })
+      } else if (wasPreviouslyPublished && !isPublished) {
+        // Document was unpublished - remove from index
+        await deleteFromURIIndex(collection.slug, doc.id)
+      }
+
+      // Handle draft versions separately if needed
+      if (doc._status === "draft") {
+        await updateURIIndex({
+          uri: doc.uri,
+          collection: collection.slug,
+          documentId: doc.id,
+          status: "draft",
+          previousURI:
+            previousDoc?.uri && previousDoc.uri !== doc.uri ? previousDoc.uri : undefined,
+        })
+      }
+    } catch (error) {
+      payload.logger.error(
+        `URI index update failed for ${collection.slug}/${doc.id}:`,
+        error
+      )
+    }
+  }
+
+  // Skip revalidation for unpublished content
+  if (context.disableRevalidate || !isPublished) {
     return doc
   }
 
@@ -105,6 +148,18 @@ export const afterCollectionDelete: CollectionAfterDeleteHook = async ({
   req: { payload, context },
   collection,
 }) => {
+  // URI Index Cleanup for Frontend Collections
+  if (isFrontendCollection(collection.slug)) {
+    try {
+      await deleteFromURIIndex(collection.slug, doc.id)
+    } catch (error) {
+      payload.logger.error(
+        `URI index cleanup failed for ${collection.slug}/${doc.id}:`,
+        error
+      )
+    }
+  }
+
   if (context.disableRevalidate) {
     return doc
   }
