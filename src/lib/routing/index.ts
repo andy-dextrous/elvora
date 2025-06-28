@@ -7,8 +7,8 @@ export { routingEngine, validateURI, type URIConflictResult } from "./uri-engine
 
 // URI Index Manager - Index maintenance and population
 export {
-  updateURIIndex,
-  deleteFromURIIndex,
+  updateURI as updateURIIndex,
+  deleteURI as deleteFromURIIndex,
   checkURIConflict,
   regenerateURIs as populateURIIndex,
   type URIIndexUpdate,

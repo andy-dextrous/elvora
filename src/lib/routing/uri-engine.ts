@@ -142,7 +142,7 @@ async function generateCollectionItemURI({
   // Priority 1: Archive page slug (if collection has designated archive page)
   if (settings[archivePageField]) {
     try {
-      const archivePage = await cache.getByID("pages", settings[archivePageField])
+      const archivePage = await cache.getByID("pages", settings[archivePageField]?.id)
 
       if (archivePage?.uri) {
         return `${archivePage.uri}/${slug}`

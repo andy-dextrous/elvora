@@ -34,4 +34,6 @@
 
 ## Current
 
-- Add isHomepage to uri-index
+- Add isHomepage to uri-index and force one instance only
+- Add revalidation hook to uri-index
+- Prevent templates causing 3 db lookups

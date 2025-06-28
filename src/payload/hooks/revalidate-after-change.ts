@@ -1,6 +1,6 @@
 import { revalidate } from "@/lib/cache/revalidation"
 import { routingEngine } from "@/lib/routing"
-import { updateURIIndex, deleteFromURIIndex } from "@/lib/routing/index-manager"
+import { updateURI, deleteURI } from "@/lib/routing/index-manager"
 import { isFrontendCollection } from "@/payload/collections/frontend"
 import type {
   CollectionAfterChangeHook,
@@ -80,7 +80,7 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
     try {
       if (isPublished) {
         // Update index entry for published documents
-        await updateURIIndex({
+        await updateURI({
           uri: doc.uri,
           collection: collection.slug,
           documentId: doc.id,
@@ -90,12 +90,12 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
         })
       } else if (wasPreviouslyPublished && !isPublished) {
         // Document was unpublished - remove from index
-        await deleteFromURIIndex(collection.slug, doc.id)
+        await deleteURI(collection.slug, doc.id)
       }
 
       // Handle draft versions separately if needed
       if (doc._status === "draft") {
-        await updateURIIndex({
+        await updateURI({
           uri: doc.uri,
           collection: collection.slug,
           documentId: doc.id,
@@ -151,7 +151,7 @@ export const afterCollectionDelete: CollectionAfterDeleteHook = async ({
   // URI Index Cleanup for Frontend Collections
   if (isFrontendCollection(collection.slug)) {
     try {
-      await deleteFromURIIndex(collection.slug, doc.id)
+      await deleteURI(collection.slug, doc.id)
     } catch (error) {
       payload.logger.error(
         `URI index cleanup failed for ${collection.slug}/${doc.id}:`,

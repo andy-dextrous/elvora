@@ -31,7 +31,7 @@ export interface URIIndexUpdate {
 /*  UPDATE URI INDEX ENTRY
 /*************************************************************************/
 
-export async function updateURIIndex({
+export async function updateURI({
   uri,
   collection,
   documentId,
@@ -99,10 +99,7 @@ export async function updateURIIndex({
 /*  DELETE FROM URI INDEX
 /*************************************************************************/
 
-export async function deleteFromURIIndex(
-  collection: string,
-  documentId: string
-): Promise<void> {
+export async function deleteURI(collection: string, documentId: string): Promise<void> {
   try {
     const payload = await getPayload({ config: configPromise })
 
@@ -193,7 +190,12 @@ export async function checkURIConflict(
 }
 
 /*************************************************************************/
-/*  POPULATE URI INDEX - BULK MIGRATION
+/*  REGENERATE URIs
+
+    Regenerate all URIs for all frontend collections.
+    This is used to ensure that all URIs are up to date and consistent.
+    It is also used to reset the URI index.
+
 /*************************************************************************/
 
 export interface PopulationStats {
@@ -218,19 +220,12 @@ export async function regenerateURIs(): Promise<PopulationStats> {
 
     // Clear existing URI index entries first (reset functionality)
     console.log("🗑️ Clearing existing URI index entries...")
-    const existingEntries = await payload.find({
+    await payload.delete({
       collection: "uri-index",
-      limit: 5000,
+      where: { id: { exists: true } },
     })
 
-    for (const entry of existingEntries.docs) {
-      await payload.delete({
-        collection: "uri-index",
-        id: entry.id,
-      })
-    }
-
-    console.log(`   ✅ Cleared ${existingEntries.docs.length} existing entries`)
+    console.log(`   ✅ Cleared all existing entries`)
 
     for (const collection of frontendCollections) {
       stats.collections[collection.slug] = { found: 0, populated: 0, errors: 0 }
