@@ -379,17 +379,18 @@ export const cache = {
     const timestamp = new Date().toISOString()
     logCacheEvent({ operation: `getByURI("${uri}")`, cacheKey, tags, timestamp })
 
+    console.log("fetching by uri", uri)
+
     return unstable_cache(
       async () => {
         const payload = await getPayload({ config: configPromise })
-        const normalizedURI = uri === "/" ? "" : uri.replace(/\/+$/, "")
 
         // Query 1: Fast URI index lookup (indexed, very fast)
         const indexResult = await payload.find({
           collection: "uri-index",
           where: {
             and: [
-              { uri: { equals: normalizedURI } },
+              { uri: { equals: uri } },
               { status: { equals: draft ? "draft" : "published" } },
             ],
           },

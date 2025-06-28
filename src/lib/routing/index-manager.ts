@@ -253,6 +253,7 @@ export async function regenerateURIs(): Promise<PopulationStats> {
           where: whereClause,
           limit: 2000,
           depth: 1,
+          // Get both published and draft documents
         })
 
         const collectionFound = documents.docs.length
@@ -267,6 +268,17 @@ export async function regenerateURIs(): Promise<PopulationStats> {
               data: doc,
             })
 
+            // Update the document itself with the new URI
+            await payload.update({
+              collection: collection.slug as any,
+              id: doc.id,
+              data: {
+                uri: generatedURI,
+              },
+              draft: hasStatusField ? doc._status === "draft" : false, // Preserve original status
+            })
+
+            // Create URI index entry
             await payload.create({
               collection: "uri-index",
               data: {
