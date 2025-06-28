@@ -1,13 +1,12 @@
 import { RenderSections } from "@/components/sections/RenderSections"
 import { cache } from "@/lib/cache"
-import { getHomepage } from "@/lib/data/globals"
 import { routingEngine } from "@/lib/routing"
 import { LivePreviewListener } from "@/payload/components/frontend/live-preview-listener"
 import { PayloadRedirects } from "@/payload/components/frontend/payload-redirects"
 import { generateMeta } from "@/utilities/generate-meta"
 import { Metadata } from "next"
 import { draftMode } from "next/headers"
-import { notFound, redirect } from "next/navigation"
+import { notFound } from "next/navigation"
 
 type Args = {
   params: Promise<{
@@ -18,15 +17,6 @@ type Args = {
 export default async function Page({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = [] } = await paramsPromise
-
-  if (slug.length > 0) {
-    const homepage = await getHomepage()
-    const slugPath = slug.join("/")
-
-    if (homepage?.slug === slugPath) {
-      redirect("/")
-    }
-  }
 
   const URI = routingEngine.slugToURI(slug)
   const routeResponse = await cache.getByURI(URI)
@@ -55,10 +45,10 @@ export default async function Page({ params: paramsPromise }: Args) {
 /*******************************************************/
 
 export async function generateStaticParams() {
-  const routes = await routingEngine.getAllURIs()
+  const uris = await cache.getAllURIs()
 
-  return routes.map((route: string) => ({
-    slug: routingEngine.uriToSlug(route),
+  return uris.map((uri: string) => ({
+    slug: routingEngine.uriToSlug(uri),
   }))
 }
 

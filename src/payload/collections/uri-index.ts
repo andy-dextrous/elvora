@@ -89,6 +89,14 @@ export const URIIndex: CollectionConfig = {
         },
       ],
     },
+    {
+      name: "isHomepage",
+      type: "checkbox",
+      defaultValue: false,
+      admin: {
+        description: "Whether this URI is the homepage. Only one homepage is allowed.",
+      },
+    },
   ],
   timestamps: true,
 }

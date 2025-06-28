@@ -22,26 +22,25 @@ export const CACHE_CONFIG: CacheConfig = {
     dependencies: [],
   },
 
-  // Collections
   pages: {
     ttl: 3600,
-    dependencies: ["global:settings", "collection:uri-index"],
+    dependencies: ["global:settings"],
   },
   posts: {
     ttl: 1800,
-    dependencies: ["global:settings", "collection:categories", "collection:uri-index"],
+    dependencies: ["global:settings", "collection:categories"],
   },
   services: {
     ttl: 7200,
-    dependencies: ["global:settings", "collection:uri-index"],
+    dependencies: ["global:settings"],
   },
   team: {
     ttl: 86400,
-    dependencies: ["collection:uri-index"],
+    dependencies: [],
   },
   testimonials: {
     ttl: 86400,
-    dependencies: ["collection:uri-index"],
+    dependencies: [],
   },
   categories: {
     ttl: 7200,
@@ -56,13 +55,11 @@ export const CACHE_CONFIG: CacheConfig = {
     dependencies: [],
   },
 
-  // URI Index Collection - core infrastructure
   "uri-index": {
-    ttl: 1800, // 30 minutes - frequent updates
+    ttl: 1800,
     dependencies: [],
   },
 
-  // Globals (using proper naming convention)
   "global:settings": {
     ttl: 7200,
     dependencies: [],
@@ -140,7 +137,6 @@ export function validateCacheConfig(): {
   const errors: string[] = []
   const warnings: string[] = []
 
-  // Check for orphaned dependencies
   Object.entries(CACHE_CONFIG).forEach(([collection, config]) => {
     if (collection === "default") return
 
@@ -162,7 +158,6 @@ export function validateCacheConfig(): {
     })
   })
 
-  // Check for circular dependencies
   const visited = new Set<string>()
   const visiting = new Set<string>()
 

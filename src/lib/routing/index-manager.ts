@@ -1,16 +1,22 @@
 import configPromise from "@payload-config"
 import { getPayload } from "payload"
 import { frontendCollections } from "@/payload/collections/frontend"
+import { routingEngine } from "./uri-engine"
 
 /*************************************************************************/
-/*  URI INDEX MANAGER - MINIMAL IMPLEMENTATION
+/*
 
-    Core functions for maintaining the URI index collection:
-    - updateURIIndex() - Real-time updates from hooks
-    - deleteFromURIIndex() - Cleanup when documents are deleted
-    - getByURI() - Single-query URI resolution (replaces collection loop)
+  URI INDEX MANAGER
 
-    No population, validation, or migration functions - keeping it simple.
+  Used to manage all operations related to the URI index.
+  URI Index stores the URI of FRONTEND-ONLY collection documents in the URI index.
+
+  - updateURIIndex() - Real-time updates from hooks
+  - deleteFromURIIndex() - Cleanup when documents are deleted
+  - checkURIConflict() - Check if a URI is already taken, with priority based on frontend collections order for conflict resolution.
+  - populateURIIndex() - Populate the URI index with the documents from the frontend collections.
+
+
 /*************************************************************************/
 
 export interface URIIndexUpdate {
@@ -35,8 +41,7 @@ export async function updateURIIndex({
   try {
     const payload = await getPayload({ config: configPromise })
 
-    // Check if entry already exists
-    const existing = await payload.find({
+    const existingEntry = await payload.find({
       collection: "uri-index",
       where: {
         and: [
@@ -59,12 +64,10 @@ export async function updateURIIndex({
       previousURIs: previousURI ? [{ uri: previousURI }] : undefined,
     }
 
-    if (existing.docs.length > 0) {
-      // Update existing entry
-      const existingDoc = existing.docs[0]
-
-      // Handle previousURIs - add old URI if it's changing
+    if (existingEntry.docs.length > 0) {
+      const existingDoc = existingEntry.docs[0]
       let updatedPreviousURIs = existingDoc.previousURIs || []
+
       if (
         previousURI &&
         !updatedPreviousURIs.some((prev: any) => prev.uri === previousURI)
@@ -81,14 +84,12 @@ export async function updateURIIndex({
         },
       })
     } else {
-      // Create new entry
       await payload.create({
         collection: "uri-index",
         data: indexData,
       })
     }
   } catch (error) {
-    // Log error but don't throw - we don't want to break content saves
     const payload = await getPayload({ config: configPromise })
     payload.logger.error("Failed to update URI index:", error)
   }
@@ -105,8 +106,7 @@ export async function deleteFromURIIndex(
   try {
     const payload = await getPayload({ config: configPromise })
 
-    // Find and delete the index entry
-    const existing = await payload.find({
+    const existingEntry = await payload.find({
       collection: "uri-index",
       where: {
         and: [
@@ -117,10 +117,10 @@ export async function deleteFromURIIndex(
       limit: 1,
     })
 
-    if (existing.docs.length > 0) {
+    if (existingEntry.docs.length > 0) {
       await payload.delete({
         collection: "uri-index",
-        id: existing.docs[0].id,
+        id: existingEntry.docs[0].id,
       })
     }
   } catch (error) {
@@ -143,7 +143,7 @@ export async function checkURIConflict(
 ): Promise<{ hasConflict: boolean; conflictingCollection?: string } | null> {
   try {
     const payload = await getPayload({ config: configPromise })
-    const normalizedURI = uri === "/" ? "" : uri.replace(/\/+$/, "")
+    const normalizedURI = uri.replace(/\/+$/, "") || "/"
 
     const conflicts = await payload.find({
       collection: "uri-index",
@@ -153,7 +153,6 @@ export async function checkURIConflict(
       limit: 10,
     })
 
-    // Filter out the document being updated
     const actualConflicts = conflicts.docs.filter((doc: any) => {
       if (excludeCollection && excludeDocumentId) {
         return !(
@@ -168,7 +167,6 @@ export async function checkURIConflict(
       return { hasConflict: false }
     }
 
-    // Find the highest priority conflicting collection based on frontend collections order
     const collectionPriorities = frontendCollections.reduce(
       (acc, collection, index) => {
         acc[collection.slug] = index
@@ -191,5 +189,124 @@ export async function checkURIConflict(
     const payload = await getPayload({ config: configPromise })
     payload.logger.error("Failed to check URI conflict:", error)
     return null
+  }
+}
+
+/*************************************************************************/
+/*  POPULATE URI INDEX - BULK MIGRATION
+/*************************************************************************/
+
+export interface PopulationStats {
+  totalFound: number
+  populated: number
+  skipped: number
+  errors: number
+  collections: Record<string, { found: number; populated: number; errors: number }>
+}
+
+export async function populateURIIndex(): Promise<PopulationStats> {
+  const stats: PopulationStats = {
+    totalFound: 0,
+    populated: 0,
+    skipped: 0,
+    errors: 0,
+    collections: {},
+  }
+
+  try {
+    const payload = await getPayload({ config: configPromise })
+
+    for (const collection of frontendCollections) {
+      stats.collections[collection.slug] = { found: 0, populated: 0, errors: 0 }
+
+      try {
+        let whereClause: any = {
+          and: [{ slug: { exists: true } }, { slug: { not_equals: "" } }],
+        }
+
+        let hasStatusField = false
+
+        await payload.find({
+          collection: collection.slug as any,
+          where: { _status: { exists: true } },
+          limit: 1,
+        })
+
+        whereClause.and.push({ _status: { equals: "published" } })
+        hasStatusField = true
+
+        const documents = await payload.find({
+          collection: collection.slug as any,
+          where: whereClause,
+          limit: 2000,
+          depth: 1,
+        })
+
+        const collectionFound = documents.docs.length
+        stats.totalFound += collectionFound
+        stats.collections[collection.slug].found = collectionFound
+
+        for (const doc of documents.docs) {
+          try {
+            const existing = await payload.find({
+              collection: "uri-index",
+              where: {
+                and: [
+                  { sourceCollection: { equals: collection.slug } },
+                  { documentId: { equals: doc.id } },
+                ],
+              },
+              limit: 1,
+            })
+
+            if (existing.docs.length > 0) {
+              stats.skipped++
+              continue
+            }
+
+            const generatedURI = await routingEngine.generateURI({
+              collection: collection.slug,
+              slug: doc.slug,
+              data: doc,
+            })
+
+            await payload.create({
+              collection: "uri-index",
+              data: {
+                uri: generatedURI,
+                sourceCollection: collection.slug,
+                documentId: doc.id,
+                document: {
+                  relationTo: collection.slug as any,
+                  value: doc.id,
+                },
+                status: hasStatusField ? "published" : "published",
+              },
+            })
+
+            stats.populated++
+            stats.collections[collection.slug].populated++
+          } catch (docError) {
+            stats.errors++
+            stats.collections[collection.slug].errors++
+          }
+        }
+
+        console.log(
+          `   📈 Collection ${collection.slug}: ${stats.collections[collection.slug].populated}/${collectionFound} indexed`
+        )
+      } catch (collectionError) {
+        console.error(
+          `❌ Failed to process collection ${collection.slug}:`,
+          collectionError
+        )
+        stats.errors++
+      }
+    }
+
+    return stats
+  } catch (error) {
+    console.error("💥 Population failed with critical error:", error)
+    throw error
   }
 }

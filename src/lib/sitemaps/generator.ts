@@ -43,29 +43,6 @@ function getSiteUrl(providedUrl?: string): string {
 }
 
 /*************************************************************************/
-/*  STATIC SITEMAP ENTRIES
-/*************************************************************************/
-
-function getStaticSitemapEntries(siteUrl: string): SitemapEntry[] {
-  const dateFallback = new Date().toISOString()
-
-  return [
-    {
-      loc: `${siteUrl}/search`,
-      lastmod: dateFallback,
-      priority: 0.5,
-      changefreq: "weekly",
-    },
-    {
-      loc: `${siteUrl}/posts`,
-      lastmod: dateFallback,
-      priority: 0.8,
-      changefreq: "daily",
-    },
-  ]
-}
-
-/*************************************************************************/
 /*  COLLECTION DOCUMENT FETCHING - URI INDEX OPTIMIZED
 /*************************************************************************/
 
@@ -154,7 +131,7 @@ async function fetchCollectionDocuments(collection: string): Promise<DocumentFor
 export async function generateSitemap(
   options: GenerateSitemapOptions
 ): Promise<SitemapGenerationResult> {
-  const { sitemapName, includeStatic = false } = options
+  const { sitemapName } = options
   const siteUrl = getSiteUrl(options.siteUrl)
 
   // Get collections that belong to this sitemap
@@ -162,12 +139,6 @@ export async function generateSitemap(
   const allEntries: SitemapEntry[] = []
   let totalCount = 0
   let filteredCount = 0
-
-  // Add static entries for pages-sitemap
-  if (includeStatic && sitemapName === "pages-sitemap.xml") {
-    const staticEntries = getStaticSitemapEntries(siteUrl)
-    allEntries.push(...staticEntries)
-  }
 
   // O(1) URI index approach: Single query for all collections
   const allDocuments = await fetchAllDocumentsViaIndex(collections)
@@ -223,7 +194,6 @@ export async function generateAllSitemaps(
         const result = await generateSitemap({
           sitemapName,
           siteUrl,
-          includeStatic: sitemapName === "pages-sitemap.xml",
         })
         results[sitemapName] = result
       } catch (error) {

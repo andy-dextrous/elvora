@@ -59,8 +59,6 @@ export const RenderSections: React.FC<{
 
   const hasSections = sections && Array.isArray(sections) && sections.length > 0
 
-  // console.log("sections", sections)
-
   if (hasSections) {
     return (
       <Fragment>

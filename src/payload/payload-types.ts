@@ -1728,6 +1728,10 @@ export interface UriIndex {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Whether this URI is the homepage. Only one homepage is allowed.
+   */
+  isHomepage?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2717,6 +2721,7 @@ export interface UriIndexSelect<T extends boolean = true> {
         uri?: T;
         id?: T;
       };
+  isHomepage?: T;
   updatedAt?: T;
   createdAt?: T;
 }

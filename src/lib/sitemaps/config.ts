@@ -50,20 +50,6 @@ export const SITEMAP_CONFIG: SitemapConfig = {
     changeFreq: "monthly",
     includeInIndex: true,
   },
-  team: {
-    sitemap: "", // Team members don't appear in sitemaps
-    respectSEO: false,
-    priority: 0.3,
-    changeFreq: "yearly",
-    includeInIndex: false,
-  },
-  testimonials: {
-    sitemap: "", // Testimonials don't appear in sitemaps
-    respectSEO: false,
-    priority: 0.3,
-    changeFreq: "yearly",
-    includeInIndex: false,
-  },
 }
 
 /*************************************************************************/

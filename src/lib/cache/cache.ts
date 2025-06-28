@@ -356,10 +356,10 @@ function logCacheEvent(event: CacheEvent) {
     Single interface for all content retrieval with intelligent caching and revalidation.
 
     Primary Methods:
-    - cache.getByURI("/about")           → Universal routing (powers [[...slug]]/page.tsx)
-    - cache.getBySlug("pages", "about")  → Individual documents
-    - cache.getCollection("posts", {...}) → Filtered collections
-    - cache.getGlobal("header")          → Site-wide content
+    - cache.getByURI("/about/team/andrew")           → Universal routing (powers [[...slug]]/page.tsx)
+    - cache.getBySlug("team", "andrew")  → Individual documents
+    - cache.getCollection("team", {...}) → Filtered collections
+    - cache.getGlobal("settings")          → Site-wide content
 
     Each method wraps Next.js unstable_cache() with standardized keys, tags,
     and dependency-based invalidation configured in cache-config.ts.
@@ -608,38 +608,45 @@ export const cache = {
       { tags }
     )()
   },
-}
 
-/*************************************************************************/
-/*  CACHE UTILITIES
-/*************************************************************************/
+  /**
+   * Get all URIs for static generation (specialized URI index query)
+   */
+  getAllURIs: async (draft: boolean = false): Promise<string[]> => {
+    const cacheKey = generateCacheKey({
+      collection: "uri-index",
+      type: "all-uris",
+      params: [draft ? "draft" : "published"],
+    })
+    const tags = generateCacheTags({ collection: "uri-index" }, true)
 
-/**
- * Generate standardized cache key for any cache operation
- */
-export function createCacheKey(options: CacheKeyOptions): string[] {
-  return generateCacheKey(options)
-}
+    const timestamp = new Date().toISOString()
+    logCacheEvent({
+      operation: `getAllURIs(${draft})`,
+      cacheKey,
+      tags,
+      timestamp,
+    })
 
-/**
- * Generate standardized cache tags for any cache operation
- */
-export function createCacheTags(
-  options: CacheKeyOptions,
-  includeDependencies: boolean = false
-): string[] {
-  return generateCacheTags(options, includeDependencies)
-}
+    return unstable_cache(
+      async () => {
+        const payload = await getPayload({ config: configPromise })
 
-/**
- * Enable cache debugging by setting CACHE_DEBUG=true in environment
- */
-export async function enableCacheDebug() {
-  process.env.CACHE_DEBUG = "true"
-  try {
-    const payload = await getPayload({ config: configPromise })
-    payload.logger.info("🗄️ Cache debugging enabled")
-  } catch (error) {
-    // payload.logger.info("🗄️  Cache debugging enabled")
-  }
+        const result = await payload.find({
+          collection: "uri-index",
+          where: {
+            status: { equals: draft ? "draft" : "published" },
+          },
+          limit: 2000,
+          depth: 0,
+          select: { uri: true },
+        })
+
+        const uris = result.docs.map((doc: any) => doc.uri).filter(Boolean)
+        return [...new Set(uris)]
+      },
+      cacheKey,
+      { tags }
+    )()
+  },
 }

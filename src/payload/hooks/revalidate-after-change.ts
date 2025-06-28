@@ -39,7 +39,7 @@ export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
 
   if (isPublishing || isPublishedSlugChange) {
     try {
-      const newURI = await routingEngine.generate({
+      const newURI = await routingEngine.generateURI({
         collection: collection.slug,
         slug: data.slug,
         data,

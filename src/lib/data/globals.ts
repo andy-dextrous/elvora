@@ -16,6 +16,24 @@ export const getSettings = () => cache.getGlobal("settings", 4)
 export const getGlobal = (slug: Global, depth = 0) => cache.getGlobal(slug, depth)
 
 /*******************************************************/
+/* Get Header
+/*******************************************************/
+
+export const getHeader = async () => {
+  const settings = await cache.getGlobal("settings", 5)
+  return settings.header
+}
+
+/*******************************************************/
+/* Get Footer
+/*******************************************************/
+
+export const getFooter = async () => {
+  const settings = await cache.getGlobal("settings", 5)
+  return settings.footer
+}
+
+/*******************************************************/
 /* Get Homepage From Settings - MIGRATED TO UNIVERSAL CACHE
 /*******************************************************/
 
@@ -24,11 +42,11 @@ export const getHomepage = async () => {
     const settings = await cache.getGlobal("settings", 5)
     const homepage = settings.routing?.homepage
 
-    if (homepage?.id) {
-      return cache.getBySlug("pages", homepage.slug || homepage.id)
+    if (homepage?.slug) {
+      return cache.getBySlug("pages", homepage.slug)
     }
   } catch (error) {
-    // Settings not found, using fallback homepage detection
+    console.error(error)
   }
 
   return null

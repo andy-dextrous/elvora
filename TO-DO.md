@@ -31,3 +31,7 @@
 - Analytics (site learns bout your content performance)
 - The more the user interacts, the better it gets: Learns preferred tone/voice from editing patterns Learns what posts tend to perform best, Tracks conversion sources and builds attribution, Remembers what agents are useful vs not
 - Add new sections/code from the front end!
+
+## Current
+
+- Add isHomepage to uri-index

@@ -1,8 +1,10 @@
 # Smart Routing Engine - URI Index Collection Architecture
 
+![Smart Routing Engine Architecture](./routing.svg)
+
 ## 🎯 **System Overview**
 
-The Smart Routing Engine is a revolutionary, enterprise-grade system that provides **O(1) URI resolution** through a centralized URI Index Collection. This system transforms traditional collection-loop routing into a high-performance, scalable architecture that delivers WordPress-like content management with Next.js performance.
+The Smart Routing Engine is a high-performance routing system that provides **O(1) URI resolution** through a centralized URI Index Collection. This system replaces traditional collection-loop routing with a scalable architecture that delivers enterprise-grade performance for Next.js applications powered by Payload CMS.
 
 ## 🚀 **Core Innovation: URI Index Collection**
 
@@ -28,336 +30,271 @@ const result = await payload.find({
 // One query, instant resolution
 ```
 
-## 📊 **System Architecture Diagrams**
-
-### **URI Index Collection Data Flow**
-
-![Smart Routing Engine Architecture](./routing.svg)
-
-## 🏗️ **Core System Architecture**
+## 📊 **System Architecture**
 
 ### **1. 🎯 URI Index Collection** `src/payload/collections/uri-index.ts`
 
-The central nervous system that provides O(1) URI resolution for the entire application.
+The central database table that provides O(1) URI resolution for the entire application.
 
 #### **Index Structure**
 
-- **URI Field**: Primary indexed field for instant lookups
-- **Document Relationship**: Direct connection to source documents
-- **Collection Metadata**: Source collection tracking
+- **URI Field**: Primary indexed field for instant lookups (`/about`, `/blog/my-post`)
+- **Document Relationship**: Direct connection to source documents via polymorphic relationship
+- **Collection Metadata**: Source collection tracking (`pages`, `posts`, `services`, etc.)
 - **Status Management**: Published/draft state handling
-- **Redirect History**: Automatic SEO redirect generation
-- **Performance Flags**: Sitemap and search optimization
+- **Previous URIs**: Automatic redirect history tracking (last 10 URIs)
+- **Performance Indexes**: Optimized for fast URI and document ID lookups
 
-#### **Key Operations**:
+#### **Key Features**:
 
-- **Instant URI Resolution**: O(1) lookup performance
-- **Conflict Prevention**: Unique URI constraint enforcement
-- **Automatic Updates**: Real-time index maintenance
-- **Batch Operations**: Efficient bulk updates
-- **Cascade Management**: Dependency-based updates
-
----
-
-### **2. 🔄 Cascading Update System** `src/lib/routing/cascade-manager.ts`
-
-Intelligent dependency management that automatically updates related URIs when changes occur.
-
-#### **Cascade Triggers**
-
-- **Parent Page Changes**: Automatically updates all descendant page URIs
-- **Archive Page Updates**: Updates all collection items using the archive
-- **Settings Changes**: Handles routing configuration changes
-- **Collection Modifications**: Maintains URI consistency across collections
-
-#### **Key Operations**:
-
-- **Dependency Analysis**: Identifies affected documents
-- **Batch Updates**: Efficient bulk URI modifications
-- **Automatic Redirects**: SEO-safe redirect creation
-- **Progress Tracking**: Monitor large cascade operations
-- **Rollback Support**: Undo failed operations
+- **Instant URI Resolution**: Single database query for any URI
+- **Conflict Prevention**: Unique URI constraint with first-match-wins priority
+- **Automatic Maintenance**: Real-time updates via Payload hooks
+- **Redirect History**: SEO-safe redirect chains
+- **Draft Support**: Separate indexing for preview mode
 
 ---
 
-### **3. 🗄️ Universal Cache System** `src/lib/cache/cache.ts`
+### **2. 🔄 URI Engine** `src/lib/routing/uri-engine.ts`
 
-Enhanced caching system optimized for URI Index Collection architecture.
+Core routing logic that generates URIs based on collection type and hierarchy.
 
-#### **Primary Cache Method: getByURI()**
+#### **URI Generation Logic**
+
+- **Homepage Handling**: Special case for home page (`"home"` slug → `"/"` URI)
+- **Hierarchical Pages**: Parent/child relationships (`/company/about` → `/company/team`)
+- **Archive-based Collections**: Uses designated archive pages (`/blog/my-post`)
+- **Collection Fallbacks**: Default patterns (`/services/web-design`)
+
+#### **Key Operations**:
+
+- **URI Generation**: `routingEngine.generate()` - Creates URIs with hierarchy support
+- **Conflict Detection**: Index-based conflict resolution with priority handling
+- **Settings Integration**: Archive page configuration from global settings
+- **Validation**: URI format validation and normalization
+
+---
+
+### **3. 🗄️ Universal Cache System** `src/lib/cache/`
+
+High-performance caching system optimized for URI Index Collection architecture.
+
+#### **Primary Cache Methods**
 
 ```typescript
-// Single-query resolution with relationship population
+// URI-based resolution (primary routing method)
 const document = await cache.getByURI("/about/team")
-// Returns: { document, collection } or null
+
+// Collection and slug-based access
+const page = await cache.getBySlug("pages", "about")
+
+// Collection queries with filtering
+const posts = await cache.getCollection("posts", { limit: 10 })
+
+// Global singleton access
+const settings = await cache.getGlobal("settings")
 ```
 
-#### **D1: URI-Based Resolution**
+#### **Cache Architecture**:
 
-- **Function**: `cache.getByURI()`
-- **Performance**: O(1) lookup via URI index
-- **Key Operations**:
-  - Single database query
-  - Automatic document population
-  - Intelligent cache tagging
-  - Draft/published state handling
-
-#### **D2: Collection Operations**
-
-- **Function**: `cache.getCollection()`
-- **Purpose**: Bulk collection access with URI optimization
-- **Key Operations**:
-  - Filtered collection retrieval
-  - URI-aware pagination
-  - Performance optimization
-
-#### **D3: Index-Aware Caching**
-
-- **Function**: `generateCacheKey()` / `generateCacheTags()`
-- **Purpose**: URI index-optimized cache strategies
-- **Key Operations**:
-  - Index-specific cache keys
-  - Cross-collection tag invalidation
-  - Cascade-aware cache management
+- **Configuration-Driven**: Dependencies defined in `cache-config.ts`
+- **Smart Invalidation**: Automatic cascade invalidation based on dependencies
+- **URI-Optimized**: Direct integration with URI index for fastest resolution
+- **Debug Support**: Comprehensive logging for cache hits/misses
 
 ---
 
-### **4. 🛣️ Enhanced Routing Engine** `src/lib/routing/uri-engine.ts`
+### **4. 🗂️ Index Manager** `src/lib/routing/index-manager.ts`
 
-Routing engine enhanced for URI Index Collection integration.
+Real-time maintenance functions for the URI index collection.
 
-#### **C1: URI Generation & Index Management**
+#### **Core Functions**
 
-- **Function**: `routingEngine.generate()`
-- **Purpose**: Creates URIs and maintains index consistency
-- **Key Operations**:
-  - URI generation with conflict detection
-  - Automatic index population
-  - Cascade trigger detection
-  - Redirect planning
+- **`updateURIIndex()`**: Updates or creates index entries from document hooks
+- **`deleteFromURIIndex()`**: Cleanup when documents are deleted
+- **`checkURIConflict()`**: O(1) conflict detection using the index
+- **`populateURIIndex()`**: Bulk population for migrations and setup
 
-#### **C2: Static Generation Optimization**
+#### **Integration Points**:
 
-- **Function**: `routingEngine.getAllURIs()`
-- **Purpose**: Efficient static generation via index scan
-- **Key Operations**:
-  - Single query URI collection
-  - Draft/published filtering
-  - Performance optimization
-
-#### **C3: Conflict Resolution**
-
-- **Function**: `routingEngine.checkConflicts()`
-- **Purpose**: Index-based conflict detection
-- **Key Operations**:
-  - Instant conflict identification
-  - Priority-based resolution
-  - Conflict logging and reporting
+- **Payload Hooks**: Automatic updates on document save/delete
+- **Conflict Resolution**: Priority-based resolution using collection order
+- **Error Handling**: Graceful failure without breaking content saves
+- **Batch Operations**: Efficient bulk updates for large datasets
 
 ---
 
-### **5. 🔗 Smart Revalidation Integration** `src/payload/hooks/revalidation.ts`
+### **5. 🔗 Smart Revalidation** `src/payload/hooks/revalidation.ts`
 
-Enhanced hooks system with URI Index Collection and cascading support.
+Universal hooks system that maintains URI index and handles cache invalidation.
 
-#### **B1: beforeCollectionChange Enhancement**
+#### **Hook Functions**
 
-- **Function**: `beforeCollectionChange()`
-- **Purpose**: URI generation with cascade detection
-- **Key Operations**:
-  - URI generation and validation
-  - Cascade operation scheduling
-  - Index preparation
-  - Conflict prevention
+- **`beforeCollectionChange`**: URI generation on publish/slug changes
+- **`afterCollectionChange`**: Index updates and cache invalidation
+- **`afterCollectionDelete`**: Index cleanup and dependency revalidation
 
-#### **B2: afterCollectionChange Enhancement**
+#### **Integration Features**:
 
-- **Function**: `afterCollectionChange()`
-- **Purpose**: Index updates and cascade execution
-- **Key Operations**:
-  - URI index maintenance
-  - Cascade operation execution
-  - Cache invalidation
-  - Performance monitoring
-
-#### **B3: Cascade Integration**
-
-- **Function**: Integration with `cascade-manager.ts`
-- **Purpose**: Handles complex dependency updates
-- **Key Operations**:
-  - Dependency analysis
-  - Batch update coordination
-  - Automatic redirect creation
-  - Progress tracking
+- **URI Index Maintenance**: Real-time updates to the index
+- **Status Tracking**: Handles published/draft transitions
+- **Previous URI Tracking**: Maintains redirect history
+- **Cache Coordination**: Smart invalidation of dependent caches
 
 ---
 
-### **6. 🗺️ Optimized Sitemap System** `src/lib/sitemaps/generator.ts`
+### **6. 🗺️ Optimized Sitemap System** `src/lib/sitemaps/`
 
 Sitemap generation optimized for URI Index Collection architecture.
 
-#### **H1: Index-Based Generation**
-
-- **Function**: `generateSitemap()`
-- **Purpose**: Efficient sitemap creation via URI index
-- **Key Operations**:
-  - Single-query document collection
-  - URI index optimization flags
-  - Performance-optimized filtering
-  - Automatic priority calculation
-
-#### **H2: Performance Enhancement**
-
-- **Performance Improvement**: 10-100x faster sitemap generation
-- **Memory Efficiency**: Reduced memory usage through index scanning
-- **SEO Optimization**: Enhanced with URI index metadata
-
----
-
-### **7. ⚡ Next.js Integration Layer** `src/lib/cache/`
-
-Enhanced Next.js integration optimized for URI Index Collection.
-
-#### **G1: Optimized Cache Storage**
-
-- **Function**: Enhanced `unstable_cache()` wrapper
-- **Purpose**: URI index-optimized caching strategies
-- **Key Operations**:
-  - Index-aware cache keys
-  - Cross-collection tag management
-  - Performance monitoring
-
-#### **G2: Intelligent Revalidation**
-
-- **Function**: Enhanced `revalidateTag()` orchestration
-- **Purpose**: Cascade-aware cache invalidation
-- **Key Operations**:
-  - Batch tag invalidation
-  - Cascade-triggered revalidation
-  - Performance optimization
-
----
-
-## ⚡ **Revolutionary Performance Improvements**
-
-### **URI Resolution Performance**
-
-| Operation              | Before (Collection Loop)    | After (URI Index)   | Improvement             |
-| ---------------------- | --------------------------- | ------------------- | ----------------------- |
-| **URI Lookup**         | O(n) collections            | O(1) index lookup   | **10-100x faster**      |
-| **Database Queries**   | 3-8 per request             | 1-2 per request     | **3-4x reduction**      |
-| **Cache Efficiency**   | Fragmented by collection    | Unified index-based | **Improved hit rates**  |
-| **Conflict Detection** | Real-time collection loops  | Index-based instant | **Near-instant**        |
-| **Static Generation**  | Multiple collection queries | Single index scan   | **Dramatic speedup**    |
-| **Sitemap Generation** | Collection iteration        | Index optimization  | **10-100x improvement** |
-
-### **Scalability Characteristics**
-
-- **Content Volume**: Linear O(1) performance regardless of collection count
-- **Memory Usage**: Reduced through index-based architecture
-- **Database Load**: Minimized through single-query resolution
-- **Cache Efficiency**: Improved through unified indexing strategy
-
----
-
-## 🔄 **Cascading Update System**
-
-### **Intelligent Dependency Management**
-
-#### **Hierarchical Page Updates**
+#### **Index-Based Generation**
 
 ```typescript
-// Parent page URI change cascades to all descendants
-/company → /about-us
-├── /company/team → /about-us/team
-├── /company/services → /about-us/services
-└── /company/services/web-design → /about-us/services/web-design
+// Single query to get all published URIs
+const uriDocs = await payload.find({
+  collection: "uri-index",
+  where: { status: { equals: "published" } },
+  limit: 10000,
+})
 ```
 
-#### **Archive Page Updates**
+#### **Performance Benefits**:
+
+- **Single Database Query**: All URIs retrieved in one operation
+- **Cache Integration**: Uses universal cache for document details
+- **SEO Optimization**: Automatic filtering and validation
+- **Fallback Support**: Graceful degradation to collection-based method
+
+---
+
+## 🚀 **Quick Start Guide**
+
+### **1. Using the Routing Engine**
 
 ```typescript
-// Archive page change affects all collection items
-Settings: postsArchivePage = "blog" → "articles"
-├── /blog/my-post → /articles/my-post
-├── /blog/news → /articles/news
-└── /blog/updates → /articles/updates
+import { routingEngine } from "@/lib/routing"
+
+// Generate URI for a document
+const uri = await routingEngine.generate({
+  collection: "pages",
+  slug: "about-us",
+  data: { parent: parentPageId }, // Optional for hierarchical
+})
+
+// Get all URIs for static generation
+const allURIs = await routingEngine.getAllURIs()
+
+// Check for conflicts
+const conflict = await routingEngine.checkConflicts("/about-us")
 ```
 
-#### **Automatic Redirect Generation**
+### **2. Using the Universal Cache**
 
-- **SEO-Safe Transitions**: 301 redirects for all URI changes
-- **Batch Operations**: Efficient bulk redirect creation
-- **Conflict Resolution**: Intelligent redirect chain management
+```typescript
+import { cache } from "@/lib/cache"
 
----
+// Primary routing method - resolve URI to document
+const document = await cache.getByURI("/about/team")
 
-## 🎯 **Key Architectural Benefits**
+// Collection access
+const page = await cache.getBySlug("pages", "about")
+const posts = await cache.getCollection("posts", { limit: 10 })
 
-### **🚀 Performance Revolution**
+// Global access
+const settings = await cache.getGlobal("settings")
+```
 
-- **O(1) URI Resolution**: Instant document lookup regardless of scale
-- **Database Efficiency**: Single-query architecture eliminates N+1 problems
-- **Cache Optimization**: Unified caching strategy with intelligent invalidation
-- **Memory Efficiency**: Reduced resource usage through index-based design
+### **3. URI Index Management**
 
-### **🔧 Enterprise Scalability**
+```typescript
+import { updateURIIndex, populateURIIndex } from "@/lib/routing"
 
-- **Horizontal Scaling**: Stateless design supports unlimited load balancing
-- **Content Growth**: Performance doesn't degrade with more collections or documents
-- **Feature Extensibility**: Modular architecture for easy expansion
-- **Operational Excellence**: Comprehensive monitoring and debugging tools
+// Update single entry (used by hooks)
+await updateURIIndex({
+  uri: "/about/team",
+  collection: "pages",
+  documentId: "doc123",
+  status: "published",
+  previousURI: "/about/staff", // Optional
+})
 
-### **🛣️ Advanced Content Management**
+// Bulk populate (for migrations)
+const stats = await populateURIIndex()
+```
 
-- **WordPress-like Experience**: Intuitive URI management with enterprise performance
-- **Automatic Conflict Resolution**: Intelligent handling of URI collisions
-- **SEO Optimization**: Automatic redirect generation and sitemap optimization
-- **Draft/Published Workflow**: Seamless content state management
+## 🏗️ **Implementation Status**
 
-### **📊 Developer Experience**
+### **✅ Implemented & Working**
 
-- **Unified API**: Single interface for all content resolution
-- **TypeScript Integration**: Full type safety across all operations
-- **Debug Capabilities**: Comprehensive logging and performance monitoring
-- **Configuration-Driven**: Zero hardcoding, entirely driven by configuration
+- URI Index Collection with full schema
+- URI Engine with hierarchical support
+- Universal Cache System with dependency management
+- Index Manager with real-time updates
+- Universal Payload hooks for automatic maintenance
+- Sitemap integration with index-based generation
+- API endpoints for index management
 
----
+### **📝 Configuration Required**
 
-## 🏁 **Production Characteristics**
+- Archive page settings in global settings
+- Collection order for conflict priority
+- Cache TTL and dependency configuration
 
-### **Performance Metrics**
+### **🔧 Manual Tasks**
 
-- **Cache Hit Rate**: >98% with URI index optimization
-- **Average Response Time**: <20ms for indexed URI resolution
-- **Invalidation Efficiency**: Surgical cache invalidation with cascade support
-- **Memory Usage**: 60% reduction through index-based architecture
-- **SEO Performance**: Enhanced with automatic redirect and sitemap optimization
+- Run `GET /api/populate-uri-index` to populate existing content
+- Configure archive pages in admin settings
+- Set up collection hierarchy in frontend collections config
 
-### **Reliability Features**
+## 🔍 **Debugging & Monitoring**
 
-- **Cascade Safety**: Rollback support for failed operations
-- **Conflict Prevention**: Unique URI constraint enforcement
-- **Error Handling**: Graceful degradation with comprehensive logging
-- **Monitoring**: Real-time performance and health monitoring
+### **API Endpoints**
 
-### **Scalability Proven**
+- `GET /api/populate-uri-index` - Bulk populate the URI index
+- `DELETE /api/clear-uri-index` - Clear all index entries (dev only)
 
-- **Document Capacity**: Tested with 100,000+ documents
-- **Collection Support**: Unlimited collections with consistent performance
-- **Query Efficiency**: Single-query resolution regardless of content volume
-- **Future-Proof**: Architecture designed for unlimited growth
+### **Cache Debug**
 
----
+```typescript
+import { enableCacheDebug } from "@/lib/cache"
 
-## 🌟 **Conclusion**
+// Enable detailed cache logging
+await enableCacheDebug()
+```
 
-The Smart Routing Engine with URI Index Collection represents a paradigm shift in content management architecture. By eliminating the traditional collection-loop bottleneck and implementing O(1) URI resolution, this system delivers:
+### **URI Index Inspection**
 
-- **Massive Performance Gains**: 10-100x improvement in URI resolution
-- **Enterprise Scalability**: Performance that doesn't degrade with growth
-- **Advanced Content Management**: WordPress-like experience with modern performance
-- **Developer Excellence**: Unified API with comprehensive tooling
-- **SEO Optimization**: Automatic redirects and optimized sitemap generation
+Access the URI Index collection in Payload admin to:
 
-This architecture transforms content management from a performance constraint into a competitive advantage, enabling large-scale content sites with enterprise-grade performance and reliability.
+- Monitor URI assignments
+- Check conflict resolution
+- Review redirect history
+- Debug index population
+
+## 📁 **File Structure**
+
+```
+src/lib/
+├── README.md              # This documentation
+├── routing/               # Smart routing engine
+│   ├── index.ts          # Clean exports
+│   ├── uri-engine.ts     # Core URI generation
+│   ├── index-manager.ts  # URI index maintenance
+│   └── README.md         # Routing-specific docs
+├── cache/                # Universal cache system
+│   ├── index.ts          # Clean exports
+│   ├── cache.ts          # Universal cache API
+│   ├── cache-config.ts   # Configuration & dependencies
+│   ├── revalidation.ts   # Smart revalidation
+│   └── README.md         # Cache-specific docs
+├── sitemaps/             # Sitemap generation
+│   ├── index.ts          # Clean exports
+│   ├── generator.ts      # URI index optimized generation
+│   └── README.md         # Sitemap-specific docs
+└── data/                 # Data layer abstractions
+    ├── posts.ts          # Post-specific queries
+    ├── globals.ts        # Global data access
+    └── templates.ts      # Template utilities
+```
+
+This system provides a solid foundation for high-performance, scalable routing that grows with your application while maintaining WordPress-like ease of use.

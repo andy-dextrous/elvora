@@ -1,6 +1,5 @@
 import { cache } from "@/lib/cache"
 import { revalidatePath, revalidateTag } from "next/cache"
-import { createCacheTags } from "./cache"
 import { getInvalidationTargets, getCacheConfig } from "./cache-config"
 import { shouldIncludeInSitemap } from "@/lib/sitemaps/config"
 import { isFrontendCollection } from "@/payload/collections/frontend"

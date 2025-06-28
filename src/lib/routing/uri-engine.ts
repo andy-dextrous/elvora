@@ -1,30 +1,33 @@
-import { frontendCollections } from "@/payload/collections/frontend"
-import configPromise from "@payload-config"
-import { unstable_cache } from "next/cache"
-import { getPayload } from "payload"
-import { checkURIConflict as checkURIConflictWithIndex } from "@/lib/routing/index-manager"
 import { cache } from "@/lib/cache/cache"
+import { checkURIConflict } from "@/lib/routing/index-manager"
+import configPromise from "@payload-config"
+import { getPayload } from "payload"
+import { getHomepage, getSettings } from "../data/globals"
 
 /*************************************************************************/
-/*  CACHED ROUTING SETTINGS
-/*************************************************************************/
+/*  URI ENGINE
 
-const getRoutingSettings = () =>
-  unstable_cache(
-    async () => {
-      const payload = await getPayload({ config: configPromise })
-      const settings = await payload.findGlobal({
-        slug: "settings",
-        depth: 1,
-      })
-      return settings?.routing || {}
-    },
-    ["global", "settings", "routing"],
-    { tags: ["global:settings", "uri-index:dependent"], revalidate: 3600 }
-  )()
+    The URI Engine is the core component of the Smart Routing Engine that handles
+    intelligent URI generation and validation for all frontend collections.
 
-/*************************************************************************/
-/*  CORE URI GENERATION LOGIC
+    KEY RESPONSIBILITIES:
+    - Generate URIs for pages with hierarchical parent/child relationships
+    - Generate URIs for collection items using archive page settings
+    - Validate URI format and detect conflicts using the URI Index
+    - Integrate with the unified cache system for optimal performance
+    - Support WordPress-like routing with first-match-wins conflict resolution
+
+    URI GENERATION RULES:
+    - Homepage: Always "/" (determined by settings.routing.homepage)
+    - Pages: Hierarchical paths based on parent relationships (/parent/child)
+    - Collection Items: Use archive page slug or collection name (/blog/post-slug)
+    - All URIs validated and checked for conflicts via URI Index Collection
+
+    ARCHITECTURE INTEGRATION:
+    - Uses unified cache API (cache.getGlobal, cache.getByID) for all database access
+    - Integrates with URI Index Collection for O(1) conflict detection
+    - Supports smart revalidation through configuration-driven cache dependencies
+
 /*************************************************************************/
 
 interface GenerateURIProps {
@@ -36,7 +39,7 @@ interface GenerateURIProps {
   payload: any
 }
 
-async function generateURI({
+async function generateDocumentURI({
   collection,
   slug,
   data,
@@ -44,9 +47,8 @@ async function generateURI({
   settings,
   payload,
 }: GenerateURIProps): Promise<string> {
-  if (collection === "pages" && slug === "home") {
-    return ""
-  }
+  // In the Smart Site, Pages are a special collection. They are equivalent to "pages" in WordPress
+  // All other frontend collections are treated as "custom post types" in WordPress
 
   if (collection === "pages") {
     return await generatePageURI({ slug, data, originalDoc, payload })
@@ -77,20 +79,29 @@ async function generatePageURI({
 }): Promise<string> {
   const parent = data?.parent || originalDoc?.parent
 
+  const homePage = await getHomepage()
+
+  // Homepage must be the root of the site
+
+  if (slug === homePage?.slug) {
+    return "/"
+  }
+
+  // For a normal page with no parent, URI is just the slug with a leading slash
+
   if (!parent) {
     return `/${slug}`
   }
 
+  // For a normal page with a parent, URI is the parent URI plus the slug with a leading slash
+
   try {
-    // Get parent document
-    const parentDoc = await payload.findByID({
-      collection: "pages",
-      id: typeof parent === "object" ? parent.id : parent,
-      depth: 0,
-    })
+    const parentDoc = await cache.getByID(
+      "pages",
+      typeof parent === "object" ? parent.id : parent
+    )
 
     if (!parentDoc?.uri) {
-      // If parent doesn't have URI yet, generate it recursively
       const parentURI = await generatePageURI({
         slug: parentDoc.slug,
         data: parentDoc,
@@ -108,6 +119,11 @@ async function generatePageURI({
 
 /*************************************************************************/
 /*  COLLECTION ITEM URI GENERATION
+
+  - This is used for all collections that are not pages
+  - Uses a priority system to determine the URI
+  - Priority 1: Archive page slug (if collection has designated archive pag in settingse)
+  - Priority 2: Original collection slug (fallback)
 /*************************************************************************/
 
 async function generateCollectionItemURI({
@@ -121,23 +137,15 @@ async function generateCollectionItemURI({
   settings: any
   payload: any
 }): Promise<string> {
-  // Use the actual settings field names: postsArchivePage, servicesArchivePage, etc.
   const archivePageField = `${collection}ArchivePage`
 
   // Priority 1: Archive page slug (if collection has designated archive page)
   if (settings[archivePageField]) {
     try {
-      const archivePage = await payload.findByID({
-        collection: "pages",
-        id:
-          typeof settings[archivePageField] === "object"
-            ? settings[archivePageField].id
-            : settings[archivePageField],
-        depth: 0,
-      })
+      const archivePage = await cache.getByID("pages", settings[archivePageField])
 
-      if (archivePage?.slug) {
-        return `/${archivePage.slug}/${slug}`
+      if (archivePage?.uri) {
+        return `${archivePage.uri}/${slug}`
       }
     } catch (error) {
       payload.logger.warn(`Failed to fetch archive page for ${collection}:`, error)
@@ -145,20 +153,6 @@ async function generateCollectionItemURI({
   }
 
   // Priority 2: Original collection slug (fallback)
-  return `/${collection}/${slug}`
-}
-
-/*************************************************************************/
-/*  FALLBACK URI GENERATION
-/*************************************************************************/
-
-function generateFallbackURI(collection: string, slug: string, data?: any): string {
-  // Simple fallback logic
-  if (collection === "pages") {
-    if (slug === "home") return ""
-    return `/${slug}`
-  }
-
   return `/${collection}/${slug}`
 }
 
@@ -173,7 +167,7 @@ export interface URIConflictResult {
   title?: string
 }
 
-async function checkURIConflict({
+async function checkConflict({
   uri,
   collection,
   documentId,
@@ -186,14 +180,12 @@ async function checkURIConflict({
 }): Promise<URIConflictResult | null> {
   if (!uri || uri === "") return null
 
-  // Use URI index for O(1) conflict detection
-  const indexResult = await checkURIConflictWithIndex(uri, collection, documentId)
+  const indexResult = await checkURIConflict(uri, collection, documentId)
 
   if (!indexResult || !indexResult.hasConflict) {
     return null
   }
 
-  // Get the actual document details via the unified cache system
   if (indexResult.conflictingCollection) {
     try {
       const conflictDoc = await cache.getByURI(uri)
@@ -216,31 +208,35 @@ async function checkURIConflict({
 
 /*************************************************************************/
 /*  URI VALIDATION UTILITIES
+
+    - Global URI Rules:
+      - Must start with /
+      - No double slashes
+      - No trailing slash except for root
+      - No spaces or special characters (basic validation)
+
 /*************************************************************************/
 
 export function validateURI(uri: string): { isValid: boolean; errors: string[] } {
   const errors: string[] = []
 
   if (!uri) {
-    return { isValid: true, errors: [] } // Empty URI is valid for homepage
+    errors.push("URI cannot be empty - use '/' for homepage")
+    return { isValid: false, errors }
   }
 
-  // Must start with / unless it's empty (homepage)
   if (!uri.startsWith("/")) {
     errors.push("URI must start with /")
   }
 
-  // No double slashes
   if (uri.includes("//")) {
     errors.push("URI cannot contain double slashes")
   }
 
-  // No trailing slash except for root
   if (uri.length > 1 && uri.endsWith("/")) {
     errors.push("URI cannot end with /")
   }
 
-  // No spaces or special characters (basic validation)
   if (!/^[a-zA-Z0-9\/-]*$/.test(uri)) {
     errors.push("URI can only contain letters, numbers, hyphens, and forward slashes")
   }
@@ -259,9 +255,9 @@ export const routingEngine = {
   /**
    * Generate URI for document (used in Payload hooks)
    */
-  generate: async ({
-    collection,
-    slug,
+  generateURI: async ({
+    collection, // Collection slug
+    slug, // Document slug
     data,
     originalDoc,
   }: {
@@ -271,20 +267,20 @@ export const routingEngine = {
     originalDoc?: any
   }): Promise<string> => {
     const payload = await getPayload({ config: configPromise })
-    const settings = await getRoutingSettings()
+    const settings = await getSettings()
+    const routingSettings = settings.routing || {}
 
-    const generatedURI = await generateURI({
+    const generatedURI = await generateDocumentURI({
       collection,
       slug,
       data,
       originalDoc,
-      settings,
+      settings: routingSettings,
       payload,
     })
 
-    // Check for URI conflicts
     const currentDocId = data?.id || originalDoc?.id
-    const conflict = await checkURIConflict({
+    const conflict = await checkConflict({
       uri: generatedURI,
       collection,
       documentId: currentDocId,
@@ -295,43 +291,11 @@ export const routingEngine = {
       payload.logger.warn(
         `⚠️  URI Conflict Detected: ${generatedURI}\n` +
           `   Current: ${collection}/${slug}\n` +
-          `   Conflicts with: ${conflict.collection}/${conflict.slug}\n` +
-          `   Using first-match-wins priority`
+          `   Conflicts with: ${conflict.collection}/${conflict.slug}\n`
       )
     }
 
     return generatedURI
-  },
-
-  /**
-   * Get all URIs for static generation (O(1) via URI index)
-   */
-  getAllURIs: async (draft: boolean = false): Promise<string[]> => {
-    const cacheKey = ["all-uris", draft ? "draft" : "published"]
-    const tags = ["routes", "uri-index:all"]
-
-    return unstable_cache(
-      async () => {
-        const payload = await getPayload({ config: configPromise })
-
-        // Single query to URI index instead of looping collections
-        const result = await payload.find({
-          collection: "uri-index",
-          where: {
-            status: { equals: draft ? "draft" : "published" },
-          },
-          limit: 2000, // Increased limit for larger sites
-          depth: 0,
-          select: { uri: true },
-        })
-
-        const uris = result.docs.map((doc: any) => doc.uri).filter(Boolean) // Remove any null/undefined URIs
-
-        return [...new Set(uris)] // Remove duplicates
-      },
-      cacheKey,
-      { tags }
-    )()
   },
 
   /**
@@ -342,7 +306,8 @@ export const routingEngine = {
     excludeDocId?: string
   ): Promise<URIConflictResult | null> => {
     const payload = await getPayload({ config: configPromise })
-    return await checkURIConflict({
+
+    return await checkConflict({
       uri,
       collection: "",
       documentId: excludeDocId,
@@ -356,7 +321,7 @@ export const routingEngine = {
   validate: validateURI,
 
   /**
-   * Convert Next.js slug array to URI (standardizes slug-to-URI conversion)
+   * Convert Next.js slug array to URI
    */
   slugToURI: (slugArray: string[]): string => {
     if (!slugArray || slugArray.length === 0) {
@@ -367,7 +332,7 @@ export const routingEngine = {
   },
 
   /**
-   * Convert URI to Next.js slug array (for generateStaticParams)
+   * Convert URI to Next.js slug array
    */
   uriToSlug: (uri: string): string[] => {
     if (!uri || uri === "/" || uri === "") {
