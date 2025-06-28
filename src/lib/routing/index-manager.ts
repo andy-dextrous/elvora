@@ -204,7 +204,7 @@ export interface PopulationStats {
   collections: Record<string, { found: number; populated: number; errors: number }>
 }
 
-export async function populateURIIndex(): Promise<PopulationStats> {
+export async function regenerateURIs(): Promise<PopulationStats> {
   const stats: PopulationStats = {
     totalFound: 0,
     populated: 0,
@@ -216,24 +216,42 @@ export async function populateURIIndex(): Promise<PopulationStats> {
   try {
     const payload = await getPayload({ config: configPromise })
 
+    // Clear existing URI index entries first (reset functionality)
+    console.log("🗑️ Clearing existing URI index entries...")
+    const existingEntries = await payload.find({
+      collection: "uri-index",
+      limit: 5000,
+    })
+
+    for (const entry of existingEntries.docs) {
+      await payload.delete({
+        collection: "uri-index",
+        id: entry.id,
+      })
+    }
+
+    console.log(`   ✅ Cleared ${existingEntries.docs.length} existing entries`)
+
     for (const collection of frontendCollections) {
       stats.collections[collection.slug] = { found: 0, populated: 0, errors: 0 }
 
       try {
-        let whereClause: any = {
+        const whereClause: any = {
           and: [{ slug: { exists: true } }, { slug: { not_equals: "" } }],
         }
 
+        // Check if collection has _status field for proper status tracking
         let hasStatusField = false
-
-        await payload.find({
-          collection: collection.slug as any,
-          where: { _status: { exists: true } },
-          limit: 1,
-        })
-
-        whereClause.and.push({ _status: { equals: "published" } })
-        hasStatusField = true
+        try {
+          await payload.find({
+            collection: collection.slug as any,
+            where: { _status: { exists: true } },
+            limit: 1,
+          })
+          hasStatusField = true
+        } catch (error) {
+          // Collection doesn't have _status field
+        }
 
         const documents = await payload.find({
           collection: collection.slug as any,
@@ -248,22 +266,6 @@ export async function populateURIIndex(): Promise<PopulationStats> {
 
         for (const doc of documents.docs) {
           try {
-            const existing = await payload.find({
-              collection: "uri-index",
-              where: {
-                and: [
-                  { sourceCollection: { equals: collection.slug } },
-                  { documentId: { equals: doc.id } },
-                ],
-              },
-              limit: 1,
-            })
-
-            if (existing.docs.length > 0) {
-              stats.skipped++
-              continue
-            }
-
             const generatedURI = await routingEngine.generateURI({
               collection: collection.slug,
               slug: doc.slug,
@@ -280,7 +282,7 @@ export async function populateURIIndex(): Promise<PopulationStats> {
                   relationTo: collection.slug as any,
                   value: doc.id,
                 },
-                status: hasStatusField ? "published" : "published",
+                status: hasStatusField ? doc._status || "published" : "published",
               },
             })
 

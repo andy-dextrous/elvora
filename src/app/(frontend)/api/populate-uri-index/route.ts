@@ -1,4 +1,4 @@
-import { populateURIIndex } from "@/lib/routing/index-manager"
+import { regenerateURIs } from "@/lib/routing/index-manager"
 import { getPayload } from "payload"
 import config from "@payload-config"
 import { headers } from "next/headers"
@@ -21,7 +21,7 @@ export const maxDuration = 300 // 5 minutes for large sites
 
 export async function GET(): Promise<Response> {
   try {
-    const stats = await populateURIIndex()
+    const stats = await regenerateURIs()
 
     // Return detailed results
     return Response.json(

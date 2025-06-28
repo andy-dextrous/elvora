@@ -10,7 +10,7 @@ export {
   updateURIIndex,
   deleteFromURIIndex,
   checkURIConflict,
-  populateURIIndex,
+  regenerateURIs as populateURIIndex,
   type URIIndexUpdate,
   type PopulationStats,
 } from "./index-manager"
