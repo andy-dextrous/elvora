@@ -26,18 +26,25 @@ export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
   req: { payload },
   collection,
 }) => {
-  if (!data?.slug) {
+  if (!isFrontendCollection(collection.slug)) {
     return data
   }
 
-  const isPublishing =
+  const draftToPublished =
     data._status === "published" && originalDoc?._status !== "published"
-  const isPublishedSlugChange =
+  const slugHasChanged =
     data._status === "published" &&
     originalDoc?._status === "published" &&
     data.slug !== originalDoc?.slug
 
-  if (isPublishing || isPublishedSlugChange) {
+  if (draftToPublished || slugHasChanged) {
+    const job = await payload.jobs.queue({
+      task: "uri-sync",
+      input: {},
+    })
+
+    await payload.jobs.runByID({ id: job.id! })
+
     try {
       const newURI = await routingEngine.generateURI({
         collection: collection.slug,
@@ -112,7 +119,7 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
     }
   }
 
-  // Skip revalidation for unpublished content
+  // Skip revalidation for unpublished content or if revalidation is disabled (to prevent publish/revalidate loops)
   if (context.disableRevalidate || !isPublished) {
     return doc
   }

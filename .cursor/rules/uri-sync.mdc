@@ -1,20 +1,20 @@
 ---
-description: When asked to work on the smart routing engine plan. Or even if the user asks to work on the next phase of "the build" or "the tasklist" they mean this.
+description: When asked to work on the uri sync strategy. Or even if the user asks to work on the next phase of "the build" or "the tasklist" they mean this.
 globs:
 alwaysApply: false
 ---
 ---
-description: When asked to work on the smart routing engine plan. Or even if the user asks to work on the next phase of "the build" or "the tasklist" they mean this.
+description: When asked to work on the uri sync strategy. Or even if the user asks to work on the next phase of "the build" or "the tasklist" they mean this.
 globs:
 alwaysApply: false
 ---
 
 Iterate with me in a back and forth manner, acting as my developer assistant. We will build this plan together but I'd like you to consult with me before undertaking any new tasks. The plan is solid but still needs work as we move through it.
 
-You should know that the tasklist you are looking at is the tip of an iceberg of planning. There are two primary docs that spell out the entire smart routing engine and all of its modules. When you start a task you should read both docs FULLY and especially focus on how the current module you are working on itegrates with the whole. This is especially important because the system is designed to work together.
+You should know that the tasklist you are looking at is the tip of an iceberg of planning. There is a primary doc that spells out the entire uri sync strategy and all of its modules. When you start a task you should read the doc FULLY and especially focus on how the current module you are working on itegrates with the whole. This is especially important because the system is designed to work together.
 
 ## Docs to study
-[README.md](mdc:src/lib/README.md) [README.md](mdc:src/lib/cache/README.md) [README.md](mdc:src/lib/routing/README.md) [README.md](mdc:src/lib/sitemaps/README.md) [smart-content-engine.md](mdc:planning/smart-content-engine.md)
+[URI-SYNC-STRATEGY.md](mdc:URI-SYNC-STRATEGY.md)
 
 ## Rules
 - Work part by part. Each phase is broken into parts with a title and tasklist. Consult me on the parts and be sure to mark the document with its status.
@@ -22,3 +22,5 @@ You should know that the tasklist you are looking at is the tip of an iceberg of
 - Stay focused on what is next to do according to the plan. You are welcome to suggest edits to how we proceed but always look ahead to the whole plan to make sure you are not jumping ahead.
 - As we build, I really only want to add the parts that are necessary at the current moment in time. So if part of a phase seems to be redundant for now, feel free to suggest we push it back to a later phase.
 - You might see example code with lots of inline comments that explain stuff within functions etc. I don't like this. Pay attention to my coding rules please and even if you see rules being broken in the tasklist or overview docs, make sure you adjust it to abide.
+- The dev server is ALWAYS running. No need to attempt to start it
+- Do NOT try to build the site. Always ask me

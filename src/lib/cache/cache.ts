@@ -379,8 +379,6 @@ export const cache = {
     const timestamp = new Date().toISOString()
     logCacheEvent({ operation: `getByURI("${uri}")`, cacheKey, tags, timestamp })
 
-    console.log("fetching by uri", uri)
-
     return unstable_cache(
       async () => {
         const payload = await getPayload({ config: configPromise })
@@ -563,12 +561,9 @@ export const cache = {
           overrideAccess,
         }
 
-        // Only add optional parameters if they're defined
-        if (limit !== undefined) query.limit = limit
-        if (page !== undefined) query.page = page
-        if (sort !== undefined) query.sort = sort
-        if (where !== undefined) query.where = where
-        if (locale !== undefined) query.locale = locale
+        Object.entries({ limit, page, sort, where, locale }).forEach(([key, value]) => {
+          if (value !== undefined) query[key] = value
+        })
 
         const result = await payload.find(query)
 

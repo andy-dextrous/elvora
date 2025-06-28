@@ -130,6 +130,7 @@ export interface Config {
   };
   jobs: {
     tasks: {
+      'uri-sync': TaskUriSync;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -1866,7 +1867,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'schedulePublish';
+        taskSlug: 'inline' | 'uri-sync' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -1899,7 +1900,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'uri-sync' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -3408,6 +3409,14 @@ export interface SettingsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskUri-sync".
+ */
+export interface TaskUriSync {
+  input?: unknown;
+  output?: unknown;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

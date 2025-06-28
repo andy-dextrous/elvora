@@ -34,6 +34,5 @@
 
 ## Current
 
-- Add isHomepage to uri-index and force one instance only
-- Add revalidation hook to uri-index
-- Prevent templates causing 3 db lookups
+- Creation of redirects when a slug changes. Removal of redirects when they change back
+- add templateId to URI doc to enable simultaneous fetches of template and document

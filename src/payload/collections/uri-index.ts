@@ -50,6 +50,7 @@ export const URIIndex: CollectionConfig = {
       type: "relationship",
       relationTo: frontendCollections.map(collection => collection.slug),
       required: true,
+      unique: true,
       admin: {
         description: "Reference to the actual document",
       },
