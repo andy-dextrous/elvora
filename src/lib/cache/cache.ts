@@ -4,6 +4,7 @@ import configPromise from "@payload-config"
 import type { Config } from "@/payload/payload-types"
 import { getCacheConfig } from "./cache-config"
 import { isFrontendCollection } from "@/payload/collections/frontend"
+import { routingEngine } from "@/lib/routing/uri-engine"
 
 /*************************************************************************/
 /*  UNIVERSAL CACHE API - TYPES & INTERFACES
@@ -109,7 +110,7 @@ function generateCacheKey(options: CacheKeyOptions): string[] {
   /*************************************************************************/
 
   if (uri !== undefined) {
-    const normalizedURI = uri === "/" ? "" : uri.replace(/\/+$/, "")
+    const normalizedURI = routingEngine.normalizeURI(uri)
     return ["uri", normalizedURI, draft ? "draft" : "published"]
   }
 
@@ -283,7 +284,7 @@ function generateCacheTags(
 
   // URI-based lookups
   if (uri !== undefined) {
-    const normalizedURI = uri === "/" ? "" : uri.replace(/\/+$/, "")
+    const normalizedURI = routingEngine.normalizeURI(uri)
     tags.push(`uri:${normalizedURI}`)
 
     // Add URI index specific tags

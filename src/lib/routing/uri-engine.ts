@@ -340,4 +340,15 @@ export const routingEngine = {
     }
     return uri.split("/").filter(Boolean)
   },
+
+  /**
+   * Normalize URI by removing trailing slashes while preserving homepage
+   */
+  normalizeURI: (uri: string): string => {
+    // Homepage should always remain as "/"
+    if (uri === "/") return "/"
+
+    // Remove trailing slashes from other paths
+    return uri.replace(/\/+$/, "")
+  },
 }

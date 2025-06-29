@@ -140,7 +140,7 @@ export async function checkURIConflict(
 ): Promise<{ hasConflict: boolean; conflictingCollection?: string } | null> {
   try {
     const payload = await getPayload({ config: configPromise })
-    const normalizedURI = uri.replace(/\/+$/, "") || "/"
+    const normalizedURI = routingEngine.normalizeURI(uri)
 
     const conflicts = await payload.find({
       collection: "uri-index",

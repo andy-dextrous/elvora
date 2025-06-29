@@ -23,6 +23,23 @@ export interface BatchInvalidationSummary {
 }
 
 /*************************************************************************/
+/*  URI NORMALIZATION UTILITY
+/*************************************************************************/
+
+/**
+ * Normalizes URIs by removing trailing slashes while preserving the homepage
+ * @param uri - The URI to normalize
+ * @returns The normalized URI
+ */
+function normalizeURI(uri: string): string {
+  // Homepage should always remain as "/"
+  if (uri === "/") return "/"
+
+  // Remove trailing slashes from other paths
+  return uri.replace(/\/+$/, "")
+}
+
+/*************************************************************************/
 /*  SURGICAL DOCUMENT INVALIDATION
 /*************************************************************************/
 
@@ -47,7 +64,7 @@ export async function revalidateForDocumentChange(
 
   // 2. Always invalidate the specific URI
   if (doc.uri) {
-    const normalizedUri = doc.uri === "/" ? "" : doc.uri.replace(/\/+$/, "")
+    const normalizedUri = normalizeURI(doc.uri)
     const uriTag = `uri:${normalizedUri}`
     await revalidateTag(uriTag)
     result.tagsInvalidated.push(uriTag)
@@ -59,8 +76,7 @@ export async function revalidateForDocumentChange(
 
   // 3. Handle old URI if changed
   if (changes.uriChanged && changes.oldUri) {
-    const oldNormalizedUri =
-      changes.oldUri === "/" ? "" : changes.oldUri.replace(/\/+$/, "")
+    const oldNormalizedUri = normalizeURI(changes.oldUri)
     const oldUriTag = `uri:${oldNormalizedUri}`
     await revalidateTag(oldUriTag)
     result.tagsInvalidated.push(oldUriTag)
@@ -217,7 +233,7 @@ export async function revalidateForGlobalChange(
       await revalidatePath("/")
       result.pathsInvalidated.push("/")
 
-      const rootUriTag = "uri:"
+      const rootUriTag = `uri:${normalizeURI("/")}`
       await revalidateTag(rootUriTag)
       result.tagsInvalidated.push(rootUriTag)
     }
