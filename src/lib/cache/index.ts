@@ -1,10 +1,16 @@
 export { cache } from "./cache"
-export { revalidate } from "./revalidation"
 
-// Main surgical invalidation system
+// Main revalidation system - all functions consolidated in one file
 export {
-  revalidateForDocumentChange,
-  revalidateForBatchChanges,
-  revalidateForGlobalChange,
+  revalidate,
+  batchRevalidate,
+  revalidateGlobal,
+  revalidateAll,
+  revalidateCollection,
   shouldSkipInvalidation,
-} from "./surgical-invalidation"
+  getInvalidationPriority,
+  type RevalidateOptions,
+  type InvalidationResult,
+  type BatchInvalidationSummary,
+  type BatchRevalidateOptions,
+} from "./revalidation"

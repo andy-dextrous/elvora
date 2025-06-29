@@ -5,7 +5,7 @@ import {
 } from "./dependency-analyzer"
 import { updateURI } from "./index-manager"
 import { routingEngine } from "./uri-engine"
-import { revalidateForBatchChanges } from "@/lib/cache/surgical-invalidation"
+import { batchRevalidate } from "@/lib/cache"
 import { detectChanges } from "@/lib/cache/change-detection"
 import { cache } from "@/lib/cache"
 
@@ -109,7 +109,15 @@ export async function processArchivePageUpdate(pageId: string): Promise<CascadeR
 
     // Batch process cache invalidation
     if (batchUpdates.length > 0) {
-      const invalidationResults = await revalidateForBatchChanges(batchUpdates)
+      // Convert to batchRevalidate format
+      const operations = batchUpdates.map(update => ({
+        collection: update.collection,
+        doc: update.doc,
+        previousDoc: { ...update.doc, uri: update.changes.oldUri },
+        action: "update" as const,
+      }))
+
+      const invalidationResults = await batchRevalidate({ operations })
       result.cacheEntriesCleared = invalidationResults.operations.reduce(
         (total: number, res: any) => total + (res.tagsInvalidated?.length || 0),
         0
@@ -191,7 +199,15 @@ export async function processPageHierarchyUpdate(pageId: string): Promise<Cascad
 
     // Batch process cache invalidation
     if (batchUpdates.length > 0) {
-      const invalidationResults = await revalidateForBatchChanges(batchUpdates)
+      // Convert to batchRevalidate format
+      const operations = batchUpdates.map(update => ({
+        collection: update.collection,
+        doc: update.doc,
+        previousDoc: { ...update.doc, uri: update.changes.oldUri },
+        action: "update" as const,
+      }))
+
+      const invalidationResults = await batchRevalidate({ operations })
       result.cacheEntriesCleared = invalidationResults.operations.reduce(
         (total: number, res: any) => total + (res.tagsInvalidated?.length || 0),
         0
@@ -295,7 +311,15 @@ export async function processHomepageChange(
 
     // Batch process cache invalidation
     if (batchUpdates.length > 0) {
-      const invalidationResults = await revalidateForBatchChanges(batchUpdates)
+      // Convert to batchRevalidate format
+      const operations = batchUpdates.map(update => ({
+        collection: update.collection,
+        doc: update.doc,
+        previousDoc: { ...update.doc, uri: update.changes.oldUri },
+        action: "update" as const,
+      }))
+
+      const invalidationResults = await batchRevalidate({ operations })
       result.cacheEntriesCleared = invalidationResults.operations.reduce(
         (total: number, res: any) => total + (res.tagsInvalidated?.length || 0),
         0
@@ -381,7 +405,15 @@ export async function processSettingsChange(
 
     // Batch process cache invalidation
     if (batchUpdates.length > 0) {
-      const invalidationResults = await revalidateForBatchChanges(batchUpdates)
+      // Convert to batchRevalidate format
+      const operations = batchUpdates.map(update => ({
+        collection: update.collection,
+        doc: update.doc,
+        previousDoc: { ...update.doc, uri: update.changes.oldUri },
+        action: "update" as const,
+      }))
+
+      const invalidationResults = await batchRevalidate({ operations })
       result.cacheEntriesCleared = invalidationResults.operations.reduce(
         (total: number, res: any) => total + (res.tagsInvalidated?.length || 0),
         0
