@@ -389,8 +389,8 @@ export const cache = {
 
         const indexDoc = indexResult.docs[0]
 
-        // Query 2: Get full document with precise control over draft/depth/access
-        const document = await payload.findByID({
+        // Query 2 & 3: Run document and template queries in parallel
+        const documentPromise = payload.findByID({
           collection: indexDoc.sourceCollection as any,
           id: indexDoc.documentId,
           draft,
@@ -398,23 +398,32 @@ export const cache = {
           overrideAccess: true,
         })
 
+        // Only fetch template if we have a templateId and document might need it
+        const templatePromise = indexDoc.templateId
+          ? payload
+              .findByID({
+                collection: "templates",
+                id: indexDoc.templateId,
+                draft: false,
+                depth: 2,
+                overrideAccess: true,
+              })
+              .catch(() => null) // Gracefully handle template fetch failures
+          : Promise.resolve(null)
+
+        // Wait for both queries to complete
+        const [document, template] = await Promise.all([documentPromise, templatePromise])
+
         if (!document) {
           return null
         }
 
-        // If document doesn't have sections, apply template sections
-        if (!document.sections || document.sections.length === 0) {
-          try {
-            const { getDefaultTemplate } = await import("@/lib/data/templates")
-            const template = await getDefaultTemplate(indexDoc.sourceCollection)
-
-            if (template?.sections) {
-              document.sections = template.sections
-            }
-          } catch (templateError) {
-            // Silently continue without template if loading fails
-            // This ensures the page still loads even if template system has issues
-          }
+        // If document doesn't have sections and we have a template, apply template sections
+        if (
+          (!document.sections || document.sections.length === 0) &&
+          template?.sections
+        ) {
+          document.sections = template.sections
         }
 
         return {

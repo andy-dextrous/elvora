@@ -1730,6 +1730,10 @@ export interface UriIndex {
       }[]
     | null;
   /**
+   * Template ID for this document (if assigned via routing settings)
+   */
+  templateId?: string | null;
+  /**
    * Whether this URI is the homepage. Only one homepage is allowed.
    */
   isHomepage?: boolean | null;
@@ -2722,6 +2726,7 @@ export interface UriIndexSelect<T extends boolean = true> {
         uri?: T;
         id?: T;
       };
+  templateId?: T;
   isHomepage?: T;
   updatedAt?: T;
   createdAt?: T;

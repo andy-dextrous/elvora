@@ -1,18 +1,7 @@
-/**
- * UNIVERSAL REVALIDATION HOOKS
- *
- * Critical fixes applied:
- * ✅ Context initialization gap - ensureCascadeContext() prevents crashes
- * ✅ URI generation safety - flags failures, validates before index updates
- * ✅ Race condition mitigation - async dispatch for immediate execution
- * ✅ Redundancy elimination - unified processCascadeJobs() function
- * ✅ Status checking consistency - fixed inverted logic in global changes
- * ✅ Enhanced cascade detection - expanded beyond just slug changes
- */
-
 import { revalidate } from "@/lib/cache/revalidation"
 import { routingEngine } from "@/lib/routing"
 import { updateURI, deleteURI } from "@/lib/routing/index-manager"
+import { getTemplateIdForCollection } from "@/lib/routing/index-manager"
 import {
   shouldTriggerArchiveCascade,
   shouldTriggerHierarchyCascade,
@@ -30,65 +19,14 @@ import type {
 } from "payload"
 
 /*************************************************************************/
-/*  UTILITY FUNCTIONS
-/*************************************************************************/
-
-/**
- * Ensures cascade context exists and returns it
- */
-function ensureCascadeContext(context: any): any[] {
-  if (!context.cascade) {
-    context.cascade = []
-  }
-  return context.cascade
-}
-
-/**
- * Unified cascade job processing
- */
-async function processCascadeJobs(
-  cascadeOps: any[],
-  payload: any,
-  logger: any
-): Promise<void> {
-  for (const cascadeOp of cascadeOps) {
-    try {
-      const job = await (payload.jobs as any).queue({
-        task: "cascade-uris",
-        input: cascadeOp,
-      })
-
-      console.log(
-        `[Cascade Jobs] Queued ${cascadeOp.operation} job (ID: ${job.id}) for entity ${cascadeOp.entityId}`
-      )
-
-      // Execute critical operations immediately (but asynchronously to avoid blocking)
-      if (cascadeOp.operation === "homepage-change") {
-        // Don't await - let it run in background to avoid race conditions
-        payload.jobs.runByID({ id: job.id! }).catch((error: any) => {
-          logger.error(`Failed to execute immediate cascade job ${job.id}:`, error)
-        })
-        console.log(
-          `[Cascade Jobs] Dispatched homepage change job for immediate execution`
-        )
-      } else {
-        // Execute all other cascade operations immediately as well
-        // This ensures URI synchronicity is maintained in real-time
-        payload.jobs.runByID({ id: job.id! }).catch((error: any) => {
-          logger.error(`Failed to execute cascade job ${job.id}:`, error)
-        })
-        console.log(
-          `[Cascade Jobs] Dispatched ${cascadeOp.operation} job for immediate execution`
-        )
-      }
-    } catch (error) {
-      logger.error(`Failed to queue cascade job for ${cascadeOp.operation}:`, error)
-    }
-  }
-}
-
-/*************************************************************************/
 /*  UNIVERSAL COLLECTION HOOKS
+
+  Contains the following hooks:
+  - beforeCollectionChange
+  - afterCollectionChange
+  - afterCollectionDelete
+  - afterGlobalChange
+
 /*************************************************************************/
 
 /**
@@ -142,8 +80,8 @@ export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
   // Initialize cascade context using utility function
   const cascadeContext = ensureCascadeContext(context)
 
-  // Enhanced Cascade Detection for Pages
-  if (collection.slug === "pages") {
+  // Enhanced Cascade Detection for Pages (ONLY for published content)
+  if (collection.slug === "pages" && (draftToPublished || slugHasChanged)) {
     // Archive Page Changes (expanded detection)
     const needsArchiveCascade = await shouldTriggerArchiveCascade(
       collection.slug,
@@ -213,6 +151,9 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
   // URI Index Maintenance for Frontend Collections
   if (isFrontendCollection(collection.slug)) {
     try {
+      // Get template ID once for all operations in this collection
+      const templateId = await getTemplateIdForCollection(collection.slug)
+
       if (isPublished && doc.uri) {
         // Update index entry for published documents
         await updateURI({
@@ -220,6 +161,7 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
           collection: collection.slug,
           documentId: doc.id,
           status: "published",
+          templateId: templateId || undefined,
           previousURI:
             previousDoc?.uri && previousDoc.uri !== doc.uri ? previousDoc.uri : undefined,
         })
@@ -233,6 +175,7 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
           collection: collection.slug,
           documentId: doc.id,
           status: "draft",
+          templateId: templateId || undefined,
           previousURI:
             previousDoc?.uri && previousDoc.uri !== doc.uri ? previousDoc.uri : undefined,
         })
@@ -434,4 +377,62 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
   }
 
   return doc
+}
+
+/*************************************************************************/
+/*  UTILITY FUNCTIONS
+/*************************************************************************/
+
+/**
+ * Ensures cascade context exists and returns it
+ */
+function ensureCascadeContext(context: any): any[] {
+  if (!context.cascade) {
+    context.cascade = []
+  }
+  return context.cascade
+}
+
+/**
+ * Unified cascade job processing
+ */
+async function processCascadeJobs(
+  cascadeOps: any[],
+  payload: any,
+  logger: any
+): Promise<void> {
+  for (const cascadeOp of cascadeOps) {
+    try {
+      const job = await (payload.jobs as any).queue({
+        task: "cascade-uris",
+        input: cascadeOp,
+      })
+
+      console.log(
+        `[Cascade Jobs] Queued ${cascadeOp.operation} job (ID: ${job.id}) for entity ${cascadeOp.entityId}`
+      )
+
+      // Execute critical operations immediately (but asynchronously to avoid blocking)
+      if (cascadeOp.operation === "homepage-change") {
+        // Don't await - let it run in background to avoid race conditions
+        payload.jobs.runByID({ id: job.id! }).catch((error: any) => {
+          logger.error(`Failed to execute immediate cascade job ${job.id}:`, error)
+        })
+        console.log(
+          `[Cascade Jobs] Dispatched homepage change job for immediate execution`
+        )
+      } else {
+        // Execute all other cascade operations immediately as well
+        // This ensures URI synchronicity is maintained in real-time
+        payload.jobs.runByID({ id: job.id! }).catch((error: any) => {
+          logger.error(`Failed to execute cascade job ${job.id}:`, error)
+        })
+        console.log(
+          `[Cascade Jobs] Dispatched ${cascadeOp.operation} job for immediate execution`
+        )
+      }
+    } catch (error) {
+      logger.error(`Failed to queue cascade job for ${cascadeOp.operation}:`, error)
+    }
+  }
 }

@@ -2,6 +2,7 @@ import configPromise from "@payload-config"
 import { getPayload } from "payload"
 import { frontendCollections } from "@/payload/collections/frontend"
 import { routingEngine } from "./uri-engine"
+import { getSettings } from "@/lib/data/globals"
 
 /*************************************************************************/
 /*
@@ -25,6 +26,38 @@ export interface URIIndexUpdate {
   documentId: string
   status: "published" | "draft"
   previousURI?: string
+  templateId?: string
+}
+
+/*************************************************************************/
+/*  TEMPLATE ID DETECTION FOR COLLECTIONS
+/*************************************************************************/
+
+export async function getTemplateIdForCollection(
+  collection: string
+): Promise<string | null> {
+  try {
+    const settings = await getSettings()
+    const routing = settings?.routing
+
+    if (!routing) return null
+
+    // Determine template field name based on collection
+    const templateField =
+      collection === "pages" ? "pagesDefaultTemplate" : `${collection}SingleTemplate`
+
+    const templateValue = routing[templateField]
+
+    // Handle relationship object or direct ID
+    if (templateValue) {
+      return typeof templateValue === "object" ? templateValue.id : templateValue
+    }
+
+    return null
+  } catch (error) {
+    console.warn(`Failed to get template ID for collection ${collection}:`, error)
+    return null
+  }
 }
 
 /*************************************************************************/
@@ -37,6 +70,7 @@ export async function updateURI({
   documentId,
   status,
   previousURI,
+  templateId,
 }: URIIndexUpdate): Promise<void> {
   try {
     const payload = await getPayload({ config: configPromise })
@@ -52,6 +86,10 @@ export async function updateURI({
       limit: 1,
     })
 
+    // Auto-detect template ID if not provided
+    const resolvedTemplateId =
+      templateId || (await getTemplateIdForCollection(collection))
+
     const indexData = {
       uri,
       sourceCollection: collection,
@@ -61,6 +99,7 @@ export async function updateURI({
         value: documentId,
       },
       status,
+      templateId: resolvedTemplateId,
       previousURIs: previousURI ? [{ uri: previousURI }] : undefined,
     }
 
@@ -268,7 +307,19 @@ export async function regenerateURIs(): Promise<PopulationStats> {
               data: doc,
             })
 
-            // Update the document itself with the new URI
+            console.log(
+              `📍 Generated URI for ${collection.slug}/${doc.slug}: "${generatedURI}"`
+            )
+
+            // Validate URI before proceeding
+            if (!generatedURI || generatedURI.trim() === "") {
+              console.error(`❌ Empty URI generated for ${collection.slug}/${doc.slug}`)
+              stats.errors++
+              stats.collections[collection.slug].errors++
+              continue
+            }
+
+            // Update the document itself with the new URI (disable hooks to prevent race condition)
             await payload.update({
               collection: collection.slug as any,
               id: doc.id,
@@ -276,26 +327,44 @@ export async function regenerateURIs(): Promise<PopulationStats> {
                 uri: generatedURI,
               },
               draft: hasStatusField ? doc._status === "draft" : false, // Preserve original status
+              context: {
+                disableRevalidate: true, // Prevent afterChange hooks from interfering
+              },
             })
 
+            // Get template ID for this collection
+            const templateId = await getTemplateIdForCollection(collection.slug)
+
             // Create URI index entry
+            const indexData = {
+              uri: generatedURI,
+              sourceCollection: collection.slug,
+              documentId: doc.id,
+              document: {
+                relationTo: collection.slug as any,
+                value: doc.id,
+              },
+              status: hasStatusField ? doc._status || "published" : "published",
+              templateId,
+            }
+
+            console.log(
+              `🔍 Creating URI index entry:`,
+              JSON.stringify(indexData, null, 2)
+            )
+
             await payload.create({
               collection: "uri-index",
-              data: {
-                uri: generatedURI,
-                sourceCollection: collection.slug,
-                documentId: doc.id,
-                document: {
-                  relationTo: collection.slug as any,
-                  value: doc.id,
-                },
-                status: hasStatusField ? doc._status || "published" : "published",
-              },
+              data: indexData,
             })
 
             stats.populated++
             stats.collections[collection.slug].populated++
           } catch (docError) {
+            console.error(
+              `❌ Failed to process document ${doc.slug} in ${collection.slug}:`,
+              docError
+            )
             stats.errors++
             stats.collections[collection.slug].errors++
           }

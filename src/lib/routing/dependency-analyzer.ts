@@ -35,10 +35,22 @@ export async function getCollectionsUsingArchive(
   for (const setting of archiveSettings) {
     const archivePage = routing[setting.field]
     if (archivePage?.id === pageId) {
+      // Get the actual page slug - archivePage only contains id, not slug
+      let pageSlug = setting.collection // fallback
+      try {
+        const fullPage = await cache.getByID("pages", pageId)
+        if (fullPage?.slug) {
+          pageSlug = fullPage.slug
+        }
+      } catch (error) {
+        // Use collection name as fallback if page fetch fails
+        pageSlug = setting.collection
+      }
+
       dependencies.push({
         collection: setting.collection,
         archivePageId: pageId,
-        archivePageSlug: archivePage.slug || setting.collection,
+        archivePageSlug: pageSlug,
         itemCount: 0, // Will be populated during cascade operation
       })
     }
@@ -170,6 +182,9 @@ export async function shouldTriggerArchiveCascade(
   // Only pages can trigger archive cascades
   if (collection !== "pages") return false
 
+  // Only trigger cascades for published content
+  if (doc._status !== "published") return false
+
   // Check if this page is used as an archive page
   const collections = await getCollectionsUsingArchive(doc.id)
   if (collections.length === 0) return false
@@ -188,6 +203,9 @@ export async function shouldTriggerHierarchyCascade(
 ): Promise<boolean> {
   // Only pages have hierarchy
   if (collection !== "pages") return false
+
+  // Only trigger cascades for published content
+  if (doc._status !== "published") return false
 
   const hierarchyChanges = detectHierarchyChanges(doc, previousDoc)
   return hierarchyChanges.parentChanged

@@ -91,6 +91,14 @@ export const URIIndex: CollectionConfig = {
       ],
     },
     {
+      name: "templateId",
+      type: "text",
+      index: true,
+      admin: {
+        description: "Template ID for this document (if assigned via routing settings)",
+      },
+    },
+    {
       name: "isHomepage",
       type: "checkbox",
       defaultValue: false,
