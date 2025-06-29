@@ -12,7 +12,6 @@ import {
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob"
 import { revalidateTag } from "next/cache"
 import { Plugin } from "payload"
-
 import { markAsReadAfterRead } from "@/payload/hooks/form-submissions"
 import { Page, Post } from "@/payload/payload-types"
 import { beforeSyncWithSearch } from "@/payload/search/beforeSync"

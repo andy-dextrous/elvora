@@ -2,7 +2,6 @@ import { getPayload } from "payload"
 import { unstable_cache } from "next/cache"
 import configPromise from "@payload-config"
 import type { Config } from "@/payload/payload-types"
-import { getCacheConfig } from "./cache-config"
 import { isFrontendCollection } from "@/payload/collections/frontend"
 import { routingEngine } from "@/lib/routing/uri-engine"
 
@@ -254,14 +253,10 @@ function generateCacheTags(
     // Add URI index tags for frontend collections
     if (isFrontendCollection(collection)) {
       tags.push(`uri-index:${collection}`) // Specific collection in URI index
-      tags.push("uri-index:item") // Individual item in URI index
+      tags.push(`uri-index:item:${collection}:${slug}`) // Specific item in URI index
     }
 
-    // Add dependencies from cache config
-    if (includeDependencies) {
-      const config = getCacheConfig(collection)
-      tags.push(...config.dependencies)
-    }
+    // Dependencies now handled by surgical invalidation system
   }
 
   // Individual items by ID (when params contains the ID)
@@ -272,14 +267,10 @@ function generateCacheTags(
     // Add URI index tags for frontend collections
     if (isFrontendCollection(collection)) {
       tags.push(`uri-index:${collection}`) // Specific collection in URI index
-      tags.push("uri-index:item") // Individual item in URI index
+      tags.push(`uri-index:item:${collection}:${params[0]}`) // Specific item in URI index
     }
 
-    // Add dependencies from cache config
-    if (includeDependencies) {
-      const config = getCacheConfig(collection)
-      tags.push(...config.dependencies)
-    }
+    // Dependencies now handled by surgical invalidation system
   }
 
   // URI-based lookups
@@ -287,9 +278,9 @@ function generateCacheTags(
     const normalizedURI = routingEngine.normalizeURI(uri)
     tags.push(`uri:${normalizedURI}`)
 
-    // Add URI index specific tags
-    tags.push("uri-index:lookup") // For URI resolution caches
-    tags.push("uri-index:dependent") // For anything that depends on URI resolution
+    // More specific URI index tags (instead of broad "lookup"/"dependent")
+    tags.push(`uri-index:path:${normalizedURI}`) // Specific path in URI index
+    tags.push(`uri-lookup:${normalizedURI}`) // Specific URI lookup cache
   }
 
   // Collection queries
@@ -299,14 +290,10 @@ function generateCacheTags(
     // Add URI index tags for frontend collections
     if (isFrontendCollection(collection)) {
       tags.push(`uri-index:${collection}`) // Specific collection in URI index
-      tags.push("uri-index:all") // General URI index tag
+      tags.push(`collection-index:${collection}`) // Collection-specific index cache
     }
 
-    // Add dependencies from cache config
-    if (includeDependencies) {
-      const config = getCacheConfig(collection)
-      tags.push(...config.dependencies)
-    }
+    // Dependencies now handled by surgical invalidation system
   }
 
   // Globals
@@ -363,7 +350,7 @@ function logCacheEvent(event: CacheEvent) {
     - cache.getGlobal("settings")          → Site-wide content
 
     Each method wraps Next.js unstable_cache() with standardized keys, tags,
-    and dependency-based invalidation configured in cache-config.ts.
+    and surgical invalidation for precise cache management.
 /*************************************************************************/
 
 export const cache = {

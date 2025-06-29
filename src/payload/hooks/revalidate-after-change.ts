@@ -71,6 +71,15 @@ async function processCascadeJobs(
         console.log(
           `[Cascade Jobs] Dispatched homepage change job for immediate execution`
         )
+      } else {
+        // Execute all other cascade operations immediately as well
+        // This ensures URI synchronicity is maintained in real-time
+        payload.jobs.runByID({ id: job.id! }).catch((error: any) => {
+          logger.error(`Failed to execute cascade job ${job.id}:`, error)
+        })
+        console.log(
+          `[Cascade Jobs] Dispatched ${cascadeOp.operation} job for immediate execution`
+        )
       }
     } catch (error) {
       logger.error(`Failed to queue cascade job for ${cascadeOp.operation}:`, error)
@@ -234,7 +243,25 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
         payload.logger.warn(
           `URI generation failed for ${collection.slug}/${doc.id}. Queuing for retry.`
         )
-        // Could queue a retry job here if needed
+        // Queue retry job for URI generation failures
+        try {
+          const job = await payload.jobs.queue({
+            task: "cascade-uris",
+            input: {
+              operation: "uri-generation-retry",
+              entityId: doc.id,
+              additionalData: {
+                collection: collection.slug,
+                retryAttempt: 1,
+              },
+            },
+          })
+          payload.logger.info(
+            `Queued URI generation retry job ${job.id} for ${collection.slug}/${doc.id}`
+          )
+        } catch (jobError) {
+          payload.logger.error(`Failed to queue URI generation retry job:`, jobError)
+        }
       }
     } catch (error) {
       payload.logger.error(

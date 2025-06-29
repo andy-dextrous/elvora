@@ -130,7 +130,7 @@ export interface Config {
   };
   jobs: {
     tasks: {
-      'uri-sync': TaskUriSync;
+      'cascade-uris': TaskCascadeUris;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -1867,7 +1867,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'uri-sync' | 'schedulePublish';
+        taskSlug: 'inline' | 'cascade-uris' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -1900,7 +1900,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'uri-sync' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'cascade-uris' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -3412,11 +3412,40 @@ export interface SettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TaskUri-sync".
+ * via the `definition` "TaskCascade-uris".
  */
-export interface TaskUriSync {
-  input?: unknown;
-  output?: unknown;
+export interface TaskCascadeUris {
+  input: {
+    operation: string;
+    entityId: string;
+    additionalData?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+  };
+  output: {
+    success?: boolean | null;
+    documentsUpdated?: number | null;
+    redirectsCreated?: number | null;
+    cacheEntriesCleared?: number | null;
+    errors?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    processedAt?: string | null;
+    operation?: string | null;
+    impactSize?: number | null;
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,8 +1,4 @@
 import { cache } from "@/lib/cache"
-import { revalidatePath, revalidateTag } from "next/cache"
-import { getInvalidationTargets, getCacheConfig } from "./cache-config"
-import { shouldIncludeInSitemap } from "@/lib/sitemaps/config"
-import { isFrontendCollection } from "@/payload/collections/frontend"
 import {
   revalidateForDocumentChange,
   revalidateForBatchChanges,
@@ -77,104 +73,6 @@ export async function revalidate(
     logger?.error(`Smart revalidation failed for ${collection}:`, error)
     throw error
   }
-}
-
-/*************************************************************************/
-/*  REVALIDATION DECISION LOGIC - LEGACY COMPATIBILITY
-/*************************************************************************/
-
-/**
- * Legacy compatibility wrapper - now uses surgical invalidation logic
- * @deprecated Use shouldSkipInvalidation from surgical-invalidation instead
- */
-function shouldSkipRevalidationLegacy(doc: any): boolean {
-  if (!doc) {
-    return false
-  }
-
-  // Only revalidate on publish events - same pattern as lockSlugAfterPublish
-  const isPublishEvent = doc._status === "published"
-
-  return !isPublishEvent
-}
-
-/*************************************************************************/
-/*  LEGACY TAG GENERATION - DEPRECATED
-/*************************************************************************/
-
-/**
- * @deprecated Use surgical invalidation instead - this function has broad invalidation issues
- * Legacy tag generation that always invalidates header/footer (THE PROBLEM WE'RE FIXING)
- */
-async function generateRevalidationTagsLegacy(
-  collection: string,
-  doc: any,
-  previousDoc: any,
-  changes: ChangeDetection
-): Promise<string[]> {
-  // This function is kept for legacy compatibility but should not be used
-  // It represents the OLD broad invalidation pattern we're replacing
-  console.warn(
-    "generateRevalidationTagsLegacy is deprecated - use surgical invalidation instead"
-  )
-
-  const tags = new Set<string>()
-
-  // Legacy behavior - always invalidate header/footer (THE PROBLEM)
-  tags.add("global:header")
-  tags.add("global:footer")
-
-  return Array.from(tags)
-}
-
-/*************************************************************************/
-/*  LEGACY FUNCTIONS - DEPRECATED
-/*************************************************************************/
-
-/**
- * @deprecated Use surgical invalidation instead
- * Legacy cascade invalidation with broad dependencies
- */
-function hasURISupportLegacy(collection: string): boolean {
-  return shouldIncludeInSitemap(collection)
-}
-
-/**
- * @deprecated Use surgical invalidation instead
- * Legacy cascade invalidation - replaced by surgical dependency analysis
- */
-async function addCascadeInvalidationLegacy(
-  collection: string,
-  doc: any,
-  previousDoc: any,
-  changes: ChangeDetection,
-  tags: Set<string>
-): Promise<void> {
-  console.warn(
-    "addCascadeInvalidationLegacy is deprecated - use surgical invalidation instead"
-  )
-  // Legacy broad invalidation logic kept for reference only
-}
-
-/**
- * @deprecated Use surgical invalidation instead
- * Legacy path revalidation - now handled by surgical invalidation
- */
-async function revalidatePathsLegacy(
-  doc: any,
-  previousDoc: any,
-  changes: ChangeDetection,
-  logger?: any
-): Promise<void> {
-  console.warn("revalidatePathsLegacy is deprecated - use surgical invalidation instead")
-}
-
-/**
- * @deprecated Use surgical invalidation instead
- * Legacy tag revalidation - now handled by surgical invalidation
- */
-async function revalidateTagsLegacy(tags: string[], logger?: any): Promise<void> {
-  console.warn("revalidateTagsLegacy is deprecated - use surgical invalidation instead")
 }
 
 /*************************************************************************/
