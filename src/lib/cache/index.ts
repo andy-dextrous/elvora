@@ -2,8 +2,8 @@ export { cache } from "./cache"
 
 // Main revalidation system - all functions consolidated in one file
 export {
-  revalidate,
-  batchRevalidate,
+  revalidateDocument as revalidate,
+  batchRevalidateDocuments as batchRevalidate,
   revalidateGlobal,
   revalidateAll,
   revalidateCollection,

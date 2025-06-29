@@ -35,4 +35,3 @@
 ## Current
 
 - Creation of redirects when a slug changes. Removal of redirects when they change back
-- add templateId to URI doc to enable simultaneous fetches of template and document

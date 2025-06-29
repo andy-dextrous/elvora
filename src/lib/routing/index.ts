@@ -15,19 +15,9 @@ export {
   type PopulationStats,
 } from "./index-manager"
 
-// Dependent Updates Operations - Business logic for URI dependent updates
-export {
-  processArchivePageUpdate,
-  processPageHierarchyUpdate,
-  processHomepageChange,
-  processSettingsChange,
-  type DependentUpdatesResult,
-  type DependentUpdatesAdditionalData,
-} from "./dependency-updates"
-
 // Dependency Analysis - Relationship and impact analysis
 export {
-  getCollectionsFromArchive as getCollectionsUsingArchive,
+  getArchiveChildCollections as getCollectionsUsingArchive,
   getCollectionItemsForArchive,
   findDescendantPages,
   getDependentUpdatesImpactSize,
@@ -35,4 +25,4 @@ export {
   detectHierarchyChanges,
   detectHomepageChange,
   detectAllSettingsChanges,
-} from "./dependency-analyzer"
+} from "./dependency-detection"

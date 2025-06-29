@@ -1,5 +1,5 @@
 import { PayloadRequest } from "payload"
-import { uriDependentUpdatesHandler } from "./dependency-updates"
+import { uriDependentUpdatesHandler } from "./dependency-updates/handler"
 
 const jobs = {
   access: {

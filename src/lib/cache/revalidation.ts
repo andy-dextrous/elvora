@@ -38,13 +38,10 @@ export interface BatchRevalidateOptions {
 }
 
 /*************************************************************************/
-/*  PUBLIC API FUNCTIONS
+/*  REVALIDATION SINGLE DOCUMENT
 /*************************************************************************/
 
-/**
- * Smart revalidation using surgical invalidation system
- */
-export async function revalidate(
+export async function revalidateDocument(
   options: RevalidateOptions
 ): Promise<InvalidationResult> {
   const { collection, doc, previousDoc, action = "update", logger } = options
@@ -63,7 +60,9 @@ export async function revalidate(
       }
     }
 
-    // Use surgical invalidation for precise cache clearing
+    /**
+     * Use surgical invalidation for precise cache clearing
+     */
     const result = await revalidateForDocumentChange(
       collection,
       doc,
@@ -85,10 +84,11 @@ export async function revalidate(
   }
 }
 
-/**
- * Batch revalidation using surgical invalidation with deduplication
- */
-export async function batchRevalidate(
+/*************************************************************************/
+/*  REVALIDATION BATCH
+/*************************************************************************/
+
+export async function batchRevalidateDocuments(
   options: BatchRevalidateOptions
 ): Promise<BatchInvalidationSummary> {
   const { operations, logger } = options
@@ -115,9 +115,10 @@ export async function batchRevalidate(
   }
 }
 
-/**
- * Revalidate global settings using surgical invalidation
- */
+/*************************************************************************/
+/*  REVALIDATION GLOBAL
+/*************************************************************************/
+
 export async function revalidateGlobal(
   globalSlug: string,
   doc: any,
@@ -148,6 +149,10 @@ export async function revalidateGlobal(
   }
 }
 
+/*************************************************************************/
+/*  REVALIDATION ALL
+/*************************************************************************/
+
 /**
  * Revalidate all cached data using surgical invalidation emergency mode
  */
@@ -172,8 +177,14 @@ export async function revalidateAll(): Promise<{
   }
 }
 
+/*************************************************************************/
+/*  REVALIDATION COLLECTION
+/*************************************************************************/
+
 /**
  * Revalidate specific collection
+ *
+ * This is used for collection-level invalidation, such as when a collection is updated.
  */
 export async function revalidateCollection(
   collection: string,
@@ -208,7 +219,7 @@ export async function revalidateCollection(
 }
 
 /*************************************************************************/
-/*  CORE INVALIDATION LOGIC
+/*  REVALIDATION SINGLE DOCUMENT
 /*************************************************************************/
 
 async function revalidateForDocumentChange(
@@ -226,36 +237,48 @@ async function revalidateForDocumentChange(
     startTime,
   }
 
-  // 1. Always invalidate the specific document
+  /**
+   * 1. Always invalidate the specific document
+   */
   const itemTag = `item:${collection}:${doc.slug || doc.id}`
   revalidateTag(itemTag)
   result.tagsInvalidated.push(itemTag)
 
-  // 2. Always invalidate the specific URI
+  /**
+   * 2. ...And its matching URI
+   */
   if (doc.uri) {
     const normalizedUri = routingEngine.normalizeURI(doc.uri)
     const uriTag = `uri:${normalizedUri}`
     revalidateTag(uriTag)
     result.tagsInvalidated.push(uriTag)
 
-    // Revalidate the path itself
+    /**
+     * Revalidate the path itself
+     */
     revalidatePath(doc.uri)
     result.pathsInvalidated.push(doc.uri)
   }
 
-  // 3. Handle old URI if changed
+  /**
+   * 3. Also invalidate the old URI if it changed
+   */
   if (changes.uriChanged && changes.oldUri) {
     const oldNormalizedUri = routingEngine.normalizeURI(changes.oldUri)
     const oldUriTag = `uri:${oldNormalizedUri}`
     revalidateTag(oldUriTag)
     result.tagsInvalidated.push(oldUriTag)
 
-    // Revalidate old path
+    /**
+     * Revalidate old path
+     */
     revalidatePath(changes.oldUri)
     result.pathsInvalidated.push(changes.oldUri)
   }
 
-  // 4. Smart navigation detection (THE KEY OPTIMIZATION)
+  /**
+   * 4. Smart navigation detection - did this change affect the header or footer?
+   */
   const navImpact = await getNavigationImpact(collection, doc, changes)
 
   if (navImpact.affectsHeader) {
@@ -268,7 +291,10 @@ async function revalidateForDocumentChange(
     result.tagsInvalidated.push("global:footer")
   }
 
-  // 5. Archive page cascade invalidation
+  /**
+   * 5. Archive page cascade invalidation - if the archive page changes, all collections using it need to be invalidated.
+   * Uses the collection: tag to invalidate all documents in the collection.
+   */
   if (collection === "pages") {
     const dependentCollections = await getCollectionsUsingArchive(doc.id)
     for (const dep of dependentCollections) {
@@ -276,31 +302,23 @@ async function revalidateForDocumentChange(
       revalidateTag(collectionTag)
       result.tagsInvalidated.push(collectionTag)
 
-      // Also invalidate URI index for affected collections
+      /**
+       * Also invalidate URI index for affected collections
+       */
       const uriIndexTag = `uri-index:${dep.collection}`
       revalidateTag(uriIndexTag)
       result.tagsInvalidated.push(uriIndexTag)
     }
   }
 
-  // 6. Collection-level invalidation (only for status changes that affect listings)
-  if (changes.statusChanged) {
-    const collectionTag = `collection:${collection}`
-    revalidateTag(collectionTag)
-    result.tagsInvalidated.push(collectionTag)
-
-    // URI index invalidation for frontend collections
-    const { isFrontendCollection } = await import("@/payload/collections/frontend")
-    if (isFrontendCollection(collection)) {
-      const uriIndexTag = `uri-index:${collection}`
-      revalidateTag(uriIndexTag)
-      result.tagsInvalidated.push(uriIndexTag)
-    }
-  }
-
-  // 7. Hierarchy-specific invalidation for pages
+  /**
+   * 6. Hierarchy-specific invalidation for pages - if the parent page changes, all child pages need to be invalidated.
+   * Uses the item: tag to invalidate the parent page.
+   */
   if (collection === "pages" && changes.parentChanged) {
-    // Invalidate parent page cache (affects child listing)
+    /**
+     * Invalidate parent page cache (affects child listing)
+     */
     if (changes.newParent) {
       const parentTag = `item:pages:${changes.newParent}`
       revalidateTag(parentTag)
@@ -318,7 +336,9 @@ async function revalidateForDocumentChange(
   result.endTime = endTime
   result.duration = new Date(endTime).getTime() - new Date(startTime).getTime()
 
-  // Summary logging
+  /**
+   * Summary logging
+   */
   if (logger && result.tagsInvalidated.length > 0) {
     logger.info(`🔄 Cache invalidated for ${collection}/${doc.slug || doc.id}:`)
     logger.info(`   Tags: [${result.tagsInvalidated.join(", ")}]`)
@@ -330,6 +350,10 @@ async function revalidateForDocumentChange(
 
   return result
 }
+
+/*************************************************************************/
+/*  REVALIDATION BATCH
+/*************************************************************************/
 
 async function revalidateForBatchChanges(
   updates: Array<{ collection: string; doc: any; changes: ChangeDetection }>,
@@ -375,6 +399,13 @@ async function revalidateForBatchChanges(
   }
 }
 
+/*************************************************************************/
+/*  REVALIDATION GLOBAL
+/*************************************************************************/
+
+/**
+ * Revalidate global settings using surgical invalidation
+ */
 async function revalidateForGlobalChange(
   globalSlug: string,
   doc: any,
@@ -390,17 +421,25 @@ async function revalidateForGlobalChange(
     startTime,
   }
 
-  // Always invalidate the specific global
+  /**
+   * 1. Always invalidate the specific global
+   */
   const globalTag = `global:${globalSlug}`
   revalidateTag(globalTag)
   result.tagsInvalidated.push(globalTag)
 
-  // Settings changes have special handling
+  /**
+   * 2. Settings changes have special handling
+   */
   if (globalSlug === "settings") {
-    const { detectAllSettingsChanges } = await import("@/lib/routing/dependency-analyzer")
+    const { detectAllSettingsChanges } = await import(
+      "@/lib/routing/dependency-detection"
+    )
     const settingsChanges = detectAllSettingsChanges(previousDoc, doc)
 
-    // Homepage changes affect root path
+    /**
+     * 3. Homepage changes affect root path
+     */
     if (settingsChanges.homepageChange.changed) {
       revalidatePath("/")
       result.pathsInvalidated.push("/")
@@ -410,7 +449,9 @@ async function revalidateForGlobalChange(
       result.tagsInvalidated.push(rootUriTag)
     }
 
-    // Archive changes affect multiple collections
+    /**
+     * 4. Archive changes affect multiple collections
+     */
     for (const archiveChange of settingsChanges.archiveChanges) {
       const collectionTag = `collection:${archiveChange.collection}`
       revalidateTag(collectionTag)
@@ -422,7 +463,9 @@ async function revalidateForGlobalChange(
     }
   }
 
-  // Header/Footer globals affect layout
+  /**
+   * 5. Header/Footer globals affect layout
+   */
   if (globalSlug === "header" || globalSlug === "footer") {
     const layoutTag = `layout:${globalSlug}`
     revalidateTag(layoutTag)
@@ -443,6 +486,13 @@ async function revalidateForGlobalChange(
   return result
 }
 
+/*************************************************************************/
+/*  REVALIDATION EMERGENCY
+/*************************************************************************/
+
+/**
+ * Revalidate all cached data using surgical invalidation emergency mode
+ */
 async function revalidateAllInternal(
   reason: string = "emergency-clear"
 ): Promise<InvalidationResult> {
@@ -454,11 +504,15 @@ async function revalidateAllInternal(
     startTime,
   }
 
-  // Nuclear option - invalidate everything
+  /**
+   * 1. Nuclear option - invalidate everything
+   */
   revalidateTag("all")
   result.tagsInvalidated.push("all")
 
-  // Revalidate key paths
+  /**
+   * 2. Revalidate key paths
+   */
   const keyPaths = ["/", "/sitemap.xml"]
   for (const path of keyPaths) {
     revalidatePath(path)

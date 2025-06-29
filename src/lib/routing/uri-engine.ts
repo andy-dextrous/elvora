@@ -81,20 +81,23 @@ async function generatePageURI({
 
   const homePage = await getHomepage()
 
-  // Homepage must be the root of the site
-
+  /**
+   * Homepage must be the root of the site
+   */
   if (slug === homePage?.slug) {
     return "/"
   }
 
-  // For a normal page with no parent, URI is just the slug with a leading slash
-
+  /**
+   * For a normal page with no parent, URI is just the slug with a leading slash
+   */
   if (!parent) {
     return `/${slug}`
   }
 
-  // For a normal page with a parent, URI is the parent URI plus the slug with a leading slash
-
+  /**
+   * For a normal page with a parent, URI is the parent URI plus the slug with a leading slash
+   */
   try {
     const parentDoc = await cache.getByID(
       "pages",
@@ -139,7 +142,9 @@ async function generateCollectionItemURI({
 }): Promise<string> {
   const archivePageField = `${collection}ArchivePage`
 
-  // Priority 1: Archive page slug (if collection has designated archive page)
+  /**
+   * Priority 1: Archive page slug (if collection has designated archive page)
+   */
   if (settings[archivePageField]) {
     try {
       const archivePage = await cache.getByID("pages", settings[archivePageField]?.id)
@@ -152,7 +157,9 @@ async function generateCollectionItemURI({
     }
   }
 
-  // Priority 2: Original collection slug (fallback)
+  /**
+   * Fallback: Original collection slug
+   */
   return `/${collection}/${slug}`
 }
 

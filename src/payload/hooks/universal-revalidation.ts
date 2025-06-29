@@ -1,15 +1,15 @@
-import { revalidate, revalidateCollection } from "@/lib/cache/revalidation"
+import { revalidateDocument, revalidateCollection } from "@/lib/cache/revalidation"
 import { routingEngine } from "@/lib/routing"
 import { updateURI, deleteURI } from "@/lib/routing/index-manager"
 import { getTemplateIdForCollection } from "@/lib/routing/index-manager"
 import {
   shouldTriggerArchiveDependentUpdates,
   shouldTriggerHierarchyDependentUpdates,
-  getCollectionsFromArchive,
+  getArchiveChildCollections,
   detectHierarchyChanges,
   detectHomepageChange,
   detectAllSettingsChanges,
-} from "@/lib/routing/dependency-analyzer"
+} from "@/lib/routing/dependency-detection"
 import { isFrontendCollection } from "@/payload/collections/frontend"
 import type {
   CollectionAfterChangeHook,
@@ -17,7 +17,7 @@ import type {
   CollectionBeforeChangeHook,
   GlobalAfterChangeHook,
 } from "payload"
-import { revalidateTag, revalidatePath } from "next/cache"
+import { revalidateTag } from "next/cache"
 
 /*************************************************************************/
 /*  UNIVERSAL COLLECTION HOOKS
@@ -50,10 +50,15 @@ export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
   req: { payload, context },
   collection,
 }) => {
-  if (!isFrontendCollection(collection.slug) || !needsURIGeneration(data, originalDoc))
+  if (
+    !isFrontendCollection(collection.slug) ||
+    !publishingOrSlugChanged(data, originalDoc)
+  )
     return data
 
-  // URI Generation - Generate and attach URI before save so it becomes part of the saved document
+  /**
+   * URI Generation - Generate and attach URI before save so it becomes part of the saved document
+   */
   try {
     const newURI = await routingEngine.generateURI({
       collection: collection.slug,
@@ -72,17 +77,18 @@ export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
     data._uriGenerationFailed = true
   }
 
-  // Dependent Updates Detection (Pages Only) - Pages can affect other collections via archive/hierarchy relationships
+  /**
+   * Only pages can affect other collections via archive/hierarchy relationships
+   */
   if (collection.slug !== "pages") return data
 
   const dependentUpdates = getDependentUpdatesContext(context)
 
-  // Archive Dependent Updates Detection - When archive pages change, all collection items need URI updates
+  /**
+   * Archive-Dependent Updates Detection - When archive pages change, all collection items need URI updates
+   */
   if (await shouldTriggerArchiveDependentUpdates(collection.slug, data, originalDoc)) {
-    const dependencies = await getCollectionsFromArchive(data.id)
-    console.log(
-      `[Dependent Updates] Archive page ${data.slug} change will affect ${dependencies.length} collections`
-    )
+    const dependencies = await getArchiveChildCollections(data.id)
 
     dependentUpdates.push({
       operation: "archive-page-update",
@@ -95,10 +101,11 @@ export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
     })
   }
 
-  // Hierarchy Dependent Updates Detection - When parent pages move, all child pages need URI updates
+  /**
+   * Hierarchy-Dependent Updates Detection - When parent pages move, all child pages need URI updates
+   */
   if (await shouldTriggerHierarchyDependentUpdates(collection.slug, data, originalDoc)) {
     const hierarchyChanges = detectHierarchyChanges(data, originalDoc)
-    console.log(`[Dependent Updates] Page ${data.slug} hierarchy change detected`)
 
     dependentUpdates.push({
       operation: "page-hierarchy-update",
@@ -137,27 +144,31 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
 }) => {
   if (!isFrontendCollection(collection.slug)) return doc
 
-  // Step 1, update the uri index for the collection with the correct uri, template, and previous uri
+  /**
+   * Now, the URI index must be updated with the correct uri, template, and previous uri
+   */
   await updateURIIndex(doc, previousDoc, collection, payload)
 
-  // Step 2, process dependent updates - Execute jobs for changes that affect other documents
+  /**
+   * Process dependent updates - Execute Payload jobs for changes that affect other documents.
+   * These run in the background and are not blocking the main thread.
+   */
   const dependentUpdates = getDependentUpdatesContext(context)
+
   if (dependentUpdates.length > 0) {
-    await processDependentUpdates(dependentUpdates, payload)
+    await queueDependentUpdatesJob(dependentUpdates, payload)
     clearDependentUpdatesContext(context)
   }
 
-  // Revalidation - Clear Next.js cache for pages affected by this change. This happens after the document is saved to the database.
-
+  /**
+   * Revalidation comes last. Both document and dependent updates are updated.
+   * Clear Next.js cache for pages affected by this change.
+   */
   const isPublished = doc._status === "published"
   if (context.disableRevalidate || !isPublished) return doc
 
-  payload.logger.info(
-    `afterCollectionChange: ${collection.slug} - ${previousDoc?.slug} -> ${doc.slug}`
-  )
-
   try {
-    await revalidate({
+    await revalidateDocument({
       collection: collection.slug,
       doc,
       previousDoc,
@@ -204,7 +215,7 @@ export const afterCollectionDelete: CollectionAfterDeleteHook = async ({
   if (context.disableRevalidate) return doc
 
   try {
-    await revalidate({
+    await revalidateDocument({
       collection: collection.slug,
       doc,
       action: "delete",
@@ -278,7 +289,7 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
               id: change.newArchive,
             })
             if (archivePage) {
-              await revalidate({
+              await revalidateDocument({
                 collection: "pages",
                 doc: archivePage,
                 action: "update",
@@ -309,7 +320,7 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
 
     // Process Dependent Updates - Execute queued jobs for detected changes
     if (dependentUpdates.length > 0) {
-      await processDependentUpdates(dependentUpdates, payload)
+      await queueDependentUpdatesJob(dependentUpdates, payload)
       clearDependentUpdatesContext(context)
     }
   }
@@ -374,7 +385,7 @@ async function updateURIIndex(doc: any, previousDoc: any, collection: any, paylo
   }
 }
 
-function needsURIGeneration(data: any, originalDoc: any): boolean {
+function publishingOrSlugChanged(data: any, originalDoc: any): boolean {
   const isPublishing =
     data._status === "published" && originalDoc?._status !== "published"
   const isSlugChange =
@@ -434,7 +445,7 @@ async function queueRetryJob(payload: any, collectionSlug: string, docId: string
   }
 }
 
-async function processDependentUpdates(
+async function queueDependentUpdatesJob(
   dependentUpdates: any[],
   payload: any
 ): Promise<void> {
@@ -445,15 +456,8 @@ async function processDependentUpdates(
         input: update,
       })
 
-      console.log(
-        `[Dependent Updates] Queued ${update.operation} job (ID: ${job.id}) for entity ${update.entityId}`
-      )
-
       // Execute immediately
       payload.jobs.runByID({ id: job.id! })
-      console.log(
-        `[Dependent Updates] Dispatched ${update.operation} job for immediate execution`
-      )
     } catch (error) {
       payload.logger.error(
         `Failed to queue dependent update job for ${update.operation}:`,

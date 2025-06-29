@@ -1,10 +1,10 @@
 import {
-  getCollectionsFromArchive,
+  getArchiveChildCollections,
   getCollectionItemsForArchive,
   findDescendantPages,
-} from "./dependency-analyzer"
-import { updateURI } from "./index-manager"
-import { routingEngine } from "./uri-engine"
+} from "@/lib/routing/dependency-detection"
+import { updateURI } from "@/lib/routing/index-manager"
+import { routingEngine } from "@/lib/routing/uri-engine"
 import { batchRevalidate } from "@/lib/cache"
 import { detectChanges } from "@/lib/cache/change-detection"
 import { cache } from "@/lib/cache"
@@ -48,29 +48,24 @@ export async function processArchivePageUpdate(
   }
 
   try {
-    // Get all collections that use this page as their archive
-    const dependencies = await getCollectionsFromArchive(pageId)
+    const dependencies = await getArchiveChildCollections(pageId)
 
     if (dependencies.length === 0) {
-      console.log(`[Dependent Updates] No collections use page ${pageId} as archive`)
       result.success = true
       return result
     }
 
-    // Get the updated page to get the new slug
-    const updatedPage = await cache.getByID("pages", pageId)
-    if (!updatedPage) {
+    const updatedArchivePage = await cache.getByID("pages", pageId)
+    if (!updatedArchivePage) {
       throw new Error(`Could not find updated page ${pageId}`)
     }
 
     const batchUpdates = []
 
-    // Process each collection that uses this archive page
+    /**
+     * Process each collection that uses this archive page
+     */
     for (const dependency of dependencies) {
-      console.log(
-        `[Dependent Updates] Processing ${dependency.collection} items for archive ${dependency.archivePageSlug}`
-      )
-
       const items = await getCollectionItemsForArchive(dependency.collection)
 
       for (const item of items) {
@@ -82,7 +77,6 @@ export async function processArchivePageUpdate(
         })
 
         if (oldURI !== newURI) {
-          // Update URI in index
           await updateURI({
             uri: newURI,
             collection: dependency.collection,
@@ -91,7 +85,6 @@ export async function processArchivePageUpdate(
             previousURI: oldURI,
           })
 
-          // Track for batch cache invalidation
           const changes = detectChanges(
             { ...item, uri: newURI },
             { ...item, uri: oldURI }
@@ -104,14 +97,15 @@ export async function processArchivePageUpdate(
           })
 
           result.documentsUpdated++
-          result.redirectsCreated++ // URI update creates automatic redirect
+          result.redirectsCreated++
         }
       }
     }
 
-    // Batch process cache invalidation
+    /**
+     * Batch process cache invalidation
+     */
     if (batchUpdates.length > 0) {
-      // Convert to batchRevalidate format
       const operations = batchUpdates.map(update => ({
         collection: update.collection,
         doc: update.doc,
@@ -129,7 +123,6 @@ export async function processArchivePageUpdate(
     result.success = true
   } catch (error) {
     result.errors.push(error instanceof Error ? error.message : String(error))
-    console.error(`[Dependent Updates] Archive page update failed:`, error)
   }
 
   return result

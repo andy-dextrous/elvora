@@ -13,7 +13,7 @@ export interface ArchiveDependency {
 /*  ARCHIVE PAGE DEPENDENCY ANALYSIS
 /*************************************************************************/
 
-export async function getCollectionsFromArchive(
+export async function getArchiveChildCollections(
   pageId: string
 ): Promise<ArchiveDependency[]> {
   const settings = await getSettings()
@@ -186,7 +186,7 @@ export async function shouldTriggerArchiveDependentUpdates(
   if (doc._status !== "published") return false
 
   // Check if this page is used as an archive page
-  const collections = await getCollectionsFromArchive(doc.id)
+  const collections = await getArchiveChildCollections(doc.id)
   if (collections.length === 0) return false
 
   // Check for slug changes
@@ -223,7 +223,7 @@ export async function getDependentUpdatesImpactSize(
 
   switch (operation) {
     case "archive-page-update":
-      const archiveDependencies = await getCollectionsFromArchive(entityId)
+      const archiveDependencies = await getArchiveChildCollections(entityId)
       for (const dep of archiveDependencies) {
         const items = await getCollectionItemsForArchive(dep.collection)
         impactSize += items.length

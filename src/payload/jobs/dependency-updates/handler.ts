@@ -1,11 +1,11 @@
-import { getDependentUpdatesImpactSize } from "@/lib/routing/dependency-analyzer"
+import { getDependentUpdatesImpactSize } from "@/lib/routing/dependency-detection"
 import {
   processArchivePageUpdate,
   processPageHierarchyUpdate,
   processHomepageChange,
   processSettingsChange,
   type DependentUpdatesResult,
-} from "@/lib/routing/dependency-updates"
+} from "./update-functions"
 
 /*************************************************************************/
 /*  DEPENDENT UPDATES JOB TYPES
@@ -63,9 +63,15 @@ export interface DependentUpdatesJobOutput {
 
 export async function uriDependentUpdatesHandler({
   input,
+  req,
 }: {
   input: DependentUpdatesJobInput
+  req: any
 }): Promise<{ output: DependentUpdatesJobOutput }> {
+  const { payload } = req
+  const logger = payload.logger
+  logger.info(`[Dependent Updates] Starting job for ${input.operation}`)
+
   const { operation, entityId, additionalData } = input
 
   const result: DependentUpdatesJobOutput = {

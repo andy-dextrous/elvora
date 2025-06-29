@@ -41,7 +41,9 @@ export function detectChanges(
     titleChanged: false,
   }
 
-  // Handle create operations
+  /**
+   * Handle create operations
+   */
   if (operation === "create" || !previousDoc) {
     changes.contentChanged = true
     changes.newUri = doc.uri || (doc.slug ? `/${doc.slug}` : undefined)
@@ -51,7 +53,9 @@ export function detectChanges(
     return changes
   }
 
-  // Handle delete operations
+  /**
+   * Handle delete operations
+   */
   if (operation === "delete") {
     changes.contentChanged = true
     changes.oldUri =
@@ -62,7 +66,9 @@ export function detectChanges(
     return changes
   }
 
-  // Handle update operations - detailed change detection
+  /**
+   * Handle update operations - detailed change detection
+   */
   const oldUri =
     previousDoc.uri || (previousDoc.slug ? `/${previousDoc.slug}` : undefined)
   const newUri = doc.uri || (doc.slug ? `/${doc.slug}` : undefined)
@@ -75,40 +81,52 @@ export function detectChanges(
   const oldTitle = previousDoc.title || previousDoc.name
   const newTitle = doc.title || doc.name
 
-  // URI changes
+  /**
+   * URI changes
+   */
   if (oldUri !== newUri) {
     changes.uriChanged = true
     changes.oldUri = oldUri
     changes.newUri = newUri
   }
 
-  // Slug changes
+  /**
+   * Slug changes
+   */
   if (oldSlug !== newSlug) {
     changes.slugChanged = true
     changes.oldSlug = oldSlug
     changes.newSlug = newSlug
   }
 
-  // Status changes
+  /**
+   * Status changes
+   */
   if (oldStatus !== newStatus) {
     changes.statusChanged = true
     changes.oldStatus = oldStatus
     changes.newStatus = newStatus
   }
 
-  // Parent changes (for hierarchical content)
+  /**
+   * Parent changes (for hierarchical content)
+   */
   if (oldParent !== newParent) {
     changes.parentChanged = true
     changes.oldParent = oldParent
     changes.newParent = newParent
   }
 
-  // Title changes (affects navigation display)
+  /**
+   * Title changes (affects navigation display)
+   */
   if (oldTitle !== newTitle) {
     changes.titleChanged = true
   }
 
-  // Content changes (deep comparison excluding system fields)
+  /**
+   * Content changes (deep comparison excluding system fields)
+   */
   if (hasContentChanges(doc, previousDoc)) {
     changes.contentChanged = true
   }

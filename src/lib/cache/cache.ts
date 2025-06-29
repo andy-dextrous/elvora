@@ -62,107 +62,45 @@ function generateCacheKey(options: CacheKeyOptions): string[] {
     params = [],
   } = options
 
-  /*************************************************************************/
-  /*  INDIVIDUAL COLLECTION ITEMS BY SLUG
-
-      Used for: cache.getBySlug("pages", "about")
-      Tags: collection:pages, item:pages:about, [dependencies]
-      Revalidated by: Smart revalidation when the specific document changes
-
-      Cache Key Structure: [collection, "item", slug, status]
-      Example: ["pages", "item", "about", "published"]
-  /*************************************************************************/
-
+  /**
+   * Individual collection items by slug
+   */
   if (collection && slug) {
     return [collection, "item", slug, draft ? "draft" : "published"]
   }
 
-  /*************************************************************************/
-  /*  INDIVIDUAL COLLECTION ITEMS BY ID
-
-      Used for: cache.getByID("pages", "64f8b9c1e4b0c7d8a9e0f1g2")
-      Tags: collection:pages, item:pages:[id], [dependencies]
-      Revalidated by: Smart revalidation when the specific document changes
-
-      Cache Key Structure: [collection, "item", id, status]
-      Example: ["pages", "item", "64f8b9c1e4b0c7d8a9e0f1g2", "published"]
-  /*************************************************************************/
-
+  /**
+   * Individual collection items by ID
+   */
   if (collection && params.length > 0 && !queryHash && !type) {
     return [collection, "item", params[0], draft ? "draft" : "published"]
   }
 
-  /*************************************************************************/
-  /*  URI-BASED LOOKUPS (PRIMARY ROUTING ENGINE METHOD)
-
-      Used for: cache.getByURI("/about") - Universal routing system
-      Tags: uri:/about (normalized without trailing slash)
-      Revalidated by: URI changes, slug changes, document status changes
-
-      This is the PRIMARY method for the smart routing engine. When users
-      visit any URL, this cache key is used to find the corresponding document.
-
-      Cache Key Structure: ["uri", normalizedURI, status]
-      Examples:
-      - Homepage: ["uri", "", "published"]
-      - About page: ["uri", "/about", "published"]
-  /*************************************************************************/
-
+  /**
+   * URI-based lookups (primary routing engine method)
+   */
   if (uri !== undefined) {
     const normalizedURI = routingEngine.normalizeURI(uri)
     return ["uri", normalizedURI, draft ? "draft" : "published"]
   }
 
-  /*************************************************************************/
-  /*  COLLECTION QUERIES WITH FILTERS/PAGINATION
-
-      Used for: cache.getCollection("posts", { limit: 10, page: 1 })
-      Tags: collection:posts, [dependencies]
-      Revalidated by: Any change to documents in the collection
-
-      The queryHash includes all query parameters (where clauses, sorting, etc.)
-      to ensure different queries are cached separately.
-
-      Cache Key Structure: [collection, "list", queryHash, status]
-      Example: ["posts", "list", "{\"limit\":10,\"page\":1}", "published"]
-  /*************************************************************************/
-
+  /**
+   * Collection queries with filters/pagination
+   */
   if (collection && queryHash) {
     return [collection, "list", queryHash, draft ? "draft" : "published"]
   }
 
-  /*************************************************************************/
-  /*  GLOBAL SINGLETONS
-
-      Used for: cache.getGlobal("header") or cache.getGlobal("settings")
-      Tags: global:header, global:settings
-      Revalidated by: Changes to the specific global document
-
-      Globals are singleton documents (header, footer, settings) that appear
-      across the entire site and need immediate revalidation when changed.
-
-      Cache Key Structure: ["global", globalSlug]
-      Examples: ["global", "header"], ["global", "footer"]
-  /*************************************************************************/
-
+  /**
+   * Global singletons
+   */
   if (globalSlug) {
     return ["global", globalSlug]
   }
 
-  /*************************************************************************/
-  /*  COMPUTED/RELATED CONTENT
-
-      Used for: Template calculations, computed values, or related content
-      Tags: computed:[type]
-      Revalidated by: Dependencies defined in the computed logic
-
-      This handles cached results of complex computations, template applications,
-      or derived content that doesn't fit other patterns.
-
-      Cache Key Structure: ["computed", type, ...additionalParams]
-      Example: ["computed", "template", "default-page-template"]
-  /*************************************************************************/
-
+  /**
+   * Computed/related content
+   */
   if (type) {
     return ["computed", type, ...params]
   }
@@ -173,58 +111,23 @@ function generateCacheKey(options: CacheKeyOptions): string[] {
 /*************************************************************************/
 /*  CACHE TAGS GENERATION
 
-    UNDERSTANDING CACHE KEYS VS CACHE TAGS:
+    CACHE KEYS vs CACHE TAGS:
 
-    🔑 CACHE KEYS = The unique identifier for a specific cached item
-       - Generated by generateCacheKey()
+    🔑 CACHE KEYS = Unique identifier for a specific cached item
        - Example: ["pages", "item", "about", "published"]
        - Used by Next.js to store/retrieve the exact cached value
-       - Each key stores ONE specific piece of data
 
-    🏷️ CACHE TAGS = Labels attached to cached items for batch invalidation
-       - Generated by generateCacheTags()
-       - Example: ["all", "collection:pages", "item:pages:about", "global:header"]
-       - Used by Next.js revalidateTag() to invalidate MULTIPLE cache entries
+    🏷️ CACHE TAGS = Labels for batch invalidation
+       - Example: ["all", "collection:pages", "item:pages:about"]
+       - Used by Next.js revalidateTag() to invalidate multiple cache entries
        - Multiple cache entries can share the same tag
 
-    RELATIONSHIP BETWEEN KEYS AND TAGS:
-
-    One Cache Key → Multiple Cache Tags
-
-    =====================================
-
-      Cache Key: ["pages", "item", "about", "published"]
-
-      Cache Tags: [
-      "all",                  ← Universal tag
-      "collection:pages",     ← Collection-level tag
-      "item:pages:about",     ← Item-specific tag
-      "global:settings"       ← Dependency tag
-      ]
-
-    ====================================
-
-    REVALIDATION POWER:
-
     When you call revalidateTag("collection:pages"), it invalidates ALL
-    cached items that have that tag, regardless of their individual keys:
-
-    - cache.getBySlug("pages", "about")     ← Invalidated
-    - cache.getBySlug("pages", "contact")   ← Invalidated
-    - cache.getCollection("pages", {...})   ← Invalidated
-    - cache.getByURI("/about")              ← Invalidated
-
-    This allows surgical cache invalidation - you can clear related content
-    without knowing every individual cache key that might be affected.
-
-    Note: Next.js treats an array of strings as one single cache key.
+    cached items with that tag, regardless of their individual keys.
 
 /*************************************************************************/
 
-function generateCacheTags(
-  options: CacheKeyOptions,
-  includeDependencies: boolean = true
-): string[] {
+function generateCacheTags(options: CacheKeyOptions): string[] {
   const { collection, slug, uri, globalSlug, type, params = [] } = options
   const tags: string[] = []
 
@@ -245,63 +148,68 @@ function generateCacheTags(
 
   tags.push("all")
 
-  // Individual items by slug
+  /**
+   * Individual items by slug
+   */
   if (collection && slug) {
     tags.push(`collection:${collection}`)
     tags.push(`item:${collection}:${slug}`)
 
-    // Add URI index tags for frontend collections
+    /**
+     * Add URI index tags for frontend collections
+     */
     if (isFrontendCollection(collection)) {
       tags.push(`uri-index:${collection}`) // Specific collection in URI index
-      tags.push(`uri-index:item:${collection}:${slug}`) // Specific item in URI index
     }
-
-    // Dependencies now handled by surgical invalidation system
   }
 
-  // Individual items by ID (when params contains the ID)
+  /**
+   * Individual items by ID (when params contains the ID)
+   */
   if (collection && params.length > 0 && !slug && !type) {
     tags.push(`collection:${collection}`)
     tags.push(`item:${collection}:${params[0]}`)
 
-    // Add URI index tags for frontend collections
+    /**
+     * Add URI index tags for frontend collections
+     */
     if (isFrontendCollection(collection)) {
       tags.push(`uri-index:${collection}`) // Specific collection in URI index
-      tags.push(`uri-index:item:${collection}:${params[0]}`) // Specific item in URI index
     }
-
-    // Dependencies now handled by surgical invalidation system
   }
 
-  // URI-based lookups
+  /**
+   * URI-based lookups
+   */
   if (uri !== undefined) {
     const normalizedURI = routingEngine.normalizeURI(uri)
     tags.push(`uri:${normalizedURI}`)
-
-    // More specific URI index tags (instead of broad "lookup"/"dependent")
-    tags.push(`uri-index:path:${normalizedURI}`) // Specific path in URI index
-    tags.push(`uri-lookup:${normalizedURI}`) // Specific URI lookup cache
   }
 
-  // Collection queries
+  /**
+   * Collection queries
+   */
   if (collection && !slug && params.length === 0) {
     tags.push(`collection:${collection}`)
 
-    // Add URI index tags for frontend collections
+    /**
+     * Add URI index tags for frontend collections
+     */
     if (isFrontendCollection(collection)) {
       tags.push(`uri-index:${collection}`) // Specific collection in URI index
-      tags.push(`collection-index:${collection}`) // Collection-specific index cache
     }
-
-    // Dependencies now handled by surgical invalidation system
   }
 
-  // Globals
+  /**
+   * Globals
+   */
   if (globalSlug) {
     tags.push(`global:${globalSlug}`)
   }
 
-  // Computed/related content
+  /**
+   * Computed/related content
+   */
   if (type) {
     tags.push(`computed:${type}`)
   }
@@ -344,10 +252,10 @@ function logCacheEvent(event: CacheEvent) {
     Single interface for all content retrieval with intelligent caching and revalidation.
 
     Primary Methods:
-    - cache.getByURI("/about/team/andrew")           → Universal routing (powers [[...slug]]/page.tsx)
-    - cache.getBySlug("team", "andrew")  → Individual documents
-    - cache.getCollection("team", {...}) → Filtered collections
-    - cache.getGlobal("settings")          → Site-wide content
+    - cache.getByURI("/about/team/andrew")        → Universal routing (powers [[...slug]]/page.tsx)
+    - cache.getBySlug("team", "andrew")           → Individual documents
+    - cache.getCollection("team", {...})          → Filtered collections
+    - cache.getGlobal("settings")                 → Site-wide content
 
     Each method wraps Next.js unstable_cache() with standardized keys, tags,
     and surgical invalidation for precise cache management.
@@ -362,7 +270,7 @@ export const cache = {
     draft: boolean = false
   ): Promise<ResolvedDocument | null> => {
     const cacheKey = generateCacheKey({ uri, draft })
-    const tags = generateCacheTags({ uri }, true)
+    const tags = generateCacheTags({ uri })
 
     const timestamp = new Date().toISOString()
     logCacheEvent({ operation: `getByURI("${uri}")`, cacheKey, tags, timestamp })
@@ -445,7 +353,7 @@ export const cache = {
     draft: boolean = false
   ): Promise<any | null> => {
     const cacheKey = generateCacheKey({ collection, params: [id], draft })
-    const tags = generateCacheTags({ collection }, true)
+    const tags = generateCacheTags({ collection })
 
     const timestamp = new Date().toISOString()
     logCacheEvent({
@@ -483,7 +391,7 @@ export const cache = {
     draft: boolean = false
   ): Promise<any | null> => {
     const cacheKey = generateCacheKey({ collection, slug, draft })
-    const tags = generateCacheTags({ collection, slug }, true)
+    const tags = generateCacheTags({ collection, slug })
 
     const timestamp = new Date().toISOString()
     logCacheEvent({
@@ -528,7 +436,7 @@ export const cache = {
   ): Promise<any[]> => {
     const queryHash = JSON.stringify(options)
     const cacheKey = generateCacheKey({ collection, queryHash, draft })
-    const tags = generateCacheTags({ collection }, true)
+    const tags = generateCacheTags({ collection })
 
     const timestamp = new Date().toISOString()
     logCacheEvent({
@@ -576,7 +484,7 @@ export const cache = {
    */
   getGlobal: async (globalSlug: Global, depth: number = 0): Promise<any> => {
     const cacheKey = generateCacheKey({ globalSlug })
-    const tags = generateCacheTags({ globalSlug }, true)
+    const tags = generateCacheTags({ globalSlug })
 
     const timestamp = new Date().toISOString()
     logCacheEvent({
@@ -611,7 +519,7 @@ export const cache = {
       type: "all-uris",
       params: [draft ? "draft" : "published"],
     })
-    const tags = generateCacheTags({ collection: "uri-index" }, true)
+    const tags = generateCacheTags({ collection: "uri-index" })
 
     const timestamp = new Date().toISOString()
     logCacheEvent({
