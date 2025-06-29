@@ -10,7 +10,7 @@ import {
   beforeCollectionChange,
   afterCollectionChange,
   afterCollectionDelete,
-} from "@/payload/hooks/revalidate-after-change"
+} from "@/payload/hooks/universal-revalidation"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 
 import {

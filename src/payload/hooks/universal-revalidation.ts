@@ -30,12 +30,17 @@ import type {
 /*************************************************************************/
 
 /**
- *    BEFORE COLLECTION CHANGE
+ *    BEFORE COLLECTION CHANGE - DATA PREPARATION PHASE
  *
- *    Universal beforeChange hook for URI generation and cascade detection
- *    - Generates URI when content is published or when published content's slug changes
- *    - Detects when changes will require cascade operations (archive pages, hierarchy changes)
- *    - Stores cascade information in request context for afterCollectionChange hook
+ *    Runs BEFORE document hits database - modifies data being saved
+ *
+ *    Why "before" is essential:
+ *    - Generates URI and attaches to document before save (data.uri = newURI)
+ *    - Compares old vs new data to detect cascade needs (using originalDoc)
+ *    - Stores cascade plans in request context for after hook
+ *    - Sets error flags on document for recovery (data._uriGenerationFailed)
+ *
+ *    Critical: Must happen before save to ensure URI becomes part of saved document
  */
 
 export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
@@ -132,10 +137,18 @@ export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
 }
 
 /**
- *    AFTER COLLECTION CHANGE
+ *    AFTER COLLECTION CHANGE - INDEX MAINTENANCE & EXECUTION PHASE
  *
- *    Universal afterChange hook that works for any collection by revalidating the document
- *    and any of its dependents as per the smart routing engine.
+ *    Runs AFTER document is safely saved to database - maintains external systems
+ *
+ *    Why "after" is essential:
+ *    - Has real document ID for new documents (doc.id now exists)
+ *    - Transaction is complete - safe to update URI index without conflicts
+ *    - Executes cascade jobs with final document state
+ *    - Handles URI generation failures flagged in before hook
+ *    - Performs smart cache revalidation with complete document data
+ *
+ *    Critical: External system updates happen after primary transaction commits
  */
 
 export const afterCollectionChange: CollectionAfterChangeHook = async ({
@@ -248,10 +261,17 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
 }
 
 /**
- *    AFTER COLLECTION DELETE
+ *    AFTER COLLECTION DELETE - CLEANUP PHASE
  *
- *    Universal afterDelete hook that works for any collection by revalidating the document
- *    and any of its dependents as per the smart routing engine.
+ *    Runs AFTER document is deleted from database - cleans up external references
+ *
+ *    Why "after delete" is needed:
+ *    - Removes URI index entries for deleted documents
+ *    - Cleans up orphaned references in external systems
+ *    - Revalidates pages that may have referenced deleted content
+ *    - No cascade operations needed (deletion doesn't change other URIs)
+ *
+ *    Critical: Cleanup happens after deletion to avoid referential integrity issues
  */
 
 export const afterCollectionDelete: CollectionAfterDeleteHook = async ({
@@ -297,12 +317,17 @@ export const afterCollectionDelete: CollectionAfterDeleteHook = async ({
 /*************************************************************************/
 
 /**
- *    AFTER GLOBAL CHANGE
+ *    AFTER GLOBAL CHANGE - SETTINGS CASCADE DETECTION PHASE
  *
- *    Universal afterChange hook for globals with cascade detection
- *    - Detects settings changes that require cascade operations
- *    - Queues cascade jobs for homepage changes and site-wide settings updates
- *    - Revalidates global dependencies as per the smart routing engine
+ *    Runs AFTER global settings are saved - detects site-wide impacts
+ *
+ *    Why "after global" is needed:
+ *    - Detects homepage designation changes (old / → /home, new /welcome → /)
+ *    - Identifies archive page assignment changes affecting entire collections
+ *    - Queues cascade jobs for site-wide URI regeneration
+ *    - Only "after" because globals don't need URI generation (no individual URIs)
+ *
+ *    Critical: Settings changes can affect hundreds of pages - cascade detection essential
  */
 
 export const afterGlobalChange: GlobalAfterChangeHook = async ({

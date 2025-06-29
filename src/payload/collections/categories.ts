@@ -5,7 +5,7 @@ import { authenticated } from "@/payload/access/authenticated"
 import {
   afterCollectionChange,
   afterCollectionDelete,
-} from "@/payload/hooks/revalidate-after-change"
+} from "@/payload/hooks/universal-revalidation"
 
 export const Categories: CollectionConfig = {
   slug: "categories",

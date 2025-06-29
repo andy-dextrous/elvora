@@ -2,7 +2,7 @@ import { CollectionConfig } from "payload"
 import {
   afterCollectionChange,
   afterCollectionDelete,
-} from "@/payload/hooks/revalidate-after-change"
+} from "@/payload/hooks/universal-revalidation"
 import { anyone } from "@/payload/access/anyone"
 import { canEditContent } from "@/payload/access/editor"
 import { slugField } from "../fields/slug"

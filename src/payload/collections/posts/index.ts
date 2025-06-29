@@ -16,7 +16,7 @@ import {
   beforeCollectionChange,
   afterCollectionChange,
   afterCollectionDelete,
-} from "@/payload/hooks/revalidate-after-change"
+} from "@/payload/hooks/universal-revalidation"
 
 import {
   MetaDescriptionField,

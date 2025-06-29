@@ -6,7 +6,7 @@ import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublis
 import {
   afterCollectionChange,
   afterCollectionDelete,
-} from "@/payload/hooks/revalidate-after-change"
+} from "@/payload/hooks/universal-revalidation"
 
 export const Templates: CollectionConfig<"templates"> = {
   slug: "templates",
