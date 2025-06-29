@@ -3,6 +3,21 @@ import { revalidatePath, revalidateTag } from "next/cache"
 import { getInvalidationTargets, getCacheConfig } from "./cache-config"
 import { shouldIncludeInSitemap } from "@/lib/sitemaps/config"
 import { isFrontendCollection } from "@/payload/collections/frontend"
+import {
+  revalidateForDocumentChange,
+  revalidateForBatchChanges,
+  revalidateForGlobalChange,
+  revalidateAll as surgicalRevalidateAll,
+  shouldSkipInvalidation,
+  type InvalidationResult,
+  type BatchInvalidationSummary,
+} from "./surgical-invalidation"
+import {
+  detectChanges,
+  type ChangeDetection,
+  type CollectionChange,
+  isContentOnlyChange,
+} from "./change-detection"
 
 /*************************************************************************/
 /*  UNIVERSAL REVALIDATION ENGINE - TYPES & INTERFACES
@@ -16,42 +31,48 @@ export interface RevalidateOptions {
   logger?: any
 }
 
-export interface ChangeDetection {
-  uriChanged: boolean
-  statusChanged: boolean
-  contentChanged: boolean
-  oldUri?: string
-  newUri?: string
-}
-
 /*************************************************************************/
 /*  SMART REVALIDATION FUNCTION
 /*************************************************************************/
 
 /**
- * Smart revalidation that uses cache config dependencies and enhanced tags
+ * Smart revalidation using surgical invalidation system
  */
-export async function revalidate(options: RevalidateOptions): Promise<void> {
-  const { collection, doc, previousDoc, logger } = options
+export async function revalidate(
+  options: RevalidateOptions
+): Promise<InvalidationResult> {
+  const { collection, doc, previousDoc, action = "update", logger } = options
 
   try {
-    const changes = detectChanges(doc, previousDoc)
+    const changes = detectChanges(doc, previousDoc, action)
 
-    if (shouldSkipRevalidation(doc)) {
-      return
+    if (shouldSkipInvalidation(doc, changes)) {
+      logger?.info(`Skipping revalidation for ${collection}/${doc.slug || doc.id}`)
+      return {
+        tagsInvalidated: [],
+        pathsInvalidated: [],
+        reason: `skipped: ${collection}/${doc.slug || doc.id}`,
+        startTime: new Date().toISOString(),
+        endTime: new Date().toISOString(),
+        duration: 0,
+      }
     }
 
-    const tagsToInvalidate = await generateRevalidationTags(
+    // Use surgical invalidation for precise cache clearing
+    const result = await revalidateForDocumentChange(
       collection,
       doc,
-      previousDoc,
-      changes
+      changes,
+      "single-change"
     )
 
-    await revalidatePaths(doc, previousDoc, changes, logger)
-    await revalidateTags(tagsToInvalidate, logger)
+    logger?.info(`Cache revalidated: ${collection}/${doc.slug || doc.id}`, {
+      tagsInvalidated: result.tagsInvalidated.length,
+      pathsInvalidated: result.pathsInvalidated.length,
+      duration: result.duration,
+    })
 
-    logger?.info(`Cache revalidated: ${collection}/${doc.slug || doc.id}`)
+    return result
   } catch (error) {
     logger?.error(`Smart revalidation failed for ${collection}:`, error)
     throw error
@@ -59,14 +80,14 @@ export async function revalidate(options: RevalidateOptions): Promise<void> {
 }
 
 /*************************************************************************/
-/*  REVALIDATION DECISION LOGIC
+/*  REVALIDATION DECISION LOGIC - LEGACY COMPATIBILITY
 /*************************************************************************/
 
 /**
- * Determines if revalidation should be skipped for performance
- * Only revalidate when changes affect public-facing content (publish events)
+ * Legacy compatibility wrapper - now uses surgical invalidation logic
+ * @deprecated Use shouldSkipInvalidation from surgical-invalidation instead
  */
-function shouldSkipRevalidation(doc: any): boolean {
+function shouldSkipRevalidationLegacy(doc: any): boolean {
   if (!doc) {
     return false
   }
@@ -78,208 +99,82 @@ function shouldSkipRevalidation(doc: any): boolean {
 }
 
 /*************************************************************************/
-/*  CHANGE DETECTION LOGIC
+/*  LEGACY TAG GENERATION - DEPRECATED
 /*************************************************************************/
 
-function detectChanges(doc: any, previousDoc?: any): ChangeDetection {
-  const changes: ChangeDetection = {
-    uriChanged: false,
-    statusChanged: false,
-    contentChanged: false,
-  }
-
-  if (!previousDoc) {
-    changes.contentChanged = true
-    changes.newUri = doc.uri || (doc.slug ? `/${doc.slug}` : undefined)
-    return changes
-  }
-
-  const oldUri =
-    previousDoc.uri || (previousDoc.slug ? `/${previousDoc.slug}` : undefined)
-  const newUri = doc.uri || (doc.slug ? `/${doc.slug}` : undefined)
-
-  if (oldUri !== newUri) {
-    changes.uriChanged = true
-    changes.oldUri = oldUri
-    changes.newUri = newUri
-  }
-
-  if (doc._status !== previousDoc._status) {
-    changes.statusChanged = true
-  }
-
-  if (JSON.stringify(doc) !== JSON.stringify(previousDoc)) {
-    changes.contentChanged = true
-  }
-
-  return changes
-}
-
-/*************************************************************************/
-/*  TAG GENERATION FOR REVALIDATION
-/*************************************************************************/
-
-async function generateRevalidationTags(
+/**
+ * @deprecated Use surgical invalidation instead - this function has broad invalidation issues
+ * Legacy tag generation that always invalidates header/footer (THE PROBLEM WE'RE FIXING)
+ */
+async function generateRevalidationTagsLegacy(
   collection: string,
   doc: any,
   previousDoc: any,
   changes: ChangeDetection
 ): Promise<string[]> {
+  // This function is kept for legacy compatibility but should not be used
+  // It represents the OLD broad invalidation pattern we're replacing
+  console.warn(
+    "generateRevalidationTagsLegacy is deprecated - use surgical invalidation instead"
+  )
+
   const tags = new Set<string>()
 
-  // NOTE: We deliberately exclude the 'all' tag from normal revalidation
-  // The 'all' tag should only be used as an emergency escape hatch
-
-  if (collection.startsWith("global:")) {
-    const globalSlug = collection.replace("global:", "")
-    tags.add(`global:${globalSlug}`)
-  } else {
-    // Collection-level tag
-    tags.add(`collection:${collection}`)
-
-    // Add URI index tags for frontend collections
-    if (isFrontendCollection(collection)) {
-      tags.add(`uri-index:${collection}`) // Collection-specific URI index
-      tags.add("uri-index:all") // General URI index tag
-    }
-
-    // Item-specific tags
-    if (doc.slug) {
-      tags.add(`item:${collection}:${doc.slug}`)
-    }
-
-    // URI-specific tags
-    if (doc.uri !== undefined) {
-      const normalizedURI = doc.uri === "/" ? "" : doc.uri.replace(/\/+$/, "")
-      tags.add(`uri:${normalizedURI}`)
-
-      // Add URI index tags for frontend collections
-      if (isFrontendCollection(collection)) {
-        tags.add(`uri-index:${collection}`) // Collection-specific URI index
-        tags.add("uri-index:lookup") // URI resolution dependent caches
-        tags.add("uri-index:item") // Individual item in URI index
-      }
-    }
-
-    // Handle old URI if it changed
-    if (changes.uriChanged && changes.oldUri && previousDoc?.slug) {
-      tags.add(`item:${collection}:${previousDoc.slug}`)
-      const oldNormalizedURI =
-        changes.oldUri === "/" ? "" : changes.oldUri.replace(/\/+$/, "")
-      tags.add(`uri:${oldNormalizedURI}`)
-
-      // Add URI index tags for old URI
-      if (isFrontendCollection(collection)) {
-        tags.add(`uri-index:${collection}`) // Collection-specific URI index
-        tags.add("uri-index:lookup") // URI resolution dependent caches
-      }
-    }
-
-    // Add dependency tags from cache config
-    const config = getCacheConfig(collection)
-    config.dependencies.forEach(dependency => tags.add(dependency))
-
-    // Always revalidate header and footer when collections change
-    // This ensures navigation menus stay up to date
-    tags.add("global:header")
-    tags.add("global:footer")
-  }
-
-  await addCascadeInvalidation(collection, doc, previousDoc, changes, tags)
+  // Legacy behavior - always invalidate header/footer (THE PROBLEM)
+  tags.add("global:header")
+  tags.add("global:footer")
 
   return Array.from(tags)
 }
 
 /*************************************************************************/
-/*  CASCADE INVALIDATION FOR HIERARCHICAL CONTENT
+/*  LEGACY FUNCTIONS - DEPRECATED
 /*************************************************************************/
 
 /**
- * Check if a collection supports URIs (auto-discovered from sitemap configuration)
+ * @deprecated Use surgical invalidation instead
+ * Legacy cascade invalidation with broad dependencies
  */
-function hasURISupport(collection: string): boolean {
+function hasURISupportLegacy(collection: string): boolean {
   return shouldIncludeInSitemap(collection)
 }
 
-async function addCascadeInvalidation(
+/**
+ * @deprecated Use surgical invalidation instead
+ * Legacy cascade invalidation - replaced by surgical dependency analysis
+ */
+async function addCascadeInvalidationLegacy(
   collection: string,
   doc: any,
   previousDoc: any,
   changes: ChangeDetection,
   tags: Set<string>
 ): Promise<void> {
-  if (collection === "templates") {
-    try {
-      const affectedCollections = await getCollectionsUsingTemplate(doc.id)
-      if (affectedCollections.length > 0) {
-        affectedCollections.forEach(collectionName => {
-          tags.add(`collection:${collectionName}`)
-        })
-      }
-    } catch (error) {
-      console.warn(`Template invalidation fallback for ${doc.id}:`, error)
-      const collectionKey = `collection:${collection}`
-      const dependentTargets = getInvalidationTargets(collectionKey)
-      dependentTargets.forEach(target => tags.add(target))
-    }
-  } else {
-    const collectionKey = collection.startsWith("global:")
-      ? collection
-      : `collection:${collection}`
-
-    const dependentTargets = getInvalidationTargets(collectionKey)
-    dependentTargets.forEach(target => tags.add(target))
-  }
-
-  if (hasURISupport(collection)) {
-    tags.add("sitemap:all")
-  }
-
-  if (collection === "global:header") {
-    tags.add("layout:header")
-  }
-  if (collection === "global:footer") {
-    tags.add("layout:footer")
-  }
-
-  if (collection === "pages" && changes.uriChanged) {
-    tags.add(`parent-page:${doc.slug}`)
-    if (previousDoc?.slug) {
-      tags.add(`parent-page:${previousDoc.slug}`)
-    }
-  }
+  console.warn(
+    "addCascadeInvalidationLegacy is deprecated - use surgical invalidation instead"
+  )
+  // Legacy broad invalidation logic kept for reference only
 }
 
-/*************************************************************************/
-/*  PATH REVALIDATION
-/*************************************************************************/
-
-async function revalidatePaths(
+/**
+ * @deprecated Use surgical invalidation instead
+ * Legacy path revalidation - now handled by surgical invalidation
+ */
+async function revalidatePathsLegacy(
   doc: any,
   previousDoc: any,
   changes: ChangeDetection,
   logger?: any
 ): Promise<void> {
-  if (changes.newUri && doc._status === "published") {
-    logger?.info(`Revalidating path: ${changes.newUri}`)
-    revalidatePath(changes.newUri)
-  }
-
-  if (changes.uriChanged && changes.oldUri && previousDoc?._status === "published") {
-    logger?.info(`Revalidating old path: ${changes.oldUri}`)
-    revalidatePath(changes.oldUri)
-  }
+  console.warn("revalidatePathsLegacy is deprecated - use surgical invalidation instead")
 }
 
-/*************************************************************************/
-/*  TAG REVALIDATION
-/*************************************************************************/
-
-async function revalidateTags(tags: string[], logger?: any): Promise<void> {
-  for (const tag of tags) {
-    logger?.info(`Revalidating tag: ${tag}`)
-    revalidateTag(tag)
-  }
+/**
+ * @deprecated Use surgical invalidation instead
+ * Legacy tag revalidation - now handled by surgical invalidation
+ */
+async function revalidateTagsLegacy(tags: string[], logger?: any): Promise<void> {
+  console.warn("revalidateTagsLegacy is deprecated - use surgical invalidation instead")
 }
 
 /*************************************************************************/
@@ -292,42 +187,43 @@ export interface BatchRevalidateOptions {
 }
 
 /**
- * Batch revalidation to handle multiple changes efficiently.
+ * Batch revalidation using surgical invalidation with deduplication
  */
-export async function batchRevalidate(options: BatchRevalidateOptions): Promise<void> {
+export async function batchRevalidate(
+  options: BatchRevalidateOptions
+): Promise<BatchInvalidationSummary> {
   const { operations, logger } = options
 
-  logger?.info(`Starting batch revalidation for ${operations.length} operations`)
+  try {
+    logger?.info(`Starting batch revalidation for ${operations.length} operations`)
 
-  const allTags = new Set<string>()
-  const pathsToRevalidate = new Set<string>()
+    // Convert operations to CollectionChange format
+    const updates: Array<{ collection: string; doc: any; changes: ChangeDetection }> = []
 
-  for (const operation of operations) {
-    const { collection, doc, previousDoc } = operation
-    const changes = detectChanges(doc, previousDoc)
+    for (const operation of operations) {
+      const { collection, doc, previousDoc, action = "update" } = operation
+      const changes = detectChanges(doc, previousDoc, action)
 
-    const tags = await generateRevalidationTags(collection, doc, previousDoc, changes)
-    tags.forEach(tag => allTags.add(tag))
-
-    if (changes.newUri && doc._status === "published") {
-      pathsToRevalidate.add(changes.newUri)
+      if (!shouldSkipInvalidation(doc, changes)) {
+        updates.push({ collection, doc, changes })
+      }
     }
-    if (changes.uriChanged && changes.oldUri && previousDoc?._status === "published") {
-      pathsToRevalidate.add(changes.oldUri)
-    }
-  }
 
-  for (const path of pathsToRevalidate) {
-    logger?.info(`Batch revalidating path: ${path}`)
-    revalidatePath(path)
-  }
+    // Use surgical batch invalidation
+    const result = await revalidateForBatchChanges(updates)
 
-  for (const tag of allTags) {
-    logger?.info(`Batch revalidating tag: ${tag}`)
-    revalidateTag(tag)
-  }
+    logger?.info(`Batch revalidation completed`, {
+      totalOperations: result.totalOperations,
+      uniqueTagsInvalidated: result.uniqueTagsInvalidated,
+      pathsInvalidated: result.pathsInvalidated,
+      totalDuration: result.totalDuration,
+    })
 
-  logger?.info(`Batch revalidation completed`)
+    return result
+  } catch (error) {
+    logger?.error("Batch revalidation failed:", error)
+    throw error
+  }
 }
 
 /*************************************************************************/
@@ -335,26 +231,57 @@ export async function batchRevalidate(options: BatchRevalidateOptions): Promise<
 /*************************************************************************/
 
 /**
- * Revalidate all cached data with a single universal tag
+ * Revalidate all cached data using surgical invalidation emergency mode
  */
 export async function revalidateAll(): Promise<{
   success: boolean
   message: string
+  result?: InvalidationResult
 }> {
   try {
-    revalidateTag("all")
-    revalidateTag("sitemap:all")
-    revalidatePath("/", "layout")
+    const result = await surgicalRevalidateAll("manual-clear-all")
 
     return {
       success: true,
-      message: "All cache cleared successfully using universal 'all' tag",
+      message: `All cache cleared successfully. Invalidated ${result.tagsInvalidated.length} tags in ${result.duration}ms`,
+      result,
     }
   } catch (error) {
     return {
       success: false,
       message: error instanceof Error ? error.message : "Unknown error occurred",
     }
+  }
+}
+
+/*************************************************************************/
+/*  GLOBAL SETTINGS REVALIDATION
+/*************************************************************************/
+
+/**
+ * Revalidate global settings using surgical invalidation
+ */
+export async function revalidateGlobal(
+  globalSlug: string,
+  doc: any,
+  previousDoc: any,
+  logger?: any
+): Promise<InvalidationResult> {
+  try {
+    const changes = detectChanges(doc, previousDoc, "update")
+
+    const result = await revalidateForGlobalChange(globalSlug, doc, previousDoc, changes)
+
+    logger?.info(`Global revalidated: ${globalSlug}`, {
+      tagsInvalidated: result.tagsInvalidated.length,
+      pathsInvalidated: result.pathsInvalidated.length,
+      duration: result.duration,
+    })
+
+    return result
+  } catch (error) {
+    logger?.error(`Global revalidation failed for ${globalSlug}:`, error)
+    throw error
   }
 }
 

@@ -24,3 +24,6 @@ You should know that the tasklist you are looking at is the tip of an iceberg of
 - You might see example code with lots of inline comments that explain stuff within functions etc. I don't like this. Pay attention to my coding rules please and even if you see rules being broken in the tasklist or overview docs, make sure you adjust it to abide.
 - The dev server is ALWAYS running. No need to attempt to start it
 - Do NOT try to build the site. Always ask me
+- Remember that we are making this system DYNAMIC for all cached collections using the isFrontendCollection hook. Make sure you brush up on this system firt. DO NOT hard code collection slug logic - "pages" are different because they are like pages in wordpress. But every other frontend collection is essentiall a custom post type.
+- Mark teh document as you go. BE SURE that you add statuses to the document.
+- Remember that for ANY data fetching patterns from Payload, there is an established pattern throughut teh app which uses teh global cache.ts module. cache.getByURI or cache.getByID etc.
