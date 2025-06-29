@@ -12,10 +12,10 @@ import { getSettings } from "@/lib/data/globals"
   Used to manage all operations related to the URI index.
   URI Index stores the URI of FRONTEND-ONLY collection documents in the URI index.
 
-  - updateURIIndex() - Real-time updates from hooks
-  - deleteFromURIIndex() - Cleanup when documents are deleted
+  - updateURI() - Real-time updates from hooks
+  - deleteURI() - Cleanup when documents are deleted
   - checkURIConflict() - Check if a URI is already taken, with priority based on frontend collections order for conflict resolution.
-  - populateURIIndex() - Populate the URI index with the documents from the frontend collections.
+  - regenerateURIs() - Populate the URI index with the documents from the frontend collections.
 
 
 /*************************************************************************/
@@ -27,37 +27,6 @@ export interface URIIndexUpdate {
   status: "published" | "draft"
   previousURI?: string
   templateId?: string
-}
-
-/*************************************************************************/
-/*  TEMPLATE ID DETECTION FOR COLLECTIONS
-/*************************************************************************/
-
-export async function getTemplateIdForCollection(
-  collection: string
-): Promise<string | null> {
-  try {
-    const settings = await getSettings()
-    const routing = settings?.routing
-
-    if (!routing) return null
-
-    // Determine template field name based on collection
-    const templateField =
-      collection === "pages" ? "pagesDefaultTemplate" : `${collection}SingleTemplate`
-
-    const templateValue = routing[templateField]
-
-    // Handle relationship object or direct ID
-    if (templateValue) {
-      return typeof templateValue === "object" ? templateValue.id : templateValue
-    }
-
-    return null
-  } catch (error) {
-    console.warn(`Failed to get template ID for collection ${collection}:`, error)
-    return null
-  }
 }
 
 /*************************************************************************/
@@ -229,6 +198,37 @@ export async function checkURIConflict(
 }
 
 /*************************************************************************/
+/*  TEMPLATE ID DETECTION FOR COLLECTIONS
+/*************************************************************************/
+
+export async function getTemplateIdForCollection(
+  collection: string
+): Promise<string | null> {
+  try {
+    const settings = await getSettings()
+    const routing = settings?.routing
+
+    if (!routing) return null
+
+    // Determine template field name based on collection
+    const templateField =
+      collection === "pages" ? "pagesDefaultTemplate" : `${collection}SingleTemplate`
+
+    const templateValue = routing[templateField]
+
+    // Handle relationship object or direct ID
+    if (templateValue) {
+      return typeof templateValue === "object" ? templateValue.id : templateValue
+    }
+
+    return null
+  } catch (error) {
+    console.warn(`Failed to get template ID for collection ${collection}:`, error)
+    return null
+  }
+}
+
+/*************************************************************************/
 /*  REGENERATE URIs
 
     Regenerate all URIs for all frontend collections.
@@ -348,11 +348,6 @@ export async function regenerateURIs(): Promise<PopulationStats> {
               templateId,
             }
 
-            console.log(
-              `🔍 Creating URI index entry:`,
-              JSON.stringify(indexData, null, 2)
-            )
-
             await payload.create({
               collection: "uri-index",
               data: indexData,
@@ -369,10 +364,6 @@ export async function regenerateURIs(): Promise<PopulationStats> {
             stats.collections[collection.slug].errors++
           }
         }
-
-        console.log(
-          `   📈 Collection ${collection.slug}: ${stats.collections[collection.slug].populated}/${collectionFound} indexed`
-        )
       } catch (collectionError) {
         console.error(
           `❌ Failed to process collection ${collection.slug}:`,

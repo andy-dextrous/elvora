@@ -137,10 +137,10 @@ export const afterCollectionChange: CollectionAfterChangeHook = async ({
 }) => {
   if (!isFrontendCollection(collection.slug)) return doc
 
-  // Update URI index after document is safely saved with real ID
-  await handleURIIndex(doc, previousDoc, collection, payload)
+  // Step 1, update the uri index for the collection with the correct uri, template, and previous uri
+  await updateURIIndex(doc, previousDoc, collection, payload)
 
-  // Process Dependent Updates - Execute jobs for changes that affect other documents
+  // Step 2, process dependent updates - Execute jobs for changes that affect other documents
   const dependentUpdates = getDependentUpdatesContext(context)
   if (dependentUpdates.length > 0) {
     await processDependentUpdates(dependentUpdates, payload)
@@ -253,7 +253,6 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
       const homepageChange = detectHomepageChange(previousDoc, doc)
 
       if (homepageChange.changed) {
-        console.log(`[Settings Dependent Updates] Homepage change detected`)
         dependentUpdates.push({
           operation: "homepage-change",
           entityId: homepageChange.newHomepage || "unknown",
@@ -267,8 +266,6 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
 
     // Archive Settings Changes - When archive page assignments change, collections need URI updates
     if (settingsChanges.archiveChanges?.length > 0) {
-      console.log(`[Settings Dependent Updates] Archive settings changes detected`)
-
       // Immediately revalidate affected collections
       for (const change of settingsChanges.archiveChanges) {
         await revalidateCollection(change.collection, "archive-page-change")
@@ -332,7 +329,7 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
 /*  UTILITIES
 /*************************************************************************/
 
-async function handleURIIndex(doc: any, previousDoc: any, collection: any, payload: any) {
+async function updateURIIndex(doc: any, previousDoc: any, collection: any, payload: any) {
   try {
     const templateId = await getTemplateIdForCollection(collection.slug)
     const isPublished = doc._status === "published"
