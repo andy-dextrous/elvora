@@ -1,11 +1,11 @@
-import { revalidate } from "@/lib/cache/revalidation"
+import { revalidate, revalidateCollection } from "@/lib/cache/revalidation"
 import { routingEngine } from "@/lib/routing"
 import { updateURI, deleteURI } from "@/lib/routing/index-manager"
 import { getTemplateIdForCollection } from "@/lib/routing/index-manager"
 import {
   shouldTriggerArchiveDependentUpdates,
   shouldTriggerHierarchyDependentUpdates,
-  getCollectionsUsingArchive,
+  getCollectionsFromArchive,
   detectHierarchyChanges,
   detectHomepageChange,
   detectAllSettingsChanges,
@@ -17,6 +17,7 @@ import type {
   CollectionBeforeChangeHook,
   GlobalAfterChangeHook,
 } from "payload"
+import { revalidateTag, revalidatePath } from "next/cache"
 
 /*************************************************************************/
 /*  UNIVERSAL COLLECTION HOOKS
@@ -78,7 +79,7 @@ export const beforeCollectionChange: CollectionBeforeChangeHook = async ({
 
   // Archive Dependent Updates Detection - When archive pages change, all collection items need URI updates
   if (await shouldTriggerArchiveDependentUpdates(collection.slug, data, originalDoc)) {
-    const dependencies = await getCollectionsUsingArchive(data.id)
+    const dependencies = await getCollectionsFromArchive(data.id)
     console.log(
       `[Dependent Updates] Archive page ${data.slug} change will affect ${dependencies.length} collections`
     )
@@ -243,7 +244,6 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
   req: { payload, context },
   global,
 }) => {
-  // Settings Dependent Updates Detection - Global settings changes can affect site-wide URI patterns
   if (global.slug === "settings" && previousDoc) {
     const dependentUpdates = getDependentUpdatesContext(context)
     const settingsChanges = detectAllSettingsChanges(previousDoc, doc)
@@ -268,6 +268,36 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
     // Archive Settings Changes - When archive page assignments change, collections need URI updates
     if (settingsChanges.archiveChanges?.length > 0) {
       console.log(`[Settings Dependent Updates] Archive settings changes detected`)
+
+      // Immediately revalidate affected collections
+      for (const change of settingsChanges.archiveChanges) {
+        await revalidateCollection(change.collection, "archive-page-change")
+
+        // Also revalidate the archive page itself if it exists
+        if (change.newArchive) {
+          try {
+            const archivePage = await payload.findByID({
+              collection: "pages",
+              id: change.newArchive,
+            })
+            if (archivePage) {
+              await revalidate({
+                collection: "pages",
+                doc: archivePage,
+                action: "update",
+                logger: payload.logger,
+              })
+            }
+          } catch (error) {
+            payload.logger.error(
+              `Failed to revalidate archive page ${change.newArchive}:`,
+              error
+            )
+          }
+        }
+      }
+
+      // Queue dependent updates for URI regeneration
       dependentUpdates.push({
         operation: "settings-change",
         entityId: doc.id,
@@ -287,18 +317,10 @@ export const afterGlobalChange: GlobalAfterChangeHook = async ({
     }
   }
 
-  // Revalidation - Clear Next.js cache for global settings changes
-  const isPublished = doc._status === "published"
-  if (context.disableRevalidate || !isPublished) return doc
-
+  // Revalidate the settings global itself
   try {
-    await revalidate({
-      collection: `global:${global.slug}`,
-      doc,
-      previousDoc,
-      action: "update",
-      logger: payload.logger,
-    })
+    revalidateTag(`global:${global.slug}`)
+    payload.logger.info(`Revalidated global:${global.slug}`)
   } catch (error) {
     payload.logger.error(`Revalidation failed for global ${global.slug}:`, error)
   }
@@ -355,33 +377,26 @@ async function handleURIIndex(doc: any, previousDoc: any, collection: any, paylo
   }
 }
 
-async function processDependentUpdates(
-  dependentUpdates: any[],
-  payload: any
-): Promise<void> {
-  for (const update of dependentUpdates) {
-    try {
-      const job = await payload.jobs.queue({
-        task: "dependent-uri-updates",
-        input: update,
-      })
+function needsURIGeneration(data: any, originalDoc: any): boolean {
+  const isPublishing =
+    data._status === "published" && originalDoc?._status !== "published"
+  const isSlugChange =
+    data._status === "published" &&
+    originalDoc?._status === "published" &&
+    data.slug !== originalDoc?.slug
 
-      console.log(
-        `[Dependent Updates] Queued ${update.operation} job (ID: ${job.id}) for entity ${update.entityId}`
-      )
+  return isPublishing || isSlugChange
+}
 
-      // Execute immediately
-      payload.jobs.runByID({ id: job.id! })
-      console.log(
-        `[Dependent Updates] Dispatched ${update.operation} job for immediate execution`
-      )
-    } catch (error) {
-      payload.logger.error(
-        `Failed to queue dependent update job for ${update.operation}:`,
-        error
-      )
-    }
+function getDependentUpdatesContext(context: any): any[] {
+  if (!context.dependentUpdates) {
+    context.dependentUpdates = []
   }
+  return context.dependentUpdates
+}
+
+function clearDependentUpdatesContext(context: any): void {
+  delete context.dependentUpdates
 }
 
 function buildURIUpdate(
@@ -422,24 +437,31 @@ async function queueRetryJob(payload: any, collectionSlug: string, docId: string
   }
 }
 
-function getDependentUpdatesContext(context: any): any[] {
-  if (!context.dependentUpdates) {
-    context.dependentUpdates = []
+async function processDependentUpdates(
+  dependentUpdates: any[],
+  payload: any
+): Promise<void> {
+  for (const update of dependentUpdates) {
+    try {
+      const job = await payload.jobs.queue({
+        task: "dependent-uri-updates",
+        input: update,
+      })
+
+      console.log(
+        `[Dependent Updates] Queued ${update.operation} job (ID: ${job.id}) for entity ${update.entityId}`
+      )
+
+      // Execute immediately
+      payload.jobs.runByID({ id: job.id! })
+      console.log(
+        `[Dependent Updates] Dispatched ${update.operation} job for immediate execution`
+      )
+    } catch (error) {
+      payload.logger.error(
+        `Failed to queue dependent update job for ${update.operation}:`,
+        error
+      )
+    }
   }
-  return context.dependentUpdates
-}
-
-function clearDependentUpdatesContext(context: any): void {
-  delete context.dependentUpdates
-}
-
-function needsURIGeneration(data: any, originalDoc: any): boolean {
-  const isPublishing =
-    data._status === "published" && originalDoc?._status !== "published"
-  const isSlugChange =
-    data._status === "published" &&
-    originalDoc?._status === "published" &&
-    data.slug !== originalDoc?.slug
-
-  return isPublishing || isSlugChange
 }

@@ -27,7 +27,7 @@ export {
 
 // Dependency Analysis - Relationship and impact analysis
 export {
-  getCollectionsUsingArchive,
+  getCollectionsFromArchive as getCollectionsUsingArchive,
   getCollectionItemsForArchive,
   findDescendantPages,
   getDependentUpdatesImpactSize,

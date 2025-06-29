@@ -1,8 +1,5 @@
 import { revalidateTag, revalidatePath } from "next/cache"
-import {
-  analyzeNavigationImpact,
-  getCollectionsUsingArchive,
-} from "./navigation-detection"
+import { getNavigationImpact, getCollectionsUsingArchive } from "./navigation-detection"
 import { routingEngine } from "@/lib/routing"
 import { detectChanges, type ChangeDetection } from "./change-detection"
 
@@ -56,7 +53,6 @@ export async function revalidate(
     const changes = detectChanges(doc, previousDoc, action)
 
     if (shouldSkipInvalidation(doc, changes)) {
-      logger?.info(`Skipping revalidation for ${collection}/${doc.slug || doc.id}`)
       return {
         tagsInvalidated: [],
         pathsInvalidated: [],
@@ -76,7 +72,7 @@ export async function revalidate(
       logger
     )
 
-    logger?.info(`Cache revalidated: ${collection}/${doc.slug || doc.id}`, {
+    logger?.info(`Cache revalidated: ${doc.uri || doc.slug}`, {
       tagsInvalidated: result.tagsInvalidated.length,
       pathsInvalidated: result.pathsInvalidated.length,
       duration: result.duration,
@@ -98,9 +94,6 @@ export async function batchRevalidate(
   const { operations, logger } = options
 
   try {
-    logger?.info(`Starting batch revalidation for ${operations.length} operations`)
-
-    // Convert operations to CollectionChange format
     const updates: Array<{ collection: string; doc: any; changes: ChangeDetection }> = []
 
     for (const operation of operations) {
@@ -114,13 +107,6 @@ export async function batchRevalidate(
 
     // Use surgical batch invalidation
     const result = await revalidateForBatchChanges(updates, logger)
-
-    logger?.info(`Batch revalidation completed`, {
-      totalOperations: result.totalOperations,
-      uniqueTagsInvalidated: result.uniqueTagsInvalidated,
-      pathsInvalidated: result.pathsInvalidated,
-      totalDuration: result.totalDuration,
-    })
 
     return result
   } catch (error) {
@@ -270,7 +256,7 @@ async function revalidateForDocumentChange(
   }
 
   // 4. Smart navigation detection (THE KEY OPTIMIZATION)
-  const navImpact = await analyzeNavigationImpact(collection, doc, changes)
+  const navImpact = await getNavigationImpact(collection, doc, changes)
 
   if (navImpact.affectsHeader) {
     revalidateTag("global:header")
@@ -363,14 +349,12 @@ async function revalidateForBatchChanges(
       logger
     )
 
-    // Deduplicate tags to avoid redundant invalidation
     result.tagsInvalidated = result.tagsInvalidated.filter(tag => {
       if (processedTags.has(tag)) return false
       processedTags.add(tag)
       return true
     })
 
-    // Deduplicate paths
     result.pathsInvalidated = result.pathsInvalidated.filter(path => {
       if (processedPaths.has(path)) return false
       processedPaths.add(path)
@@ -449,14 +433,11 @@ async function revalidateForGlobalChange(
   result.endTime = endTime
   result.duration = new Date(endTime).getTime() - new Date(startTime).getTime()
 
-  // Summary logging
   if (logger && result.tagsInvalidated.length > 0) {
-    logger.info(`🔄 Global cache invalidated for ${globalSlug}:`)
     logger.info(`   Tags: [${result.tagsInvalidated.join(", ")}]`)
     if (result.pathsInvalidated.length > 0) {
       logger.info(`   Paths: [${result.pathsInvalidated.join(", ")}]`)
     }
-    logger.info(`   Duration: ${result.duration}ms`)
   }
 
   return result

@@ -13,7 +13,7 @@ export interface NavigationImpact {
 /*  NAVIGATION IMPACT ANALYSIS
 /*************************************************************************/
 
-export async function analyzeNavigationImpact(
+export async function getNavigationImpact(
   collection: string,
   doc: any,
   changes: ChangeDetection

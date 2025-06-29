@@ -1,5 +1,5 @@
 import {
-  getCollectionsUsingArchive,
+  getCollectionsFromArchive,
   getCollectionItemsForArchive,
   findDescendantPages,
 } from "./dependency-analyzer"
@@ -49,7 +49,7 @@ export async function processArchivePageUpdate(
 
   try {
     // Get all collections that use this page as their archive
-    const dependencies = await getCollectionsUsingArchive(pageId)
+    const dependencies = await getCollectionsFromArchive(pageId)
 
     if (dependencies.length === 0) {
       console.log(`[Dependent Updates] No collections use page ${pageId} as archive`)
