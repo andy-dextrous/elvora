@@ -12,11 +12,7 @@ import { authenticated } from "@/payload/access/authenticated"
 import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublished"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { populateAuthors } from "./hooks/populateAuthors"
-import {
-  beforeCollectionChange,
-  afterCollectionChange,
-  afterCollectionDelete,
-} from "@/payload/hooks/universal-revalidation"
+import { enableFrontend } from "@/payload/collections/frontend"
 
 import {
   MetaDescriptionField,
@@ -25,263 +21,260 @@ import {
   OverviewField,
   PreviewField,
 } from "@payloadcms/plugin-seo/fields"
-import { slugField } from "@/payload/fields/slug"
-import { lockSlugAfterPublish } from "./hooks/lockSlug"
+
 import { anyone } from "@/payload/access/anyone"
 
-export const Posts: CollectionConfig<"posts"> = {
-  slug: "posts",
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
-  },
-  defaultPopulate: {
-    title: true,
-    slug: true,
-    uri: true,
-    categories: true,
-    meta: {
-      image: true,
-      description: true,
+export const Posts: CollectionConfig<"posts"> = enableFrontend(
+  {
+    slug: "posts",
+    access: {
+      create: authenticated,
+      delete: authenticated,
+      read: anyone,
+      update: authenticated,
     },
-  },
-  admin: {
-    defaultColumns: [
-      "title",
-      "featuredImage",
-      "slug",
-      "updatedAt",
-      "categories",
-      "status",
-    ],
-    hideAPIURL: process.env.NODE_ENV === "production",
-    livePreview: {
-      url: ({ data, req }) => {
-        const path = generatePreviewPath({
+    defaultPopulate: {
+      title: true,
+      slug: true,
+      uri: true,
+      categories: true,
+      meta: {
+        image: true,
+        description: true,
+      },
+    },
+    admin: {
+      defaultColumns: [
+        "title",
+        "featuredImage",
+        "slug",
+        "updatedAt",
+        "categories",
+        "status",
+      ],
+      hideAPIURL: process.env.NODE_ENV === "production",
+      livePreview: {
+        url: ({ data, req }) => {
+          const path = generatePreviewPath({
+            slug: typeof data?.slug === "string" ? data.slug : "",
+            collection: "posts",
+            req,
+          })
+
+          return path
+        },
+      },
+      preview: (data, { req }) =>
+        generatePreviewPath({
           slug: typeof data?.slug === "string" ? data.slug : "",
           collection: "posts",
           req,
-        })
-
-        return path
-      },
+        }),
+      useAsTitle: "title",
     },
-    preview: (data, { req }) =>
-      generatePreviewPath({
-        slug: typeof data?.slug === "string" ? data.slug : "",
-        collection: "posts",
-        req,
-      }),
-    useAsTitle: "title",
-  },
-  fields: [
-    {
-      name: "title",
-      type: "text",
-      required: true,
-    },
-    {
-      name: "relatedPosts",
-      type: "relationship",
-      admin: {
-        position: "sidebar",
+    fields: [
+      {
+        name: "title",
+        type: "text",
+        required: true,
       },
-      filterOptions: ({ id, data }) => {
-        const query: any = {
-          id: {
-            not_in: [id],
-          },
-        }
-
-        // If the current post has categories, prioritize posts with matching categories
-        if (
-          data?.categories &&
-          Array.isArray(data.categories) &&
-          data.categories.length > 0
-        ) {
-          const categoryIds = data.categories.map((cat: any) =>
-            typeof cat === "object" ? cat.id : cat
-          )
-
-          query.or = [
-            // First priority: posts with matching categories
-            {
-              categories: {
-                in: categoryIds,
-              },
+      {
+        name: "relatedPosts",
+        type: "relationship",
+        admin: {
+          position: "sidebar",
+        },
+        filterOptions: ({ id, data }) => {
+          const query: any = {
+            id: {
+              not_in: [id],
             },
-            // Second priority: all other posts (as fallback)
-            {
-              categories: {
-                not_in: categoryIds,
-              },
-            },
-          ]
-        }
+          }
 
-        return query
-      },
-      hasMany: true,
-      maxDepth: 2,
-      relationTo: "posts",
-    },
-    {
-      name: "categories",
-      type: "relationship",
-      admin: {
-        position: "sidebar",
-      },
-      hasMany: true,
-      relationTo: "categories",
-    },
-    {
-      name: "heroImage",
-      label: "Featured Image",
-      type: "upload",
-      relationTo: "media",
-      admin: {
-        position: "sidebar",
-      },
-    },
-    {
-      type: "tabs",
-      tabs: [
-        {
-          fields: [
-            {
-              name: "content",
-              type: "richText",
-              editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                  return [
-                    ...rootFeatures,
-                    HeadingFeature({ enabledHeadingSizes: ["h1", "h2", "h3", "h4"] }),
-                    FixedToolbarFeature(),
-                    InlineToolbarFeature(),
-                    HorizontalRuleFeature(),
-                  ]
+          // If the current post has categories, prioritize posts with matching categories
+          if (
+            data?.categories &&
+            Array.isArray(data.categories) &&
+            data.categories.length > 0
+          ) {
+            const categoryIds = data.categories.map((cat: any) =>
+              typeof cat === "object" ? cat.id : cat
+            )
+
+            query.or = [
+              // First priority: posts with matching categories
+              {
+                categories: {
+                  in: categoryIds,
                 },
-              }),
-              label: false,
-            },
-          ],
-          label: "Content",
-        },
-        {
-          name: "meta",
-          label: "SEO",
-          fields: [
-            OverviewField({
-              titlePath: "meta.title",
-              descriptionPath: "meta.description",
-              imagePath: "meta.image",
-            }),
-            MetaTitleField({
-              hasGenerateFn: true,
-            }),
-            MetaImageField({
-              relationTo: "media",
-            }),
+              },
+              // Second priority: all other posts (as fallback)
+              {
+                categories: {
+                  not_in: categoryIds,
+                },
+              },
+            ]
+          }
 
-            MetaDescriptionField({}),
-            PreviewField({
-              hasGenerateFn: true,
-              titlePath: "meta.title",
-              descriptionPath: "meta.description",
-            }),
-            {
-              name: "noIndex",
-              type: "checkbox",
-              label: "No Index",
-              admin: {
-                description:
-                  "Prevent this post from appearing in search engines and sitemaps",
-              },
-            },
-            {
-              name: "canonicalUrl",
-              type: "text",
-              label: "Canonical URL",
-              admin: {
-                description:
-                  "Optional canonical URL for this post (use for republished content)",
-              },
-            },
-          ],
+          return query
         },
-      ],
-    },
-    {
-      name: "publishedAt",
-      type: "date",
-      admin: {
-        date: {
-          pickerAppearance: "dayAndTime",
-        },
-        position: "sidebar",
+        hasMany: true,
+        maxDepth: 2,
+        relationTo: "posts",
       },
-      hooks: {
-        beforeChange: [
-          ({ siblingData, value }) => {
-            if (siblingData._status === "published" && !value) {
-              return new Date()
-            }
-            return value
+      {
+        name: "categories",
+        type: "relationship",
+        admin: {
+          position: "sidebar",
+        },
+        hasMany: true,
+        relationTo: "categories",
+      },
+      {
+        name: "heroImage",
+        label: "Featured Image",
+        type: "upload",
+        relationTo: "media",
+        admin: {
+          position: "sidebar",
+        },
+      },
+      {
+        type: "tabs",
+        tabs: [
+          {
+            fields: [
+              {
+                name: "content",
+                type: "richText",
+                editor: lexicalEditor({
+                  features: ({ rootFeatures }) => {
+                    return [
+                      ...rootFeatures,
+                      HeadingFeature({ enabledHeadingSizes: ["h1", "h2", "h3", "h4"] }),
+                      FixedToolbarFeature(),
+                      InlineToolbarFeature(),
+                      HorizontalRuleFeature(),
+                    ]
+                  },
+                }),
+                label: false,
+              },
+            ],
+            label: "Content",
+          },
+          {
+            name: "meta",
+            label: "SEO",
+            fields: [
+              OverviewField({
+                titlePath: "meta.title",
+                descriptionPath: "meta.description",
+                imagePath: "meta.image",
+              }),
+              MetaTitleField({
+                hasGenerateFn: true,
+              }),
+              MetaImageField({
+                relationTo: "media",
+              }),
+
+              MetaDescriptionField({}),
+              PreviewField({
+                hasGenerateFn: true,
+                titlePath: "meta.title",
+                descriptionPath: "meta.description",
+              }),
+              {
+                name: "noIndex",
+                type: "checkbox",
+                label: "No Index",
+                admin: {
+                  description:
+                    "Prevent this post from appearing in search engines and sitemaps",
+                },
+              },
+              {
+                name: "canonicalUrl",
+                type: "text",
+                label: "Canonical URL",
+                admin: {
+                  description:
+                    "Optional canonical URL for this post (use for republished content)",
+                },
+              },
+            ],
           },
         ],
       },
-    },
-    {
-      name: "authors",
-      type: "relationship",
-      admin: {
-        position: "sidebar",
-      },
-      hasMany: true,
-      relationTo: "users",
-    },
-    // This field is only used to populate the user data via the `populateAuthors` hook
-    // This is because the `user` collection has access control locked to protect user privacy
-    // GraphQL will also not return mutated user data that differs from the underlying schema
-    {
-      name: "populatedAuthors",
-      type: "array",
-      access: {
-        update: () => false,
-      },
-      admin: {
-        disabled: true,
-        readOnly: true,
-      },
-      fields: [
-        {
-          name: "id",
-          type: "text",
+      {
+        name: "publishedAt",
+        type: "date",
+        admin: {
+          date: {
+            pickerAppearance: "dayAndTime",
+          },
+          position: "sidebar",
         },
-        {
-          name: "name",
-          type: "text",
+        hooks: {
+          beforeChange: [
+            ({ siblingData, value }) => {
+              if (siblingData._status === "published" && !value) {
+                return new Date()
+              }
+              return value
+            },
+          ],
         },
-      ],
-    },
-    ...slugField(),
-  ],
-  hooks: {
-    afterChange: [afterCollectionChange],
-    beforeChange: [beforeCollectionChange],
-    afterRead: [populateAuthors],
-    afterDelete: [afterCollectionDelete],
-    beforeOperation: [lockSlugAfterPublish],
-  },
-  versions: {
-    drafts: {
-      autosave: {
-        interval: 100, // We set this interval for optimal live preview
       },
-      schedulePublish: true,
+      {
+        name: "authors",
+        type: "relationship",
+        admin: {
+          position: "sidebar",
+        },
+        hasMany: true,
+        relationTo: "users",
+      },
+      // This field is only used to populate the user data via the `populateAuthors` hook
+      // This is because the `user` collection has access control locked to protect user privacy
+      // GraphQL will also not return mutated user data that differs from the underlying schema
+      {
+        name: "populatedAuthors",
+        type: "array",
+        access: {
+          update: () => false,
+        },
+        admin: {
+          disabled: true,
+          readOnly: true,
+        },
+        fields: [
+          {
+            name: "id",
+            type: "text",
+          },
+          {
+            name: "name",
+            type: "text",
+          },
+        ],
+      },
+    ],
+    hooks: {
+      afterRead: [populateAuthors],
     },
-    maxPerDoc: 50,
+    versions: {
+      drafts: {
+        autosave: {
+          interval: 100, // We set this interval for optimal live preview
+        },
+        schedulePublish: true,
+      },
+      maxPerDoc: 50,
+    },
   },
-}
+  "Posts"
+)

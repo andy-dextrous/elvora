@@ -3,15 +3,10 @@ import type { CollectionConfig } from "payload"
 import { sectionBlocks } from "@/components/sections/config"
 import { authenticated } from "@/payload/access/authenticated"
 import { authenticatedOrPublished } from "@/payload/access/authenticatedOrPublished"
-import { slugField } from "@/payload/fields/slug"
 import { populatePublishedAt } from "@/payload/hooks/populate-published-at"
 import { generatePreviewPath } from "@/utilities/generate-preview-path"
 import { applyDefaultTemplate } from "./hooks/applyDefaultTemplate"
-import {
-  beforeCollectionChange,
-  afterCollectionChange,
-  afterCollectionDelete,
-} from "@/payload/hooks/universal-revalidation"
+import { enableFrontend } from "@/payload/collections/frontend"
 
 import {
   MetaDescriptionField,
@@ -20,156 +15,127 @@ import {
   OverviewField,
   PreviewField,
 } from "@payloadcms/plugin-seo/fields"
-import { lockSlugAfterPublish } from "./hooks/lockSlug"
 
-export const Pages: CollectionConfig<"pages"> = {
-  slug: "pages",
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: authenticatedOrPublished,
-    update: authenticated,
-  },
-  defaultPopulate: {
-    title: true,
-    slug: true,
-    uri: true,
-    breadcrumbs: true,
-  },
-  admin: {
-    defaultColumns: [
-      "title",
-      "featuredImage",
-      "slug",
-      "updatedAt",
-      "id",
-      "categories",
-      "status",
-    ],
-    hideAPIURL: process.env.NODE_ENV === "production",
-    livePreview: {
-      url: ({ data, req }) => {
-        const path = generatePreviewPath({
+export const Pages: CollectionConfig<"pages"> = enableFrontend(
+  {
+    slug: "pages",
+    access: {
+      create: authenticated,
+      delete: authenticated,
+      read: authenticatedOrPublished,
+      update: authenticated,
+    },
+    defaultPopulate: {
+      title: true,
+      slug: true,
+      uri: true,
+      breadcrumbs: true,
+    },
+    admin: {
+      defaultColumns: [
+        "title",
+        "featuredImage",
+        "slug",
+        "updatedAt",
+        "id",
+        "categories",
+        "status",
+      ],
+      hideAPIURL: process.env.NODE_ENV === "production",
+      livePreview: {
+        url: ({ data, req }) => {
+          const path = generatePreviewPath({
+            slug: typeof data?.slug === "string" ? data.slug : "",
+            collection: "pages",
+            req,
+          })
+
+          return path
+        },
+      },
+      preview: (data, { req }) =>
+        generatePreviewPath({
           slug: typeof data?.slug === "string" ? data.slug : "",
           collection: "pages",
           req,
-        })
-
-        return path
+        }),
+      useAsTitle: "title",
+    },
+    fields: [
+      {
+        name: "title",
+        type: "text",
+        required: true,
       },
-    },
-    preview: (data, { req }) =>
-      generatePreviewPath({
-        slug: typeof data?.slug === "string" ? data.slug : "",
-        collection: "pages",
-        req,
-      }),
-    useAsTitle: "title",
-  },
-  fields: [
-    {
-      name: "title",
-      type: "text",
-      required: true,
-    },
-    {
-      name: "publishedAt",
-      type: "date",
-      admin: {
-        position: "sidebar",
-      },
-    },
-    {
-      name: "categories",
-      type: "relationship",
-      admin: {
-        position: "sidebar",
-      },
-      hasMany: true,
-      relationTo: "categories",
-    },
-
-    {
-      type: "tabs",
-      tabs: [
-        {
-          label: "Page Layout",
-          fields: [
-            {
-              name: "sections",
-              label: "Sections",
-              type: "blocks",
-              blocks: sectionBlocks,
-              required: true,
-              admin: {
-                initCollapsed: false,
-              },
-            },
-          ],
-        },
-        {
-          name: "meta",
-          label: "SEO Metadata",
-          fields: [
-            OverviewField({
-              titlePath: "meta.title",
-              descriptionPath: "meta.description",
-              imagePath: "meta.image",
-            }),
-            MetaTitleField({
-              hasGenerateFn: true,
-            }),
-            MetaImageField({
-              relationTo: "media",
-            }),
-            MetaDescriptionField({}),
-            PreviewField({
-              hasGenerateFn: true,
-              titlePath: "meta.title",
-              descriptionPath: "meta.description",
-            }),
-            {
-              name: "noIndex",
-              label: "No Index Page",
-              type: "checkbox",
-              defaultValue: false,
-            },
-            {
-              name: "canonicalUrl",
-              label: "Canonical URL",
-              type: "text",
-            },
-          ],
-        },
-      ],
-    },
-
-    ...slugField(),
-    {
-      name: "templateControl",
-      type: "ui",
-      label: "Apply Template",
-      admin: {
-        position: "sidebar",
-        components: {
-          Field: "@/payload/components/backend/assign-template",
+      {
+        name: "featuredImage",
+        type: "upload",
+        relationTo: "media",
+        admin: {
+          position: "sidebar",
         },
       },
-    },
-  ],
-  hooks: {
-    afterChange: [afterCollectionChange],
-    beforeChange: [populatePublishedAt, applyDefaultTemplate, beforeCollectionChange],
-    afterDelete: [afterCollectionDelete],
-    beforeOperation: [lockSlugAfterPublish],
-  },
-  versions: {
-    drafts: {
-      autosave: {
-        interval: 100, // We set this interval for optimal live preview
+      {
+        name: "categories",
+        type: "relationship",
+        relationTo: "categories",
+        hasMany: true,
+        admin: {
+          position: "sidebar",
+        },
       },
-      schedulePublish: true,
+      {
+        name: "seo",
+        type: "group",
+        fields: [
+          MetaTitleField({
+            hasGenerateFn: true,
+          }),
+          MetaDescriptionField({}),
+          MetaImageField({
+            relationTo: "media",
+          }),
+          OverviewField({
+            titlePath: "meta.title",
+            descriptionPath: "meta.description",
+            imagePath: "meta.image",
+          }),
+          PreviewField({
+            hasGenerateFn: true,
+            titlePath: "meta.title",
+            descriptionPath: "meta.description",
+          }),
+        ],
+      },
+      {
+        name: "sections",
+        type: "blocks",
+        blocks: sectionBlocks,
+      },
+      {
+        name: "templateControl",
+        type: "ui",
+        label: "Apply Template",
+        admin: {
+          position: "sidebar",
+          components: {
+            Field: "@/payload/components/backend/assign-template",
+          },
+        },
+      },
+    ],
+    hooks: {
+      beforeChange: [populatePublishedAt, applyDefaultTemplate],
     },
-    maxPerDoc: 50,
+    versions: {
+      drafts: {
+        autosave: {
+          interval: 100, // We set this interval for optimal live preview
+        },
+        schedulePublish: true,
+      },
+      maxPerDoc: 50,
+    },
   },
-}
+  "Pages"
+)

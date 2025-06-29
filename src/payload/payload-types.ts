@@ -486,38 +486,38 @@ export interface Form {
 export interface Page {
   id: string;
   title: string;
-  publishedAt?: string | null;
+  featuredImage?: (string | null) | Media;
   categories?: (string | Category)[] | null;
-  sections: (
-    | HeroPrimaryBlock
-    | HeroFullBlock
-    | TextImageBlock
-    | CirclesAnimationBlock
-    | ServiceCardsListBlock
-    | TestimonialsBlock
-    | InfoGridBlock
-    | LatestArticlesBlock
-    | FullwidthCtaBlock
-    | GlobeLocationsBlock
-    | ContactFormBlock
-    | CtaFormBlock
-    | HeadingLeftContentBlock
-    | SimpleTextBlock
-    | PostHeroBlock
-    | PostContentBlock
-    | PostsArchiveBlock
-    | RelatedPostsBlock
-  )[];
-  meta?: {
+  seo?: {
     title?: string | null;
+    description?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
     image?: (string | null) | Media;
-    description?: string | null;
-    noIndex?: boolean | null;
-    canonicalUrl?: string | null;
   };
+  sections?:
+    | (
+        | HeroPrimaryBlock
+        | HeroFullBlock
+        | TextImageBlock
+        | CirclesAnimationBlock
+        | ServiceCardsListBlock
+        | TestimonialsBlock
+        | InfoGridBlock
+        | LatestArticlesBlock
+        | FullwidthCtaBlock
+        | GlobeLocationsBlock
+        | ContactFormBlock
+        | CtaFormBlock
+        | HeadingLeftContentBlock
+        | SimpleTextBlock
+        | PostHeroBlock
+        | PostContentBlock
+        | PostsArchiveBlock
+        | RelatedPostsBlock
+      )[]
+    | null;
   slug?: string | null;
   /**
    * Auto-generated on publish based on slug and routing settings
@@ -1034,12 +1034,6 @@ export interface Testimonial {
    * The testimonial quote from the client
    */
   quote: string;
-  slug?: string | null;
-  /**
-   * Auto-generated on publish based on slug and routing settings
-   */
-  uri?: string | null;
-  slugLock?: boolean | null;
   /**
    * Full name of the person giving the testimonial
    */
@@ -1060,6 +1054,12 @@ export interface Testimonial {
    * Mark as featured to prioritize in displays
    */
   featured?: boolean | null;
+  slug?: string | null;
+  /**
+   * Auto-generated on publish based on slug and routing settings
+   */
+  uri?: string | null;
+  slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1608,12 +1608,6 @@ export interface RelatedPostsBlock {
  */
 export interface Team {
   id: string;
-  slug?: string | null;
-  /**
-   * Auto-generated on publish based on slug and routing settings
-   */
-  uri?: string | null;
-  slugLock?: boolean | null;
   name: string;
   email: string;
   /**
@@ -1631,6 +1625,12 @@ export interface Team {
         id?: string | null;
       }[]
     | null;
+  slug?: string | null;
+  /**
+   * Auto-generated on publish based on slug and routing settings
+   */
+  uri?: string | null;
+  slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1697,20 +1697,8 @@ export interface UriIndex {
    */
   document:
     | {
-        relationTo: 'pages';
-        value: string | Page;
-      }
-    | {
-        relationTo: 'posts';
-        value: string | Post;
-      }
-    | {
         relationTo: 'team';
         value: string | Team;
-      }
-    | {
-        relationTo: 'services';
-        value: string | Service;
       }
     | {
         relationTo: 'testimonials';
@@ -2026,8 +2014,15 @@ export interface PayloadMigration {
  */
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
-  publishedAt?: T;
+  featuredImage?: T;
   categories?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   sections?:
     | T
     | {
@@ -2049,15 +2044,6 @@ export interface PagesSelect<T extends boolean = true> {
         'post-content'?: T | PostContentBlockSelect<T>;
         'posts-archive'?: T | PostsArchiveBlockSelect<T>;
         'related-posts'?: T | RelatedPostsBlockSelect<T>;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        image?: T;
-        description?: T;
-        noIndex?: T;
-        canonicalUrl?: T;
       };
   slug?: T;
   uri?: T;
@@ -2448,9 +2434,6 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "team_select".
  */
 export interface TeamSelect<T extends boolean = true> {
-  slug?: T;
-  uri?: T;
-  slugLock?: T;
   name?: T;
   email?: T;
   image?: T;
@@ -2463,6 +2446,9 @@ export interface TeamSelect<T extends boolean = true> {
         url?: T;
         id?: T;
       };
+  slug?: T;
+  uri?: T;
+  slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2519,14 +2505,14 @@ export interface ServicesSelect<T extends boolean = true> {
  */
 export interface TestimonialsSelect<T extends boolean = true> {
   quote?: T;
-  slug?: T;
-  uri?: T;
-  slugLock?: T;
   name?: T;
   title?: T;
   company?: T;
   companyLogo?: T;
   featured?: T;
+  slug?: T;
+  uri?: T;
+  slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -3218,15 +3204,9 @@ export interface Setting {
      * Default template for new pages (if no template is specified)
      */
     pagesDefaultTemplate?: (string | null) | Template;
-    postsCollectionLabel?: string | null;
-    postsArchivePage?: (string | null) | Page;
-    postsSingleTemplate?: (string | null) | Template;
     teamCollectionLabel?: string | null;
     teamArchivePage?: (string | null) | Page;
     teamSingleTemplate?: (string | null) | Template;
-    servicesCollectionLabel?: string | null;
-    servicesArchivePage?: (string | null) | Page;
-    servicesSingleTemplate?: (string | null) | Template;
     testimonialsCollectionLabel?: string | null;
     testimonialsArchivePage?: (string | null) | Page;
     testimonialsSingleTemplate?: (string | null) | Template;
@@ -3390,15 +3370,9 @@ export interface SettingsSelect<T extends boolean = true> {
     | {
         homepage?: T;
         pagesDefaultTemplate?: T;
-        postsCollectionLabel?: T;
-        postsArchivePage?: T;
-        postsSingleTemplate?: T;
         teamCollectionLabel?: T;
         teamArchivePage?: T;
         teamSingleTemplate?: T;
-        servicesCollectionLabel?: T;
-        servicesArchivePage?: T;
-        servicesSingleTemplate?: T;
         testimonialsCollectionLabel?: T;
         testimonialsArchivePage?: T;
         testimonialsSingleTemplate?: T;
