@@ -516,12 +516,18 @@ export async function revalidateForBatchChanges(
 **Goal**: Implement cascade operation detection and Payload Jobs integration
 **Risk**: MEDIUM | **Impact**: HIGH | **Dependencies**: Phase 1
 
-- [ ] **Task 2.1**: Enhance `src/lib/routing/dependency-analyzer.ts` with hierarchy and settings analysis
-- [ ] **Task 2.2**: Create `src/payload/jobs/uri-cascade-handler.ts` with main job handler
-- [ ] **Task 2.3**: Add `cascade-uris` task to Payload config with proper schema
-- [ ] **Task 2.4**: Update `beforeCollectionChange` hook to detect cascade scenarios
-- [ ] **Task 2.5**: Update `afterCollectionChange` hook to queue cascade jobs
-- [ ] **Task 2.6**: Add global settings change hook with cascade detection
+- [x] **Task 2.1**: Enhance `src/lib/routing/dependency-analyzer.ts` with hierarchy and settings analysis
+      ✅ **COMPLETED**: Existing implementation already comprehensive with archive dependency analysis, hierarchy analysis, settings change detection, cascade trigger detection, and impact sizing utilities
+- [x] **Task 2.2**: Create `src/payload/jobs/uri-cascade-handler.ts` with main job handler
+      ✅ **COMPLETED**: Comprehensive cascade handler with archive page updates, hierarchy changes, homepage changes, and settings changes. Includes proper error handling, batch processing, surgical cache invalidation, and performance tracking
+- [x] **Task 2.3**: Add `cascade-uris` task to Payload config with proper schema
+      ✅ **COMPLETED**: Integrated uriCascadeHandler into Payload Jobs with comprehensive input/output schemas, proper error handling (3 retries), and admin interface visibility for monitoring cascade operations
+- [x] **Task 2.4**: Update `beforeCollectionChange` hook to detect cascade scenarios
+      ✅ **COMPLETED**: Enhanced beforeCollectionChange hook with cascade detection for archive page changes, page hierarchy changes, and context storage for cascade job queuing
+- [x] **Task 2.5**: Update `afterCollectionChange` hook to queue cascade jobs
+      ✅ **COMPLETED**: Enhanced afterCollectionChange hook to process cascade operations from context, queue cascade jobs using the cascade-uris task, execute critical operations immediately (homepage changes), and provide comprehensive logging and cleanup
+- [x] **Task 2.6**: Add global settings change hook with cascade detection
+      ✅ **COMPLETED**: Enhanced afterGlobalChange hook with comprehensive settings cascade detection including homepage changes, archive settings changes, immediate execution of critical operations, and proper error handling
 
 **Success Criteria**:
 
