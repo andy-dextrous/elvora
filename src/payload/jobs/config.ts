@@ -1,5 +1,5 @@
 import { PayloadRequest } from "payload"
-import { uriCascadeHandler } from "./uri-cascade-handler"
+import { uriDependentUpdatesHandler } from "./dependency-updates"
 
 const jobs = {
   access: {
@@ -12,14 +12,14 @@ const jobs = {
   tasks: [
     {
       retries: 3,
-      slug: "cascade-uris",
-      handler: uriCascadeHandler,
+      slug: "dependent-uri-updates",
+      handler: uriDependentUpdatesHandler,
       inputSchema: [
         {
           name: "operation",
           type: "text",
           required: true,
-          label: "Cascade Operation Type",
+          label: "Dependent Updates Operation Type",
         },
         {
           name: "entityId",

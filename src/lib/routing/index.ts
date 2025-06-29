@@ -15,22 +15,22 @@ export {
   type PopulationStats,
 } from "./index-manager"
 
-// Cascade Operations - Business logic for URI cascade updates
+// Dependent Updates Operations - Business logic for URI dependent updates
 export {
   processArchivePageUpdate,
   processPageHierarchyUpdate,
   processHomepageChange,
   processSettingsChange,
-  type CascadeResult,
-  type CascadeAdditionalData,
-} from "./cascade-operations"
+  type DependentUpdatesResult,
+  type DependentUpdatesAdditionalData,
+} from "./dependency-updates"
 
 // Dependency Analysis - Relationship and impact analysis
 export {
   getCollectionsUsingArchive,
   getCollectionItemsForArchive,
   findDescendantPages,
-  getCascadeImpactSize,
+  getDependentUpdatesImpactSize,
   detectArchiveChanges,
   detectHierarchyChanges,
   detectHomepageChange,

@@ -51,7 +51,7 @@ export async function getCollectionsUsingArchive(
         collection: setting.collection,
         archivePageId: pageId,
         archivePageSlug: pageSlug,
-        itemCount: 0, // Will be populated during cascade operation
+        itemCount: 0, // Will be populated during dependent updates operation
       })
     }
   }
@@ -174,15 +174,15 @@ export async function getCollectionItemsForArchive(
 /*  DEPENDENCY DETECTION UTILITIES
 /*************************************************************************/
 
-export async function shouldTriggerArchiveCascade(
+export async function shouldTriggerArchiveDependentUpdates(
   collection: string,
   doc: any,
   previousDoc: any
 ): Promise<boolean> {
-  // Only pages can trigger archive cascades
+  // Only pages can trigger archive dependent updates
   if (collection !== "pages") return false
 
-  // Only trigger cascades for published content
+  // Only trigger dependent updates for published content
   if (doc._status !== "published") return false
 
   // Check if this page is used as an archive page
@@ -196,7 +196,7 @@ export async function shouldTriggerArchiveCascade(
   return oldSlug !== newSlug
 }
 
-export async function shouldTriggerHierarchyCascade(
+export async function shouldTriggerHierarchyDependentUpdates(
   collection: string,
   doc: any,
   previousDoc: any
@@ -204,7 +204,7 @@ export async function shouldTriggerHierarchyCascade(
   // Only pages have hierarchy
   if (collection !== "pages") return false
 
-  // Only trigger cascades for published content
+  // Only trigger dependent updates for published content
   if (doc._status !== "published") return false
 
   const hierarchyChanges = detectHierarchyChanges(doc, previousDoc)
@@ -212,10 +212,10 @@ export async function shouldTriggerHierarchyCascade(
 }
 
 /*************************************************************************/
-/*  CASCADE OPERATION UTILITIES
+/*  DEPENDENT UPDATES OPERATION UTILITIES
 /*************************************************************************/
 
-export async function getCascadeImpactSize(
+export async function getDependentUpdatesImpactSize(
   operation: string,
   entityId: string
 ): Promise<number> {

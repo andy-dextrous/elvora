@@ -10,10 +10,10 @@ import { detectChanges } from "@/lib/cache/change-detection"
 import { cache } from "@/lib/cache"
 
 /*************************************************************************/
-/*  CASCADE OPERATION TYPES
+/*  DEPENDENT UPDATES OPERATION TYPES
 /*************************************************************************/
 
-export interface CascadeResult {
+export interface DependentUpdatesResult {
   success: boolean
   documentsUpdated: number
   redirectsCreated: number
@@ -22,7 +22,7 @@ export interface CascadeResult {
   operation: string
 }
 
-export interface CascadeAdditionalData {
+export interface DependentUpdatesAdditionalData {
   oldSlug?: string
   newSlug?: string
   oldParent?: string
@@ -35,8 +35,10 @@ export interface CascadeAdditionalData {
 /*  ARCHIVE PAGE UPDATE PROCESSING
 /*************************************************************************/
 
-export async function processArchivePageUpdate(pageId: string): Promise<CascadeResult> {
-  const result: CascadeResult = {
+export async function processArchivePageUpdate(
+  pageId: string
+): Promise<DependentUpdatesResult> {
+  const result: DependentUpdatesResult = {
     success: false,
     documentsUpdated: 0,
     redirectsCreated: 0,
@@ -50,7 +52,7 @@ export async function processArchivePageUpdate(pageId: string): Promise<CascadeR
     const dependencies = await getCollectionsUsingArchive(pageId)
 
     if (dependencies.length === 0) {
-      console.log(`[URI Cascade] No collections use page ${pageId} as archive`)
+      console.log(`[Dependent Updates] No collections use page ${pageId} as archive`)
       result.success = true
       return result
     }
@@ -66,7 +68,7 @@ export async function processArchivePageUpdate(pageId: string): Promise<CascadeR
     // Process each collection that uses this archive page
     for (const dependency of dependencies) {
       console.log(
-        `[URI Cascade] Processing ${dependency.collection} items for archive ${dependency.archivePageSlug}`
+        `[Dependent Updates] Processing ${dependency.collection} items for archive ${dependency.archivePageSlug}`
       )
 
       const items = await getCollectionItemsForArchive(dependency.collection)
@@ -127,7 +129,7 @@ export async function processArchivePageUpdate(pageId: string): Promise<CascadeR
     result.success = true
   } catch (error) {
     result.errors.push(error instanceof Error ? error.message : String(error))
-    console.error(`[URI Cascade] Archive page update failed:`, error)
+    console.error(`[Dependent Updates] Archive page update failed:`, error)
   }
 
   return result
@@ -137,8 +139,10 @@ export async function processArchivePageUpdate(pageId: string): Promise<CascadeR
 /*  PAGE HIERARCHY UPDATE PROCESSING
 /*************************************************************************/
 
-export async function processPageHierarchyUpdate(pageId: string): Promise<CascadeResult> {
-  const result: CascadeResult = {
+export async function processPageHierarchyUpdate(
+  pageId: string
+): Promise<DependentUpdatesResult> {
+  const result: DependentUpdatesResult = {
     success: false,
     documentsUpdated: 0,
     redirectsCreated: 0,
@@ -152,12 +156,12 @@ export async function processPageHierarchyUpdate(pageId: string): Promise<Cascad
     const descendants = await findDescendantPages(pageId)
 
     if (descendants.length === 0) {
-      console.log(`[URI Cascade] No descendants found for page ${pageId}`)
+      console.log(`[Dependent Updates] No descendants found for page ${pageId}`)
       result.success = true
       return result
     }
 
-    console.log(`[URI Cascade] Processing ${descendants.length} descendant pages`)
+    console.log(`[Dependent Updates] Processing ${descendants.length} descendant pages`)
 
     const batchUpdates = []
 
@@ -217,7 +221,7 @@ export async function processPageHierarchyUpdate(pageId: string): Promise<Cascad
     result.success = true
   } catch (error) {
     result.errors.push(error instanceof Error ? error.message : String(error))
-    console.error(`[URI Cascade] Page hierarchy update failed:`, error)
+    console.error(`[Dependent Updates] Page hierarchy update failed:`, error)
   }
 
   return result
@@ -229,9 +233,9 @@ export async function processPageHierarchyUpdate(pageId: string): Promise<Cascad
 
 export async function processHomepageChange(
   newHomepageId: string,
-  additionalData?: CascadeAdditionalData
-): Promise<CascadeResult> {
-  const result: CascadeResult = {
+  additionalData?: DependentUpdatesAdditionalData
+): Promise<DependentUpdatesResult> {
+  const result: DependentUpdatesResult = {
     success: false,
     documentsUpdated: 0,
     redirectsCreated: 0,
@@ -329,7 +333,7 @@ export async function processHomepageChange(
     result.success = true
   } catch (error) {
     result.errors.push(error instanceof Error ? error.message : String(error))
-    console.error(`[URI Cascade] Homepage change failed:`, error)
+    console.error(`[Dependent Updates] Homepage change failed:`, error)
   }
 
   return result
@@ -341,9 +345,9 @@ export async function processHomepageChange(
 
 export async function processSettingsChange(
   settingsId: string,
-  additionalData?: CascadeAdditionalData
-): Promise<CascadeResult> {
-  const result: CascadeResult = {
+  additionalData?: DependentUpdatesAdditionalData
+): Promise<DependentUpdatesResult> {
+  const result: DependentUpdatesResult = {
     success: false,
     documentsUpdated: 0,
     redirectsCreated: 0,
@@ -354,7 +358,9 @@ export async function processSettingsChange(
 
   try {
     if (!additionalData?.affectedCollections) {
-      console.log(`[URI Cascade] No affected collections specified for settings change`)
+      console.log(
+        `[Dependent Updates] No affected collections specified for settings change`
+      )
       result.success = true
       return result
     }
@@ -363,7 +369,9 @@ export async function processSettingsChange(
 
     // Process each affected collection
     for (const collectionSlug of additionalData.affectedCollections) {
-      console.log(`[URI Cascade] Processing settings change impact on ${collectionSlug}`)
+      console.log(
+        `[Dependent Updates] Processing settings change impact on ${collectionSlug}`
+      )
 
       const items = await getCollectionItemsForArchive(collectionSlug)
 
@@ -423,7 +431,7 @@ export async function processSettingsChange(
     result.success = true
   } catch (error) {
     result.errors.push(error instanceof Error ? error.message : String(error))
-    console.error(`[URI Cascade] Settings change failed:`, error)
+    console.error(`[Dependent Updates] Settings change failed:`, error)
   }
 
   return result

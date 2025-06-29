@@ -1,17 +1,17 @@
-import { getCascadeImpactSize } from "@/lib/routing/dependency-analyzer"
+import { getDependentUpdatesImpactSize } from "@/lib/routing/dependency-analyzer"
 import {
   processArchivePageUpdate,
   processPageHierarchyUpdate,
   processHomepageChange,
   processSettingsChange,
-  type CascadeResult,
-} from "@/lib/routing/cascade-operations"
+  type DependentUpdatesResult,
+} from "@/lib/routing/dependency-updates"
 
 /*************************************************************************/
-/*  CASCADE JOB TYPES
+/*  DEPENDENT UPDATES JOB TYPES
 /*************************************************************************/
 
-export interface CascadeJobInput {
+export interface DependentUpdatesJobInput {
   operation:
     | "archive-page-update"
     | "page-hierarchy-update"
@@ -28,7 +28,7 @@ export interface CascadeJobInput {
   }
 }
 
-export interface CascadeJobOutput {
+export interface DependentUpdatesJobOutput {
   success: boolean
   documentsUpdated: number
   redirectsCreated: number
@@ -40,11 +40,11 @@ export interface CascadeJobOutput {
 }
 
 /*************************************************************************/
-/*  MAIN CASCADE HANDLER (ORCHESTRATION LAYER)
+/*  MAIN DEPENDENT UPDATES HANDLER (ORCHESTRATION LAYER)
 
-    Background job orchestrator for complex URI dependency updates. Handles cascade
-    operations that maintain URI consistency across the entire site when foundational
-    changes occur:
+    Background job orchestrator for complex URI dependency updates. Handles dependent
+    update operations that maintain URI consistency across the entire site when
+    foundational changes occur:
 
     - Archive Page Updates: When archive page slugs change (e.g., /blog → /articles),
       updates all dependent collection items and creates redirects
@@ -61,14 +61,14 @@ export interface CascadeJobOutput {
 
 /*************************************************************************/
 
-export async function uriCascadeHandler({
+export async function uriDependentUpdatesHandler({
   input,
 }: {
-  input: CascadeJobInput
-}): Promise<{ output: CascadeJobOutput }> {
+  input: DependentUpdatesJobInput
+}): Promise<{ output: DependentUpdatesJobOutput }> {
   const { operation, entityId, additionalData } = input
 
-  const result: CascadeJobOutput = {
+  const result: DependentUpdatesJobOutput = {
     success: false,
     documentsUpdated: 0,
     redirectsCreated: 0,
@@ -80,36 +80,36 @@ export async function uriCascadeHandler({
   }
 
   try {
-    result.impactSize = await getCascadeImpactSize(operation, entityId)
+    result.impactSize = await getDependentUpdatesImpactSize(operation, entityId)
 
-    let cascadeResult: CascadeResult
+    let dependentUpdatesResult: DependentUpdatesResult
 
     switch (operation) {
       case "archive-page-update":
-        cascadeResult = await processArchivePageUpdate(entityId)
+        dependentUpdatesResult = await processArchivePageUpdate(entityId)
         break
 
       case "page-hierarchy-update":
-        cascadeResult = await processPageHierarchyUpdate(entityId)
+        dependentUpdatesResult = await processPageHierarchyUpdate(entityId)
         break
 
       case "homepage-change":
-        cascadeResult = await processHomepageChange(entityId, additionalData)
+        dependentUpdatesResult = await processHomepageChange(entityId, additionalData)
         break
 
       case "settings-change":
-        cascadeResult = await processSettingsChange(entityId, additionalData)
+        dependentUpdatesResult = await processSettingsChange(entityId, additionalData)
         break
 
       default:
-        throw new Error(`Unknown cascade operation: ${operation}`)
+        throw new Error(`Unknown dependent updates operation: ${operation}`)
     }
 
-    result.success = cascadeResult.success
-    result.documentsUpdated = cascadeResult.documentsUpdated
-    result.redirectsCreated = cascadeResult.redirectsCreated
-    result.cacheEntriesCleared = cascadeResult.cacheEntriesCleared
-    result.errors = cascadeResult.errors
+    result.success = dependentUpdatesResult.success
+    result.documentsUpdated = dependentUpdatesResult.documentsUpdated
+    result.redirectsCreated = dependentUpdatesResult.redirectsCreated
+    result.cacheEntriesCleared = dependentUpdatesResult.cacheEntriesCleared
+    result.errors = dependentUpdatesResult.errors
   } catch (error) {
     result.errors.push(error instanceof Error ? error.message : String(error))
   }

@@ -130,7 +130,7 @@ export interface Config {
   };
   jobs: {
     tasks: {
-      'cascade-uris': TaskCascadeUris;
+      'dependent-uri-updates': TaskDependentUriUpdates;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -1871,7 +1871,7 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'cascade-uris' | 'schedulePublish';
+        taskSlug: 'inline' | 'dependent-uri-updates' | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -1904,7 +1904,7 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'cascade-uris' | 'schedulePublish') | null;
+  taskSlug?: ('inline' | 'dependent-uri-updates' | 'schedulePublish') | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -3417,9 +3417,9 @@ export interface SettingsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TaskCascade-uris".
+ * via the `definition` "TaskDependent-uri-updates".
  */
-export interface TaskCascadeUris {
+export interface TaskDependentUriUpdates {
   input: {
     operation: string;
     entityId: string;
