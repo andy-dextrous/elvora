@@ -17,61 +17,61 @@ const jobs = {
       inputSchema: [
         {
           name: "operation",
-          type: "text",
+          type: "text" as const,
           required: true,
           label: "Dependent Updates Operation Type",
         },
         {
           name: "entityId",
-          type: "text",
+          type: "text" as const,
           required: true,
           label: "Entity ID",
         },
         {
           name: "additionalData",
-          type: "json",
+          type: "json" as const,
           label: "Additional Data",
         },
       ],
       outputSchema: [
         {
           name: "success",
-          type: "checkbox",
+          type: "checkbox" as const,
           label: "Operation Success",
         },
         {
           name: "documentsUpdated",
-          type: "number",
+          type: "number" as const,
           label: "Documents Updated",
         },
         {
           name: "redirectsCreated",
-          type: "number",
+          type: "number" as const,
           label: "Redirects Created",
         },
         {
           name: "cacheEntriesCleared",
-          type: "number",
+          type: "number" as const,
           label: "Cache Entries Cleared",
         },
         {
           name: "errors",
-          type: "json",
+          type: "json" as const,
           label: "Errors",
         },
         {
           name: "processedAt",
-          type: "text",
+          type: "text" as const,
           label: "Processed At",
         },
         {
           name: "operation",
-          type: "text",
+          type: "text" as const,
           label: "Operation Type",
         },
         {
           name: "impactSize",
-          type: "number",
+          type: "number" as const,
           label: "Impact Size",
         },
       ],
