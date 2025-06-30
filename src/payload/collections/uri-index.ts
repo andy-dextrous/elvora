@@ -1,4 +1,4 @@
-import type { CollectionConfig } from "payload"
+import type { CollectionConfig, CollectionSlug } from "payload"
 import { isAdmin } from "@/payload/access/admin"
 import { frontendCollections } from "@/payload/collections/frontend"
 
@@ -48,7 +48,9 @@ export const URIIndex: CollectionConfig = {
     {
       name: "document",
       type: "relationship",
-      relationTo: frontendCollections.map(collection => collection.slug),
+      relationTo: frontendCollections.map(
+        collection => collection.slug as CollectionSlug
+      ),
       required: true,
       unique: true,
       admin: {

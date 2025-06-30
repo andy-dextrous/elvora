@@ -486,38 +486,39 @@ export interface Form {
 export interface Page {
   id: string;
   title: string;
-  featuredImage?: (string | null) | Media;
   categories?: (string | Category)[] | null;
-  seo?: {
+  sections: (
+    | HeroPrimaryBlock
+    | HeroFullBlock
+    | TextImageBlock
+    | CirclesAnimationBlock
+    | ServiceCardsListBlock
+    | TestimonialsBlock
+    | InfoGridBlock
+    | LatestArticlesBlock
+    | FullwidthCtaBlock
+    | GlobeLocationsBlock
+    | ContactFormBlock
+    | CtaFormBlock
+    | HeadingLeftContentBlock
+    | SimpleTextBlock
+    | PostHeroBlock
+    | PostContentBlock
+    | PostsArchiveBlock
+    | RelatedPostsBlock
+  )[];
+  meta?: {
     title?: string | null;
-    description?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
     image?: (string | null) | Media;
+    description?: string | null;
+    noIndex?: boolean | null;
+    canonicalUrl?: string | null;
   };
-  sections?:
-    | (
-        | HeroPrimaryBlock
-        | HeroFullBlock
-        | TextImageBlock
-        | CirclesAnimationBlock
-        | ServiceCardsListBlock
-        | TestimonialsBlock
-        | InfoGridBlock
-        | LatestArticlesBlock
-        | FullwidthCtaBlock
-        | GlobeLocationsBlock
-        | ContactFormBlock
-        | CtaFormBlock
-        | HeadingLeftContentBlock
-        | SimpleTextBlock
-        | PostHeroBlock
-        | PostContentBlock
-        | PostsArchiveBlock
-        | RelatedPostsBlock
-      )[]
-    | null;
+  publishedAt?: string | null;
+  featuredImage?: (string | null) | Media;
   slug?: string | null;
   /**
    * Auto-generated on publish based on slug and routing settings
@@ -611,7 +612,6 @@ export interface Post {
   title: string;
   relatedPosts?: (string | Post)[] | null;
   categories?: (string | Category)[] | null;
-  heroImage?: (string | null) | Media;
   content?: {
     root: {
       type: string;
@@ -634,16 +634,9 @@ export interface Post {
      */
     image?: (string | null) | Media;
     description?: string | null;
-    /**
-     * Prevent this post from appearing in search engines and sitemaps
-     */
     noIndex?: boolean | null;
-    /**
-     * Optional canonical URL for this post (use for republished content)
-     */
     canonicalUrl?: string | null;
   };
-  publishedAt?: string | null;
   authors?: (string | User)[] | null;
   populatedAuthors?:
     | {
@@ -651,6 +644,8 @@ export interface Post {
         name?: string | null;
       }[]
     | null;
+  publishedAt?: string | null;
+  heroImage?: (string | null) | Media;
   slug?: string | null;
   /**
    * Auto-generated on publish based on slug and routing settings
@@ -717,8 +712,6 @@ export interface Service {
    * Brief description of the service
    */
   description?: string | null;
-  publishedAt?: string | null;
-  featuredImage?: (string | null) | Media;
   sections: (
     | HeroPrimaryBlock
     | HeroFullBlock
@@ -749,6 +742,8 @@ export interface Service {
     noIndex?: boolean | null;
     canonicalUrl?: string | null;
   };
+  publishedAt?: string | null;
+  featuredImage?: (string | null) | Media;
   slug?: string | null;
   /**
    * Auto-generated on publish based on slug and routing settings
@@ -1054,6 +1049,18 @@ export interface Testimonial {
    * Mark as featured to prioritize in displays
    */
   featured?: boolean | null;
+  publishedAt?: string | null;
+  featuredImage?: (string | null) | Media;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+    description?: string | null;
+    noIndex?: boolean | null;
+    canonicalUrl?: string | null;
+  };
   slug?: string | null;
   /**
    * Auto-generated on publish based on slug and routing settings
@@ -1062,6 +1069,7 @@ export interface Testimonial {
   slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1633,6 +1641,7 @@ export interface Team {
   slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2014,15 +2023,7 @@ export interface PayloadMigration {
  */
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
-  featuredImage?: T;
   categories?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
   sections?:
     | T
     | {
@@ -2045,6 +2046,17 @@ export interface PagesSelect<T extends boolean = true> {
         'posts-archive'?: T | PostsArchiveBlockSelect<T>;
         'related-posts'?: T | RelatedPostsBlockSelect<T>;
       };
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+        noIndex?: T;
+        canonicalUrl?: T;
+      };
+  publishedAt?: T;
+  featuredImage?: T;
   slug?: T;
   uri?: T;
   slugLock?: T;
@@ -2403,7 +2415,6 @@ export interface PostsSelect<T extends boolean = true> {
   title?: T;
   relatedPosts?: T;
   categories?: T;
-  heroImage?: T;
   content?: T;
   meta?:
     | T
@@ -2414,7 +2425,6 @@ export interface PostsSelect<T extends boolean = true> {
         noIndex?: T;
         canonicalUrl?: T;
       };
-  publishedAt?: T;
   authors?: T;
   populatedAuthors?:
     | T
@@ -2422,6 +2432,8 @@ export interface PostsSelect<T extends boolean = true> {
         id?: T;
         name?: T;
       };
+  publishedAt?: T;
+  heroImage?: T;
   slug?: T;
   uri?: T;
   slugLock?: T;
@@ -2451,6 +2463,7 @@ export interface TeamSelect<T extends boolean = true> {
   slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2459,8 +2472,6 @@ export interface TeamSelect<T extends boolean = true> {
 export interface ServicesSelect<T extends boolean = true> {
   title?: T;
   description?: T;
-  publishedAt?: T;
-  featuredImage?: T;
   sections?:
     | T
     | {
@@ -2492,6 +2503,8 @@ export interface ServicesSelect<T extends boolean = true> {
         noIndex?: T;
         canonicalUrl?: T;
       };
+  publishedAt?: T;
+  featuredImage?: T;
   slug?: T;
   uri?: T;
   slugLock?: T;
@@ -2510,11 +2523,23 @@ export interface TestimonialsSelect<T extends boolean = true> {
   company?: T;
   companyLogo?: T;
   featured?: T;
+  publishedAt?: T;
+  featuredImage?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+        noIndex?: T;
+        canonicalUrl?: T;
+      };
   slug?: T;
   uri?: T;
   slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3444,8 +3469,16 @@ export interface TaskSchedulePublish {
           value: string | Post;
         } | null)
       | ({
+          relationTo: 'team';
+          value: string | Team;
+        } | null)
+      | ({
           relationTo: 'services';
           value: string | Service;
+        } | null)
+      | ({
+          relationTo: 'testimonials';
+          value: string | Testimonial;
         } | null);
     global?: string | null;
     user?: (string | null) | User;
